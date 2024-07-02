@@ -347,7 +347,7 @@ class _SmoothMatrixDecompositionBase(nn.Module):
             exit()
 
         P = D
-        sig0 = torch.tensor(1.0)
+        sig0 = torch.tensor(5.0)
         sig1 = sig0 * 2
         sig2 = sig0 * 4
         sig3 = sig0 * 6
