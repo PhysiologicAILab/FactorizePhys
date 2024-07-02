@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 30
   LR: 1e-3
-  MODEL_FILE_NAME: UBFC_UBFC_PURE_FactorizePhys_v09_R1_S5_ST4_TanH_NMF
+  MODEL_FILE_NAME: UBFC_UBFC_PURE_FactorizePhys_v09_R1_S1_ST3_TanH_NMF
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -106,8 +106,8 @@ MODEL:
     MD_FSAM: True
     MD_TYPE: "NMF"
     MD_R: 1
-    MD_S: 5
-    MD_STEPS: 4
+    MD_S: 1
+    MD_STEPS: 3
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
