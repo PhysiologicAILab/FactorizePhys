@@ -10,7 +10,7 @@ from torch.nn.modules.batchnorm import _BatchNorm
 import numpy as np
 
 # num_filters
-nf = [8, 16, 16, 16]
+nf = [9, 16, 16, 16]
 
 model_config = {
     "MD_FSAM": True,
@@ -824,30 +824,30 @@ class BVP_Head(nn.Module):
 
             nn.Dropout3d(p=dropout_rate),
 
-            nn.Conv3d(nf[0], nf[0], (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0)),
-            nn.Tanh(),
-            nn.InstanceNorm3d(nf[0])
+            # nn.Conv3d(nf[0], nf[0]//2, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0)),
+            # nn.Tanh(),
+            # nn.InstanceNorm3d(nf[0]//2)
         )
 
         self.final_conv1a = nn.Sequential(
-            nn.Conv1d(nf[0], 1, 3, 1, 1, dilation=1),
+            nn.Conv1d(nf[0]*9, nf[0]//3, 3, 1, 1, dilation=1),
             nn.Tanh(),
-            nn.InstanceNorm1d(1)
+            nn.InstanceNorm1d(nf[0]//3)
         )
 
         self.final_conv1b = nn.Sequential(
-            nn.Conv1d(nf[0], 1, 5, 1, 2, dilation=1),
+            nn.Conv1d(nf[0]*9, nf[0]//3, 5, 1, 2, dilation=1),
             nn.Tanh(),
-            nn.InstanceNorm1d(1)
+            nn.InstanceNorm1d(nf[0]//3)
         )
 
         self.final_conv1c = nn.Sequential(
-            nn.Conv1d(nf[0], 1, 7, 1, 3, dilation=1),
+            nn.Conv1d(nf[0]*9, nf[0]//3, 7, 1, 3, dilation=1),
             nn.Tanh(),
-            nn.InstanceNorm1d(1)
+            nn.InstanceNorm1d(nf[0]//3)
         )
                 
-        self.final_conv = nn.Conv1d(3, 1, 1)
+        self.final_conv = nn.Conv1d(3*nf[0]//3, 1, 3, 1, 1)
 
 
     def forward(self, voxel_embeddings, batch, length):
@@ -888,7 +888,7 @@ class BVP_Head(nn.Module):
         else:
             x = self.conv_decoder(voxel_embeddings)
 
-        x_1d = x.view(-1, nf[0], length)
+        x_1d = x.view(batch, -1, length)
 
         if self.debug:
             print("     x.shape", x.shape)
