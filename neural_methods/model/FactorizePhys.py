@@ -905,7 +905,7 @@ class BVP_Head(nn.Module):
         if self.debug:
             print("     rPPG.shape", rPPG.shape)
         
-        if self.use_fsam:
+        if self.training and self.use_fsam:
             return rPPG, factorized_embeddings, att_mask, appx_error
         else:
             return rPPG
@@ -978,7 +978,7 @@ class FactorizePhys(nn.Module):
         if self.debug:
             print("voxel_embeddings.shape", voxel_embeddings.shape)
         
-        if self.use_fsam:
+        if self.training and self.use_fsam:
             rPPG, factorized_embeddings, att_mask, appx_error = self.rppg_head(voxel_embeddings, batch, length-1)
         else:
             rPPG = self.rppg_head(voxel_embeddings, batch, length-1)
@@ -991,7 +991,7 @@ class FactorizePhys(nn.Module):
         if self.debug:
             print("rPPG.shape", rPPG.shape)
 
-        if self.use_fsam:
+        if self.training and self.use_fsam:
             return rPPG, voxel_embeddings, factorized_embeddings, att_mask, appx_error
         else:
             return rPPG, voxel_embeddings
@@ -1072,7 +1072,7 @@ if __name__ == "__main__":
         appx_error_list = []
         for passes in range(num_trials):
             t0 = time.time()
-            if use_fsam:
+            if net.training and use_fsam:
                 pred, vox_embed, factorized_embed, att_mask, appx_error = net(test_data)
             else:
                 pred, vox_embed = net(test_data)
@@ -1085,7 +1085,7 @@ if __name__ == "__main__":
         plt.plot(time_vec)
         plt.show()
     else:
-        if use_fsam:
+        if net.training and use_fsam:
             pred, vox_embed, factorized_embed, att_mask, appx_error = net(test_data)
             print("Appx error: ", appx_error.item())  # .detach().numpy())
         else:
@@ -1094,7 +1094,7 @@ if __name__ == "__main__":
     # print("-"*100)
     # print(net)
     # print("-"*100)
-
+    '''
     if visualize:
         test_data = test_data.detach().numpy()
         vox_embed = vox_embed.detach().numpy()
@@ -1212,8 +1212,8 @@ if __name__ == "__main__":
 
             plt.show()
             plt.close(fig)
-
     print("pred.shape", pred.shape)
+    '''
 
     pytorch_total_params = sum(p.numel() for p in net.parameters())
     print("Total parameters = ", pytorch_total_params)
