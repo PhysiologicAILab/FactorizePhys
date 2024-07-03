@@ -801,7 +801,6 @@ class encoder_block(nn.Module):
         return x
 
 
-
 class BVP_Head(nn.Module):
     def __init__(self, md_config, device, dropout_rate=0.1, debug=False):
         super(BVP_Head, self).__init__()
@@ -825,10 +824,16 @@ class BVP_Head(nn.Module):
 
             nn.Dropout3d(p=dropout_rate),
 
-            nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0)),
+            nn.Conv3d(nf[0], nf[0], (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0)),
         )
 
-    def forward(self, voxel_embeddings):
+        self.final_conv1 = nn.Conv1d(nf[0], 1, 3, 1, 1)
+        self.final_conv2 = nn.Conv1d(nf[0], 1, 5, 1, 2)
+        self.final_conv3 = nn.Conv1d(nf[0], 1, 7, 1, 3)
+        self.final_conv = nn.Conv1d(3, 1, 3, 1, 2)
+
+
+    def forward(self, voxel_embeddings, length):
 
         if self.debug:
             print("Decoder")
@@ -866,13 +871,23 @@ class BVP_Head(nn.Module):
         else:
             x = self.conv_decoder(voxel_embeddings)
         
+        x_1d = x.view(-1, length)
+
+        x_1d_conv1 = self.final_conv1(x_1d)
+        x_1d_conv2 = self.final_conv2(x_1d)
+        x_1d_conv3 = self.final_conv3(x_1d)
+
+        rPPG = self.final_conv(torch.cat([x_1d_conv1, x_1d_conv2, x_1d_conv3], dim=0))
+
         if self.debug:
-            print("     conv_decoder_x.shape", x.shape)
+            print("     x.shape", x.shape)
+            print("     x_1d.shape", x_1d.shape)
+            print("     rPPG.shape", rPPG.shape)
         
         if self.use_fsam:
-            return x, factorized_embeddings, att_mask, appx_error
+            return rPPG, factorized_embeddings, att_mask, appx_error
         else:
-            return x
+            return rPPG
 
 
 
@@ -943,14 +958,14 @@ class FactorizePhys(nn.Module):
             print("voxel_embeddings.shape", voxel_embeddings.shape)
         
         if self.use_fsam:
-            rppg_feats, factorized_embeddings, att_mask, appx_error = self.rppg_head(voxel_embeddings)
+            rPPG, factorized_embeddings, att_mask, appx_error = self.rppg_head(voxel_embeddings, length-1)
         else:
-            rppg_feats = self.rppg_head(voxel_embeddings)
+            rPPG = self.rppg_head(voxel_embeddings, length-1)
 
-        if self.debug:
-            print("rppg_feats.shape", rppg_feats.shape)
+        # if self.debug:
+        #     print("rppg_feats.shape", rppg_feats.shape)
 
-        rPPG = rppg_feats.view(-1, length-1)
+        # rPPG = rppg_feats.view(-1, length-1)
 
         if self.debug:
             print("rPPG.shape", rPPG.shape)
@@ -993,10 +1008,10 @@ if __name__ == "__main__":
     num_trials = model_config["num_trials"]
     visualize = model_config["visualize"]
 
-    if torch.cuda.is_available():
-        device = torch.device(0)
-    else:
-        device = torch.device("cpu")
+    # if torch.cuda.is_available():
+    #     device = torch.device(0)
+    # else:
+    device = torch.device("cpu")
 
     if visualize:
         np_data = np.load(data_path)
@@ -1016,7 +1031,7 @@ if __name__ == "__main__":
         test_data = torch.cat((test_data, last_frame), 2)
     else:
         # test_data = torch.rand(batch_size, in_channels, frames, height, width).to(device)
-        test_data = torch.rand(batch_size, data_channels, frames + 1, height, width).to(device)
+        test_data = torch.rand(batch_size, data_channels, frames + 1, height, width)
 
     test_data = test_data.to(torch.float32).to(device)
     # print(test_data.shape)
