@@ -825,6 +825,8 @@ class BVP_Head(nn.Module):
             nn.Dropout3d(p=dropout_rate),
 
             nn.Conv3d(nf[0], nf[0], (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0)),
+            nn.Tanh(),
+            nn.InstanceNorm3d(nf[0])
         )
 
         self.final_conv1 = nn.Conv1d(nf[0], 1, 3, 1, 1)
