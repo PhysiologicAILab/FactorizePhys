@@ -824,11 +824,7 @@ class BVP_Head(nn.Module):
 
             nn.Dropout3d(p=dropout_rate),
 
-            nn.Conv3d(nf[0], nf[0], (5, 1, 1), stride=(1, 1, 1), padding=(2, 0, 0)),
-            nn.Tanh(),
-            nn.InstanceNorm3d(nf[0]),
-
-            nn.Conv3d(nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0)),
+            nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0)),
         )
 
 
@@ -853,14 +849,14 @@ class BVP_Head(nn.Module):
             # # Residual connection: 
             # factorized_embeddings = voxel_embeddings + self.fsam_norm(att_mask)
 
-            # # Multiplication
-            # x = torch.mul(voxel_embeddings - voxel_embeddings.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
-            # factorized_embeddings = self.fsam_norm(x)
-
-            # Multiplication with Residual connection
+            # Multiplication
             x = torch.mul(voxel_embeddings - voxel_embeddings.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
             factorized_embeddings = self.fsam_norm(x)
-            factorized_embeddings = voxel_embeddings + factorized_embeddings
+
+            # # Multiplication with Residual connection
+            # x = torch.mul(voxel_embeddings - voxel_embeddings.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
+            # factorized_embeddings = self.fsam_norm(x)
+            # factorized_embeddings = voxel_embeddings + factorized_embeddings
             
             # # Concatenate
             # factorized_embeddings = torch.cat([voxel_embeddings, self.fsam_norm(x)], dim=1)
