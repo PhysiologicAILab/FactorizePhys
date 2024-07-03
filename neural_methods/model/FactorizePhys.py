@@ -777,8 +777,8 @@ class encoder_block(nn.Module):
         self.debug = debug
 
         self.encoder = nn.Sequential(
-            ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 1, 1]),
-            ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 2, 2], [1, 1, 1]),
+            ConvBlock3D(inCh, nf[0], [5, 3, 3], [1, 1, 1], [2, 1, 1]),
+            ConvBlock3D(nf[0], nf[1], [5, 3, 3], [1, 2, 2], [2, 1, 1]),
             ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 1, 1]),
             nn.Dropout3d(p=dropout_rate),
 
@@ -829,10 +829,25 @@ class BVP_Head(nn.Module):
             nn.InstanceNorm3d(nf[0])
         )
 
-        self.final_conv1 = nn.Conv1d(nf[0], 1, 3, 1, 1)
-        self.final_conv2 = nn.Conv1d(nf[0], 1, 5, 1, 2)
-        self.final_conv3 = nn.Conv1d(nf[0], 1, 7, 1, 3)
-        self.final_conv = nn.Conv1d(3, 1, 3, 1, 1)
+        self.final_conv1a = nn.Sequential(
+            nn.Conv1d(nf[0], 1, 3, 1, 1, dilation=1),
+            nn.Tanh(),
+            nn.InstanceNorm1d(1)
+        )
+
+        self.final_conv1b = nn.Sequential(
+            nn.Conv1d(nf[0], 1, 5, 1, 2, dilation=1),
+            nn.Tanh(),
+            nn.InstanceNorm1d(1)
+        )
+
+        self.final_conv1c = nn.Sequential(
+            nn.Conv1d(nf[0], 1, 7, 1, 3, dilation=1),
+            nn.Tanh(),
+            nn.InstanceNorm1d(1)
+        )
+                
+        self.final_conv = nn.Conv1d(3, 1, 1)
 
 
     def forward(self, voxel_embeddings, batch, length):
@@ -879,11 +894,11 @@ class BVP_Head(nn.Module):
             print("     x.shape", x.shape)
             print("     x_1d.shape", x_1d.shape)
 
-        x_1d_conv1 = self.final_conv1(x_1d)
-        x_1d_conv2 = self.final_conv2(x_1d)
-        x_1d_conv3 = self.final_conv3(x_1d)
+        xa = self.final_conv1a(x_1d)
+        xb = self.final_conv1b(x_1d)
+        xc = self.final_conv1c(x_1d)
 
-        rPPG = self.final_conv(torch.cat([x_1d_conv1, x_1d_conv2, x_1d_conv3], dim=1))
+        rPPG = self.final_conv(torch.cat([xa, xb, xc], dim=1))
 
         rPPG = rPPG.view(-1, length)
 
