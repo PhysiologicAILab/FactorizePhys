@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 30
   LR: 1e-3
-  MODEL_FILE_NAME: UBFC_UBFC_PURE_FactorizePhys_v09_R1_S1_ST4_TanH_NMF_Mul_onlyTraining
+  MODEL_FILE_NAME: UBFC_UBFC_PURE_FactorizePhys_Base
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -103,26 +103,10 @@ MODEL:
   FactorizePhys:
     CHANNELS: 3
     FRAME_NUM: 160
-    MD_FSAM: True
-    MD_TYPE: "NMF"
-    MD_R: 1
-    MD_S: 1
-    MD_STEPS: 4
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
     WINDOW_SIZE: 30        # In seconds
-  MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_v01_R1_S1_ST6_ELU_B_Mul_OnesInit_Epoch29.pth"
-  # MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_v01_R1_S4_ST6_ELU_BN_MulRes_Epoch29.pth"
-  # MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_v63_R4_S8_ST6_Mul_II_LR5e-4_Epoch29.pth"
-  # MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_v63_R4_S4_ST5_Mul_II_OnesInit_Grad_Epoch29.pth"
-  # MODEL_PATH : "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_v63_R4_S4_ST4_LR1e-3_Mul_InstanceNorm_Epoch29.pth"
-  # MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_v63_R1_S10_ST4_LR1e-3_Res_Epoch4.pth"
-  # MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_v63_R1_S2_ST4_LR1e-3_Res_Epoch29.pth"
-  # MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_v63_R1_S16_ST6_LR1e-3_Res_Epoch29.pth"
-  # MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_v63_R10_S8_ST6_LR1e-3_NoRes_Epoch29.pth"
-  # MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_v63_R1_S16_ST6_LR1e-3_Res_Epoch29.pth"
-  # MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_v48_R5_S8_ST5_LR1e-3_Epoch29.pth"
-  # MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_v43_R1_S4_ST1_LR1e-4_Epoch11.pth"
+  MODEL_PATH: ""

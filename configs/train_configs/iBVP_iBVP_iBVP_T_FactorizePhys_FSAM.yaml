@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 30
   LR: 1e-3
-  MODEL_FILE_NAME: iBVP_iBVP_iBVP_T_FactorizePhys_v10_R4_S5_ST5_TanH_NMF_Mul
+  MODEL_FILE_NAME: iBVP_iBVP_iBVP_T_FactorizePhys_FSAM
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -111,15 +111,13 @@ MODEL:
     FRAME_NUM: 160
     MD_FSAM: True
     MD_TYPE: "NMF"
-    MD_R: 4
-    MD_S: 5
-    MD_STEPS: 5
+    MD_R: 2
+    MD_S: 1
+    MD_STEPS: 4
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
     WINDOW_SIZE: 30        # In seconds
-  # MODEL_PATH: "./runs/exp/iBVP_RGBT_160_72x72/PreTrainedModels/iBVP_iBVP_iBVP_FactorizePhys_FactorizePhys_v43_R1_S4_ST1_LR1e-4_Epoch29.pth"
-  # MODEL_PATH: "./runs/exp/iBVP_RGBT_160_72x72/PreTrainedModels/iBVP_iBVP_iBVP_FactorizePhys_FactorizePhys_v43_R1_S4_ST1_LR1e-4_Epoch39.pth"
-  MODEL_PATH: "./runs/exp/iBVP_RGBT_160_72x72/PreTrainedModels/iBVP_iBVP_iBVP_T_FactorizePhys_FactorizePhys_T_v63_R4_S4_ST6_LR1e-3_Mul_InstanceNorm_Epoch29.pth"
+  # MODEL_PATH: ""
