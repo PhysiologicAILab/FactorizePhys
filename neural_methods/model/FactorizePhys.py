@@ -14,7 +14,7 @@ nf = [8, 16, 16, 16]
 
 model_config = {
     "MD_FSAM": True,
-    "MD_TYPE": "Smooth_NMF",
+    "MD_TYPE": "NMF",
     "MD_R": 1,
     "MD_S": 1,
     "MD_STEPS": 4,
@@ -830,10 +830,10 @@ class BVP_Head(nn.Module):
         self.final_conv1 = nn.Conv1d(nf[0], 1, 3, 1, 1)
         self.final_conv2 = nn.Conv1d(nf[0], 1, 5, 1, 2)
         self.final_conv3 = nn.Conv1d(nf[0], 1, 7, 1, 3)
-        self.final_conv = nn.Conv1d(3, 1, 3, 1, 2)
+        self.final_conv = nn.Conv1d(3, 1, 3, 1, 1)
 
 
-    def forward(self, voxel_embeddings, length):
+    def forward(self, voxel_embeddings, batch, length):
 
         if self.debug:
             print("Decoder")
@@ -870,18 +870,22 @@ class BVP_Head(nn.Module):
         
         else:
             x = self.conv_decoder(voxel_embeddings)
-        
-        x_1d = x.view(-1, length)
+
+        x_1d = x.view(-1, nf[0], length)
+
+        if self.debug:
+            print("     x.shape", x.shape)
+            print("     x_1d.shape", x_1d.shape)
 
         x_1d_conv1 = self.final_conv1(x_1d)
         x_1d_conv2 = self.final_conv2(x_1d)
         x_1d_conv3 = self.final_conv3(x_1d)
 
-        rPPG = self.final_conv(torch.cat([x_1d_conv1, x_1d_conv2, x_1d_conv3], dim=0))
+        rPPG = self.final_conv(torch.cat([x_1d_conv1, x_1d_conv2, x_1d_conv3], dim=1))
+
+        rPPG = rPPG.view(-1, length)
 
         if self.debug:
-            print("     x.shape", x.shape)
-            print("     x_1d.shape", x_1d.shape)
             print("     rPPG.shape", rPPG.shape)
         
         if self.use_fsam:
@@ -958,9 +962,9 @@ class FactorizePhys(nn.Module):
             print("voxel_embeddings.shape", voxel_embeddings.shape)
         
         if self.use_fsam:
-            rPPG, factorized_embeddings, att_mask, appx_error = self.rppg_head(voxel_embeddings, length-1)
+            rPPG, factorized_embeddings, att_mask, appx_error = self.rppg_head(voxel_embeddings, batch, length-1)
         else:
-            rPPG = self.rppg_head(voxel_embeddings, length-1)
+            rPPG = self.rppg_head(voxel_embeddings, batch, length-1)
 
         # if self.debug:
         #     print("rppg_feats.shape", rppg_feats.shape)
