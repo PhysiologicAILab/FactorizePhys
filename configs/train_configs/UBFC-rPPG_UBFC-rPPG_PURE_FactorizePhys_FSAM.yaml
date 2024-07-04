@@ -107,7 +107,7 @@ MODEL:
     MD_TYPE: "NMF"
     MD_R: 1
     MD_S: 1
-    MD_STEPS: 3
+    MD_STEPS: 2
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
