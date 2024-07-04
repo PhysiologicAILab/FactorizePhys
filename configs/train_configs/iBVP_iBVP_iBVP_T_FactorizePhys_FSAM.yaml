@@ -112,8 +112,8 @@ MODEL:
     MD_FSAM: True
     MD_TYPE: "NMF"
     MD_R: 4
-    MD_S: 1
-    MD_STEPS: 4
+    MD_S: 5
+    MD_STEPS: 5
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
