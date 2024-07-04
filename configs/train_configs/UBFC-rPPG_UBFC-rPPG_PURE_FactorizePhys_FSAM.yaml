@@ -104,10 +104,10 @@ MODEL:
     CHANNELS: 3
     FRAME_NUM: 160
     MD_FSAM: True
-    MD_TYPE: "NMF"
+    MD_TYPE: "Smooth_NMF"
     MD_R: 1
     MD_S: 1
-    MD_STEPS: 3
+    MD_STEPS: 4
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"

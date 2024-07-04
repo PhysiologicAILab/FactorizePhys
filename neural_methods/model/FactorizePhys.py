@@ -10,11 +10,11 @@ from torch.nn.modules.batchnorm import _BatchNorm
 import numpy as np
 
 # num_filters
-nf = [8, 16, 16, 16]
+nf = [8, 8, 8, 8]
 
 model_config = {
     "MD_FSAM": True,
-    "MD_TYPE": "NMF",
+    "MD_TYPE": "Smooth_NMF",
     "MD_R": 1,
     "MD_S": 1,
     "MD_STEPS": 4,
@@ -368,10 +368,10 @@ class _SmoothMatrixDecompositionBase(nn.Module):
         rbfN = torch.ones(P, 1)
 
         rbfs = torch.cat([
-            rbf0[:, torch.arange(0, P, 4)],
-            rbf1[:, torch.arange(0, P, 4)],
-            rbf2[:, torch.arange(0, P, 6)],
-            rbf3[:, torch.arange(0, P, 8)],
+            rbf0[:, torch.arange(0, P, 1)],
+            rbf1[:, torch.arange(0, P, 2)],
+            rbf2[:, torch.arange(0, P, 4)],
+            rbf3[:, torch.arange(0, P, 6)],
             rbf4[:, torch.arange(0, P, 8)],
             rbf5[:, torch.arange(0, P, 10)],
             rbfN,
@@ -834,7 +834,7 @@ class BVP_Head(nn.Module):
             print("Decoder")
             print("     voxel_embeddings.shape", voxel_embeddings.shape)
 
-        if self.training and self.use_fsam:
+        if (self.training or self.debug) and self.use_fsam:
             if "NMF" in self.md_type:
                 att_mask, appx_error = self.fsam(voxel_embeddings - voxel_embeddings.min()) # to make it positive (>= 0)
             else:
@@ -884,7 +884,7 @@ class BVP_Head(nn.Module):
         if self.debug:
             print("     rPPG.shape", rPPG.shape)
         
-        if self.training and self.use_fsam:
+        if (self.training or self.debug) and self.use_fsam:
             return rPPG, factorized_embeddings, att_mask, appx_error
         else:
             return rPPG
@@ -957,7 +957,7 @@ class FactorizePhys(nn.Module):
         if self.debug:
             print("voxel_embeddings.shape", voxel_embeddings.shape)
         
-        if self.training and self.use_fsam:
+        if (self.training or self.debug) and self.use_fsam:
             rPPG, factorized_embeddings, att_mask, appx_error = self.rppg_head(voxel_embeddings, batch, length-1)
         else:
             rPPG = self.rppg_head(voxel_embeddings, batch, length-1)
@@ -970,7 +970,7 @@ class FactorizePhys(nn.Module):
         if self.debug:
             print("rPPG.shape", rPPG.shape)
 
-        if self.training and self.use_fsam:
+        if (self.training or self.debug) and self.use_fsam:
             return rPPG, voxel_embeddings, factorized_embeddings, att_mask, appx_error
         else:
             return rPPG, voxel_embeddings
@@ -1051,7 +1051,7 @@ if __name__ == "__main__":
         appx_error_list = []
         for passes in range(num_trials):
             t0 = time.time()
-            if net.training and use_fsam:
+            if (net.training or debug) and use_fsam:
                 pred, vox_embed, factorized_embed, att_mask, appx_error = net(test_data)
             else:
                 pred, vox_embed = net(test_data)
@@ -1064,7 +1064,7 @@ if __name__ == "__main__":
         plt.plot(time_vec)
         plt.show()
     else:
-        if net.training and use_fsam:
+        if (net.training or debug) and use_fsam:
             pred, vox_embed, factorized_embed, att_mask, appx_error = net(test_data)
             print("Appx error: ", appx_error.item())  # .detach().numpy())
         else:
@@ -1073,7 +1073,7 @@ if __name__ == "__main__":
     # print("-"*100)
     # print(net)
     # print("-"*100)
-    '''
+
     if visualize:
         test_data = test_data.detach().numpy()
         vox_embed = vox_embed.detach().numpy()
@@ -1192,7 +1192,6 @@ if __name__ == "__main__":
             plt.show()
             plt.close(fig)
     print("pred.shape", pred.shape)
-    '''
 
     pytorch_total_params = sum(p.numel() for p in net.parameters())
     print("Total parameters = ", pytorch_total_params)
