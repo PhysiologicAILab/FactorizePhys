@@ -1,7 +1,7 @@
 BASE: ['']
 TOOLBOX_MODE: "train_and_test"  # "train_and_test" or "only_train" or "only_test"
 TRAIN:
-  BATCH_SIZE: 8
+  BATCH_SIZE: 4
   EPOCHS: 30
   LR: 1e-3
   MODEL_FILE_NAME: UBFC_UBFC_PURE_FactorizePhys_Base
@@ -104,7 +104,7 @@ MODEL:
     CHANNELS: 3
     FRAME_NUM: 160
 INFERENCE:
-  BATCH_SIZE: 8
+  BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
