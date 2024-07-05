@@ -10,20 +10,20 @@ from torch.nn.modules.batchnorm import _BatchNorm
 import numpy as np
 
 # num_filters
-nf = [8, 8, 8, 8]
+nf = [4, 8, 8, 8]
 
 model_config = {
     "MD_FSAM": True,
     "MD_TYPE": "NMF",
     "MD_R": 1,
     "MD_S": 1,
-    "MD_STEPS": 3,
+    "MD_STEPS": 4,
     "INV_T": 1,
     "ETA": 0.9,
     "RAND_INIT": True,
     "in_channels": 3,
     "data_channels": 4,
-    "align_channels": nf[3]//2,
+    "align_channels": nf[3]//1,
     "height": 72,
     "weight": 72,
     "batch_size": 2,
@@ -818,13 +818,13 @@ class BVP_Head(nn.Module):
             inC = nf[3]
 
         self.conv_decoder = nn.Sequential(
-            nn.Conv3d(inC, nf[0], (3, 3, 3), stride=(1, 2, 2), padding=(1, 0, 0)),
+            nn.Conv3d(inC, nf[0], (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0)),
             nn.Tanh(),
             nn.InstanceNorm3d(nf[0]),
 
             nn.Dropout3d(p=dropout_rate),
 
-            nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0)),
+            nn.Conv3d(nf[0], 1, (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0)),
         )
 
 

@@ -1,8 +1,8 @@
 BASE: ['']
 TOOLBOX_MODE: "train_and_test"  # "train_and_test" or "only_train" or "only_test"
 TRAIN:
-  BATCH_SIZE: 8
-  EPOCHS: 50
+  BATCH_SIZE: 4
+  EPOCHS: 30
   LR: 1e-3
   MODEL_FILE_NAME: iBVP_iBVP_iBVP_RGBT_FactorizePhys-Base
   PLOT_LOSSES_AND_LR: True
@@ -110,7 +110,7 @@ MODEL:
     CHANNELS: 4
     FRAME_NUM: 256
 INFERENCE:
-  BATCH_SIZE: 8
+  BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length

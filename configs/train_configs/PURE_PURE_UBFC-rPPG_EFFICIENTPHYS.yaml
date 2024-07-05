@@ -1,8 +1,8 @@
 BASE: ['']
 TOOLBOX_MODE: "train_and_test"      # "train_and_test"  or "only_test"
 TRAIN:
-  BATCH_SIZE: 8
-  EPOCHS: 50
+  BATCH_SIZE: 4
+  EPOCHS: 30
   LR: 9e-3
   MODEL_FILE_NAME: PURE_PURE_UBFC_EfficientPhys
   PLOT_LOSSES_AND_LR: True
@@ -103,7 +103,7 @@ MODEL:
   EFFICIENTPHYS:
     FRAME_DEPTH: 20
 INFERENCE:
-  BATCH_SIZE: 8
+  BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
