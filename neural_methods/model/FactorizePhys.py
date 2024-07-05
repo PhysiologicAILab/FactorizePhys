@@ -28,8 +28,8 @@ model_config = {
     "weight": 72,
     "batch_size": 2,
     "frames": 160,
-    "debug": True,
-    "assess_latency": False,
+    "debug": False,
+    "assess_latency": True,
     "num_trials": 20,
     "visualize": False,
     "ckpt_path": "",
@@ -1048,7 +1048,8 @@ if __name__ == "__main__":
 
     if assess_latency:
         time_vec = []
-        appx_error_list = []
+        if debug:
+            appx_error_list = []
         for passes in range(num_trials):
             t0 = time.time()
             if (net.training or debug) and use_fsam:
@@ -1057,10 +1058,12 @@ if __name__ == "__main__":
                 pred, vox_embed = net(test_data)
             t1 = time.time()
             time_vec.append(t1-t0)
-            appx_error_list.append(appx_error.item())
+            if debug:
+                appx_error_list.append(appx_error.item())
 
         print("Median time: ", np.median(time_vec))
-        print("Median error:", np.median(appx_error_list))
+        if debug:
+            print("Median error:", np.median(appx_error_list))
         plt.plot(time_vec)
         plt.show()
     else:
