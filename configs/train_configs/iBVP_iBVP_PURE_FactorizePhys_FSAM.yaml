@@ -110,7 +110,7 @@ MODEL:
     MD_FSAM: True
     MD_TYPE: "NMF"
     MD_R: 1
-    MD_S: 2
+    MD_S: 1
     MD_STEPS: 4
 INFERENCE:
   BATCH_SIZE: 4
