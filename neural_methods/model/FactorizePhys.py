@@ -10,7 +10,7 @@ from torch.nn.modules.batchnorm import _BatchNorm
 import numpy as np
 
 # num_filters
-nf = [4, 8, 8, 8]
+nf = [12, 12, 12, 12]
 
 model_config = {
     "MD_FSAM": True,
@@ -28,8 +28,8 @@ model_config = {
     "weight": 72,
     "batch_size": 2,
     "frames": 160,
-    "debug": False,
-    "assess_latency": True,
+    "debug": True,
+    "assess_latency": False,
     "num_trials": 20,
     "visualize": False,
     "ckpt_path": "",
