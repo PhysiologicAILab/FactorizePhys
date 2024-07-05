@@ -104,16 +104,16 @@ NUM_OF_GPU_TRAIN: 1
 LOG:
   PATH: runs/exp
 MODEL:
-  DROP_RATE: 0.2
+  DROP_RATE: 0.1
   NAME: FactorizePhys
   FactorizePhys:
     CHANNELS: 1
     FRAME_NUM: 160
     MD_FSAM: True
     MD_TYPE: "NMF"
-    MD_R: 2
-    MD_S: 1
-    MD_STEPS: 4
+    MD_R: 4
+    MD_S: 5
+    MD_STEPS: 5
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"

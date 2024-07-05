@@ -102,7 +102,7 @@ NUM_OF_GPU_TRAIN: 1
 LOG:
   PATH: runs/exp
 MODEL:
-  DROP_RATE: 0.2
+  DROP_RATE: 0.1
   NAME: FactorizePhys
   FactorizePhys:
     CHANNELS: 3
