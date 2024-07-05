@@ -10,7 +10,7 @@ from torch.nn.modules.batchnorm import _BatchNorm
 import numpy as np
 
 # num_filters
-nf = [8, 16, 16, 16]
+nf = [6, 12, 12, 12]
 
 model_config = {
     "MD_FSAM": True,
