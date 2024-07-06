@@ -14,7 +14,7 @@ nf = [8, 16, 16, 16]
 
 model_config = {
     "MD_FSAM": True,
-    "MD_TYPE": "Smooth_NMF",
+    "MD_TYPE": "NMF",
     "MD_R": 1,
     "MD_S": 1,
     "MD_STEPS": 4,
@@ -231,8 +231,8 @@ class NMF(_MatrixDecompositionBase):
         self.inv_t = 1
 
     def _build_bases(self, B, S, D, R):
-        # bases = torch.rand((B * S, D, R)).to(self.device)
-        bases = torch.ones((B * S, D, R)).to(self.device)
+        bases = torch.rand((B * S, D, R)).to(self.device)
+        # bases = torch.ones((B * S, D, R)).to(self.device)
         bases = F.normalize(bases, dim=1)
 
         return bases
@@ -502,8 +502,8 @@ class VQ(_MatrixDecompositionBase):
         self.device = device
 
     def _build_bases(self, B, S, D, R):
-        # bases = torch.randn((B * S, D, R)).to(self.device)
-        bases = torch.ones((B * S, D, R)).to(self.device)
+        bases = torch.randn((B * S, D, R)).to(self.device)
+        # bases = torch.ones((B * S, D, R)).to(self.device)
         bases = F.normalize(bases, dim=1)
         return bases
 
@@ -826,7 +826,7 @@ class BVP_Head(nn.Module):
             nn.Tanh(),
             nn.InstanceNorm3d(nf[0]),
 
-            # nn.Dropout3d(p=dropout_rate),
+            nn.Dropout3d(p=dropout_rate),
 
             nn.Conv3d(nf[0], 1, (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),    #B, 1, 160, 1, 1
         )

@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 30
   LR: 1e-3
-  MODEL_FILE_NAME: UBFC_UBFC_PURE_FactorizePhys_FSAM_Smooth
+  MODEL_FILE_NAME: UBFC_UBFC_PURE_FactorizePhys_FSAM_NMF_114
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -104,7 +104,7 @@ MODEL:
     CHANNELS: 3
     FRAME_NUM: 160
     MD_FSAM: True
-    MD_TYPE: "Smooth_NMF"
+    MD_TYPE: "NMF"
     MD_R: 1
     MD_S: 1
     MD_STEPS: 4
