@@ -839,7 +839,8 @@ class BVP_Head(nn.Module):
             print("Decoder")
             print("     voxel_embeddings.shape", voxel_embeddings.shape)
 
-        if (self.training or self.debug) and self.use_fsam:
+        # if (self.training or self.debug) and self.use_fsam:
+        if self.use_fsam:
             if "NMF" in self.md_type:
                 att_mask, appx_error = self.fsam(voxel_embeddings - voxel_embeddings.min()) # to make it positive (>= 0)
             else:
