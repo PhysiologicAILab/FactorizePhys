@@ -13,7 +13,7 @@ import numpy as np
 nf = [8, 16, 16, 16]
 
 model_config = {
-    "MD_FSAM": True,
+    "MD_FSAM": False,
     "MD_TYPE": "NMF",
     "MD_R": 1,
     "MD_S": 1,
@@ -822,13 +822,13 @@ class BVP_Head(nn.Module):
             inC = nf[3]
 
         self.conv_decoder = nn.Sequential(
-            nn.Conv3d(inC, nf[0], (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),  #B, nf[0], 160, 4, 4
+            nn.Conv3d(inC, nf[0], (5, 2, 2), stride=(1, 2, 2), padding=(2, 0, 0), bias=False),  #B, nf[0], 160, 3, 3
             nn.Tanh(),
             nn.InstanceNorm3d(nf[0]),
 
             nn.Dropout3d(p=dropout_rate),
 
-            nn.Conv3d(nf[0], 1, (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),    #B, 1, 160, 1, 1
+            nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),    #B, 1, 160, 1, 1
         )
 
     def forward(self, voxel_embeddings, batch, length):
