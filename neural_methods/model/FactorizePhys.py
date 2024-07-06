@@ -10,7 +10,7 @@ from torch.nn.modules.batchnorm import _BatchNorm
 import numpy as np
 
 # num_filters
-nf = [6, 12, 12, 12]
+nf = [8, 16, 16, 16]
 
 model_config = {
     "MD_FSAM": True,
@@ -775,24 +775,24 @@ class encoder_block(nn.Module):
         # inCh, out_channel, kernel_size, stride, padding
 
         self.debug = debug
-
+        #                                                        Input: #B, inCh, 160, 72, 72
         self.encoder1 = nn.Sequential(
-            ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),
-            ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]),
-            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]),
+            ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),  #B, nf[0], 160, 70, 70
+            ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 160, 34, 34
+            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 32, 32
             nn.Dropout3d(p=dropout_rate),
 
-            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]),
-            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 2, 2], [1, 0, 0]),
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]),
+            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 30, 30
+            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 14, 14
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 12, 12
             nn.Dropout3d(p=dropout_rate)
         )
 
         self.encoder2 = nn.Sequential(
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]),
-            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]),
-            # nn.Dropout3d(p=dropout_rate),
-            # ConvBlock3D(nf[3], nf[3], [3, 1, 1], [1, 1, 1], [1, 0, 0]),
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 10, 10
+            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 8, 8
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 6, 6
+            nn.Dropout3d(p=dropout_rate)
         )
 
     def forward(self, x):
@@ -822,13 +822,13 @@ class BVP_Head(nn.Module):
             inC = nf[3]
 
         self.conv_decoder = nn.Sequential(
-            nn.Conv3d(inC, nf[0], (3, 4, 4), stride=(1, 2, 2), padding=(1, 0, 0), bias=False),
+            nn.Conv3d(inC, nf[0], (3, 3, 3), stride=(1, 3, 3), padding=(1, 0, 0), bias=False),
             nn.Tanh(),
             nn.InstanceNorm3d(nf[0]),
 
             nn.Dropout3d(p=dropout_rate),
 
-            nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),
+            nn.Conv3d(nf[0], 1, (3, 2, 2), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),
         )
 
         # self.align_length = nn.Upsample((md_config["FRAME_NUM"], 1, 1))
@@ -839,8 +839,8 @@ class BVP_Head(nn.Module):
             print("Decoder")
             print("     voxel_embeddings.shape", voxel_embeddings.shape)
 
-        # if (self.training or self.debug) and self.use_fsam:
-        if self.use_fsam:
+        # if self.use_fsam:
+        if (self.training or self.debug) and self.use_fsam:
             if "NMF" in self.md_type:
                 att_mask, appx_error = self.fsam(voxel_embeddings - voxel_embeddings.min()) # to make it positive (>= 0)
             else:
