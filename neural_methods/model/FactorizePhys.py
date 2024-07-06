@@ -10,7 +10,7 @@ from torch.nn.modules.batchnorm import _BatchNorm
 import numpy as np
 
 # num_filters
-nf = [12, 16, 16, 16]
+nf = [12, 12, 12, 12]
 
 model_config = {
     "MD_FSAM": True,
@@ -822,13 +822,13 @@ class BVP_Head(nn.Module):
             inC = nf[3]
 
         self.conv_decoder = nn.Sequential(
-            nn.Conv3d(inC, nf[0], (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),
+            nn.Conv3d(inC, nf[0], (3, 6, 6), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),  #B, nf[0], 160, 1, 1
             nn.Tanh(),
             nn.InstanceNorm3d(nf[0]),
 
-            nn.Dropout3d(p=dropout_rate),
+            # nn.Dropout3d(p=dropout_rate),
 
-            nn.Conv3d(nf[0], 1, (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),
+            nn.Conv3d(nf[0], 1, (1, 1, 1), stride=(1, 1, 1), padding=(0, 0, 0), bias=False),    #B, 1, 160, 1, 1
         )
 
     def forward(self, voxel_embeddings, batch, length):
