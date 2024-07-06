@@ -760,7 +760,7 @@ class ConvBlock3D(nn.Module):
     def __init__(self, in_channel, out_channel, kernel_size, stride, padding):
         super(ConvBlock3D, self).__init__()
         self.conv_block_3d = nn.Sequential(
-            nn.Conv3d(in_channel, out_channel, kernel_size, stride, padding=padding, bias=False),
+            nn.Conv3d(in_channel, out_channel, kernel_size, stride, padding=padding, bias=True),
             nn.Tanh(),
             nn.InstanceNorm3d(out_channel),
         )
@@ -822,16 +822,14 @@ class BVP_Head(nn.Module):
             inC = nf[3]
 
         self.conv_decoder = nn.Sequential(
-            nn.Conv3d(inC, nf[0], (3, 3, 3), stride=(1, 3, 3), padding=(1, 0, 0), bias=False),
+            nn.Conv3d(inC, nf[0], (3, 3, 3), stride=(1, 3, 3), padding=(1, 0, 0), bias=True),
             nn.Tanh(),
             nn.InstanceNorm3d(nf[0]),
 
             nn.Dropout3d(p=dropout_rate),
 
-            nn.Conv3d(nf[0], 1, (3, 2, 2), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),
+            nn.Conv3d(nf[0], 1, (3, 2, 2), stride=(1, 1, 1), padding=(1, 0, 0), bias=True),
         )
-
-        # self.align_length = nn.Upsample((md_config["FRAME_NUM"], 1, 1))
 
     def forward(self, voxel_embeddings, batch, length):
 
@@ -871,21 +869,6 @@ class BVP_Head(nn.Module):
         
         else:
             x = self.conv_decoder(voxel_embeddings)
-
-        # x_1d = x.view(batch, -1, length)
-
-        # if self.debug:
-        #     print("     x.shape", x.shape)
-        #     print("     x_1d.shape", x_1d.shape)
-
-        # xa = self.final_conv1a(x_1d)
-        # xb = self.final_conv1b(x_1d)
-        # xc = self.final_conv1c(x_1d)
-
-        # rPPG = self.final_conv(torch.cat([xa, xb, xc], dim=1))
-        # rPPG = rPPG.view(-1, length)
-        
-        # x = self.align_length(x)
 
         rPPG = x.view(-1, length)
 
