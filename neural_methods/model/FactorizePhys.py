@@ -843,9 +843,7 @@ class BVP_Head(nn.Module):
             print("Decoder")
             print("     voxel_embeddings.shape", voxel_embeddings.shape)
 
-        # if self.use_fsam:
-        # if (self.training or self.debug) and self.use_fsam:
-        if (self.md_infer or self.debug) and self.use_fsam:
+        if (self.md_infer or self.training or self.debug) and self.use_fsam:
             if "NMF" in self.md_type:
                 att_mask, appx_error = self.fsam(voxel_embeddings - voxel_embeddings.min()) # to make it positive (>= 0)
             else:
@@ -882,8 +880,7 @@ class BVP_Head(nn.Module):
         if self.debug:
             print("     rPPG.shape", rPPG.shape)
         
-        # if (self.training or self.debug) and self.use_fsam:
-        if (self.md_infer or self.debug) and self.use_fsam:
+        if (self.md_infer or self.training or self.debug) and self.use_fsam:
             return rPPG, factorized_embeddings, att_mask, appx_error
         else:
             return rPPG
@@ -958,8 +955,7 @@ class FactorizePhys(nn.Module):
         #     print("hidden_embeddings.shape", hidden_embeddings.shape)
         #     print("voxel_embeddings.shape", voxel_embeddings.shape)
         
-        # if (self.training or self.debug) and self.use_fsam:
-        if (self.md_infer or self.debug) and self.use_fsam:
+        if (self.md_infer or self.training or self.debug) and self.use_fsam:
             rPPG, factorized_embeddings, att_mask, appx_error = self.rppg_head(voxel_embeddings, batch, length-1)
         else:
             rPPG = self.rppg_head(voxel_embeddings, batch, length-1)
@@ -972,8 +968,7 @@ class FactorizePhys(nn.Module):
         if self.debug:
             print("rPPG.shape", rPPG.shape)
 
-        # if (self.training or self.debug) and self.use_fsam:
-        if (self.md_infer or self.debug) and self.use_fsam:
+        if (self.md_infer or self.training or self.debug) and self.use_fsam:
             return rPPG, voxel_embeddings, factorized_embeddings, att_mask, appx_error
         else:
             return rPPG, voxel_embeddings
@@ -1060,7 +1055,7 @@ if __name__ == "__main__":
             appx_error_list = []
         for passes in range(num_trials):
             t0 = time.time()
-            if (md_infer or debug) and use_fsam:
+            if (md_infer or net.training or debug) and use_fsam:
                 pred, vox_embed, factorized_embed, att_mask, appx_error = net(test_data)
             else:
                 pred, vox_embed = net(test_data)
@@ -1075,7 +1070,7 @@ if __name__ == "__main__":
         plt.plot(time_vec)
         plt.show()
     else:
-        if (md_infer or debug) and use_fsam:
+        if (md_infer or net.training or debug) and use_fsam:
             pred, vox_embed, factorized_embed, att_mask, appx_error = net(test_data)
             print("Appx error: ", appx_error.item())  # .detach().numpy())
         else:
@@ -1088,7 +1083,7 @@ if __name__ == "__main__":
     if visualize:
         test_data = test_data.detach().numpy()
         vox_embed = vox_embed.detach().numpy()
-        if (md_infer or debug) and use_fsam:
+        if (md_infer or net.training or debug) and use_fsam:
             factorized_embed = factorized_embed.detach().numpy()
             att_mask = att_mask.detach().numpy()
 
@@ -1096,7 +1091,7 @@ if __name__ == "__main__":
         b, ch, enc_frames, enc_height, enc_width = vox_embed.shape
         # exit()
         for ch in range(vox_embed.shape[1]):
-            if (md_infer or debug) and use_fsam:
+            if (md_infer or net.training or debug) and use_fsam:
                 fig, ax = plt.subplots(9, 4, layout="tight")
             else:
                 fig, ax = plt.subplots(9, 2, layout="tight")
@@ -1106,7 +1101,7 @@ if __name__ == "__main__":
             ax[0, 0].axis('off')
             ax[0, 1].imshow(vox_embed[0, ch, frame, :, :])
             ax[0, 1].axis('off')
-            if (md_infer or debug) and use_fsam:
+            if (md_infer or net.training or debug) and use_fsam:
                 ax[0, 2].imshow(factorized_embed[0, ch, frame, :, :])
                 ax[0, 2].axis('off')
                 ax[0, 3].imshow(att_mask[0, ch, frame, :, :])
@@ -1117,7 +1112,7 @@ if __name__ == "__main__":
             ax[1, 0].axis('off')
             ax[1, 1].imshow(vox_embed[0, ch, frame//4, :, :])
             ax[1, 1].axis('off')
-            if (md_infer or debug) and use_fsam:
+            if (md_infer or net.training or debug) and use_fsam:
                 ax[1, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
                 ax[1, 2].axis('off')
                 ax[1, 3].imshow(att_mask[0, ch, frame//4, :, :])
@@ -1128,7 +1123,7 @@ if __name__ == "__main__":
             ax[2, 0].axis('off')
             ax[2, 1].imshow(vox_embed[0, ch, frame//4, :, :])
             ax[2, 1].axis('off')
-            if (md_infer or debug) and use_fsam:
+            if (md_infer or net.training or debug) and use_fsam:
                 ax[2, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
                 ax[2, 2].axis('off')
                 ax[2, 3].imshow(att_mask[0, ch, frame//4, :, :])
@@ -1139,7 +1134,7 @@ if __name__ == "__main__":
             ax[3, 0].axis('off')
             ax[3, 1].imshow(vox_embed[0, ch, frame//4, :, :])
             ax[3, 1].axis('off')
-            if (md_infer or debug) and use_fsam:
+            if (md_infer or net.training or debug) and use_fsam:
                 ax[3, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
                 ax[3, 2].axis('off')
                 ax[3, 3].imshow(att_mask[0, ch, frame//4, :, :])
@@ -1150,7 +1145,7 @@ if __name__ == "__main__":
             ax[4, 0].axis('off')
             ax[4, 1].imshow(vox_embed[0, ch, frame//4, :, :])
             ax[4, 1].axis('off')
-            if (md_infer or debug) and use_fsam:
+            if (md_infer or net.training or debug) and use_fsam:
                 ax[4, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
                 ax[4, 2].axis('off')
                 ax[4, 3].imshow(att_mask[0, ch, frame//4, :, :])
@@ -1161,7 +1156,7 @@ if __name__ == "__main__":
             ax[5, 0].axis('off')
             ax[5, 1].imshow(vox_embed[0, ch, frame//4, :, :])
             ax[5, 1].axis('off')
-            if (md_infer or debug) and use_fsam:
+            if (md_infer or net.training or debug) and use_fsam:
                 ax[5, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
                 ax[5, 2].axis('off')
                 ax[5, 3].imshow(att_mask[0, ch, frame//4, :, :])
@@ -1172,7 +1167,7 @@ if __name__ == "__main__":
             ax[6, 0].axis('off')
             ax[6, 1].imshow(vox_embed[0, ch, frame//4, :, :])
             ax[6, 1].axis('off')
-            if (md_infer or debug) and use_fsam:
+            if (md_infer or net.training or debug) and use_fsam:
                 ax[6, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
                 ax[6, 2].axis('off')
                 ax[6, 3].imshow(att_mask[0, ch, frame//4, :, :])
@@ -1183,7 +1178,7 @@ if __name__ == "__main__":
             ax[7, 0].axis('off')
             ax[7, 1].imshow(vox_embed[0, ch, frame//4, :, :])
             ax[7, 1].axis('off')
-            if (md_infer or debug) and use_fsam:
+            if (md_infer or net.training or debug) and use_fsam:
                 ax[7, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
                 ax[7, 2].axis('off')
                 ax[7, 3].imshow(att_mask[0, ch, frame//4, :, :])
@@ -1194,7 +1189,7 @@ if __name__ == "__main__":
             ax[8, 0].axis('off')
             ax[8, 1].imshow(vox_embed[0, ch, frame//4, :, :])
             ax[8, 1].axis('off')
-            if (md_infer or debug) and use_fsam:
+            if (md_infer or net.training or debug) and use_fsam:
                 ax[8, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
                 ax[8, 2].axis('off')
                 ax[8, 3].imshow(att_mask[0, ch, frame//4, :, :])

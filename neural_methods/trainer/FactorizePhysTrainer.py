@@ -45,6 +45,10 @@ class FactorizePhysTrainer(BaseTrainer):
         md_config["MD_R"] = self.config.MODEL.FactorizePhys.MD_R
         md_config["MD_STEPS"] = self.config.MODEL.FactorizePhys.MD_STEPS
         md_config["MD_INFERENCE"] = self.config.MODEL.FactorizePhys.MD_INFERENCE
+
+        self.md_infer = self.config.MODEL.FactorizePhys.MD_INFERENCE
+        self.use_fsam = self.config.MODEL.FactorizePhys.MD_FSAM
+
         self.model = FactorizePhys(frames=frames, md_config=md_config, in_channels=in_channels,
                                 dropout=self.dropout_rate, device=self.device)  # [3, T, 128,128]
 
@@ -100,7 +104,7 @@ class FactorizePhysTrainer(BaseTrainer):
                 # labels[torch.isnan(labels)] = 0
 
                 self.optimizer.zero_grad()
-                if self.model.training and self.config.MODEL.FactorizePhys.MD_FSAM:
+                if self.model.training and self.use_fsam:
                     pred_ppg, vox_embed, factorized_embed, att_mask, appx_error = self.model(data)
                 else:
                     pred_ppg, vox_embed = self.model(data)
@@ -116,7 +120,7 @@ class FactorizePhysTrainer(BaseTrainer):
                         f'[{epoch}, {idx + 1:5d}] loss: {running_loss / 100:.3f}')
                     running_loss = 0.0
                 train_loss.append(loss.item())
-                if self.config.MODEL.FactorizePhys.MD_FSAM:
+                if self.use_fsam:
                     appx_error_list.append(appx_error.item())
 
                 # Append the current learning rate to the list
@@ -125,14 +129,14 @@ class FactorizePhysTrainer(BaseTrainer):
                 self.optimizer.step()
                 self.scheduler.step()
                 
-                if self.config.MODEL.FactorizePhys.MD_FSAM:
+                if self.use_fsam:
                     tbar.set_postfix({"appx_error": appx_error.item()}, loss=loss.item())
                 else:
                     tbar.set_postfix(loss=loss.item())
 
             # Append the mean training loss for the epoch
             mean_training_losses.append(np.mean(train_loss))
-            if self.config.MODEL.FactorizePhys.MD_FSAM:
+            if self.use_fsam:
                 mean_appx_error.append(np.mean(appx_error_list))
                 print("Mean train loss: {}, Mean appx error: {}".format(
                     np.mean(train_loss), np.mean(appx_error_list)))
@@ -184,20 +188,20 @@ class FactorizePhysTrainer(BaseTrainer):
                 # labels = labels/ torch.std(labels)  # normalize
                 # labels[torch.isnan(labels)] = 0
 
-                # if self.config.MODEL.FactorizePhys.MD_FSAM:
-                #     pred_ppg, vox_embed, factorized_embed, att_mask, appx_error = self.model(data)
-                # else:
-                pred_ppg, vox_embed = self.model(data)
+                if self.md_infer and self.use_fsam:
+                    pred_ppg, vox_embed, factorized_embed, att_mask, appx_error = self.model(data)
+                else:
+                    pred_ppg, vox_embed = self.model(data)
                 pred_ppg = (pred_ppg - torch.mean(pred_ppg)) / torch.std(pred_ppg)  # normalize
                 loss = self.criterion(pred_ppg, labels)
 
                 valid_loss.append(loss.item())
                 valid_step += 1
                 # vbar.set_postfix(loss=loss.item())
-                # if self.config.MODEL.FactorizePhys.MD_FSAM:
-                #     vbar.set_postfix({"appx_error": appx_error.item()}, loss=loss.item())
-                # else:
-                vbar.set_postfix(loss=loss.item())
+                if self.md_infer and self.use_fsam:
+                    vbar.set_postfix({"appx_error": appx_error.item()}, loss=loss.item())
+                else:
+                    vbar.set_postfix(loss=loss.item())
             valid_loss = np.asarray(valid_loss)
         return np.mean(valid_loss)
 
@@ -250,10 +254,10 @@ class FactorizePhysTrainer(BaseTrainer):
                 # labels_test = labels_test/ torch.std(labels_test)  # normalize
                 # labels_test[torch.isnan(labels_test)] = 0
 
-                # if self.config.MODEL.FactorizePhys.MD_FSAM:
-                #     pred_ppg_test, vox_embed, factorized_embed, att_mask, appx_error = self.model(data)
-                # else:
-                pred_ppg_test, vox_embed = self.model(data)
+                if self.md_infer and self.use_fsam:
+                    pred_ppg_test, vox_embed, factorized_embed, att_mask, appx_error = self.model(data)
+                else:
+                    pred_ppg_test, vox_embed = self.model(data)
                 pred_ppg_test = (pred_ppg_test - torch.mean(pred_ppg_test)) / torch.std(pred_ppg_test)  # normalize
 
                 if self.config.TEST.OUTPUT_SAVE_DIR:
