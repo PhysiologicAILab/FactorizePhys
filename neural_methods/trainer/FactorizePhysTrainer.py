@@ -44,6 +44,7 @@ class FactorizePhysTrainer(BaseTrainer):
         md_config["MD_S"] = self.config.MODEL.FactorizePhys.MD_S
         md_config["MD_R"] = self.config.MODEL.FactorizePhys.MD_R
         md_config["MD_STEPS"] = self.config.MODEL.FactorizePhys.MD_STEPS
+        md_config["MD_INFERENCE"] = self.config.MODEL.FactorizePhys.MD_INFERENCE
         self.model = FactorizePhys(frames=frames, md_config=md_config, in_channels=in_channels,
                                 dropout=self.dropout_rate, device=self.device)  # [3, T, 128,128]
 

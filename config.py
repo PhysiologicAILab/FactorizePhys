@@ -307,6 +307,7 @@ _C.MODEL.FactorizePhys.MD_TYPE = 'NMF'
 _C.MODEL.FactorizePhys.MD_R = 1
 _C.MODEL.FactorizePhys.MD_S = 1
 _C.MODEL.FactorizePhys.MD_STEPS = 4
+_C.MODEL.FactorizePhys.MD_INFERENCE = False
 
 # -----------------------------------------------------------------------------
 # Model Settings for TS-CAN
