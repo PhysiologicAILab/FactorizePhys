@@ -1,7 +1,7 @@
 BASE: ['']
 TOOLBOX_MODE: "train_and_test"  # "train_and_test" or "only_train" or "only_test"
 TRAIN:
-  BATCH_SIZE: 4
+  BATCH_SIZE: 8
   EPOCHS: 30
   LR: 1e-3
   MODEL_FILE_NAME: UBFC_UBFC_PURE_FactorizePhys_Base
@@ -98,7 +98,7 @@ NUM_OF_GPU_TRAIN: 1
 LOG:
   PATH: runs/exp
 MODEL:
-  DROP_RATE: 0.1
+  DROP_RATE: 0.2
   NAME: FactorizePhys
   FactorizePhys:
     CHANNELS: 3
