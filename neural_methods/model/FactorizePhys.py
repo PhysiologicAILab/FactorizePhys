@@ -13,7 +13,7 @@ import numpy as np
 nf = [8, 16, 16, 16]
 
 model_config = {
-    "MD_FSAM": True,
+    "MD_FSAM": False,
     "MD_TYPE": "NMF",
     "MD_R": 1,
     "MD_S": 1,

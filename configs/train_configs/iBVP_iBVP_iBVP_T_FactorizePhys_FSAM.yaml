@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 30
   LR: 1e-3
-  MODEL_FILE_NAME: iBVP_iBVP_iBVP_T_FactorizePhys_FSAM_TrainOnly
+  MODEL_FILE_NAME: iBVP_iBVP_iBVP_T_FactorizePhys_FSAM
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -114,6 +114,7 @@ MODEL:
     MD_R: 2
     MD_S: 1
     MD_STEPS: 4
+    MD_INFERENCE: True
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
