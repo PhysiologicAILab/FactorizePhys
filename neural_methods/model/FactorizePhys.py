@@ -758,21 +758,13 @@ class FeaturesFactorizationModule(nn.Module):
 
 
 class ConvBlock3D(nn.Module):
-    def __init__(self, in_channel, out_channel, kernel_size, stride, padding, dropout_rate=0):
+    def __init__(self, in_channel, out_channel, kernel_size, stride, padding):
         super(ConvBlock3D, self).__init__()
-        if 0 < dropout_rate < 1:
-            self.conv_block_3d = nn.Sequential(
-                nn.Conv3d(in_channel, out_channel, kernel_size, stride, padding=padding, bias=False),
-                nn.Tanh(),
-                nn.InstanceNorm3d(out_channel),
-                nn.Dropout3d(p=dropout_rate),
-            )
-        else:
-            self.conv_block_3d = nn.Sequential(
-                nn.Conv3d(in_channel, out_channel, kernel_size, stride, padding=padding, bias=False),
-                nn.Tanh(),
-                nn.InstanceNorm3d(out_channel),
-            )            
+        self.conv_block_3d = nn.Sequential(
+            nn.Conv3d(in_channel, out_channel, kernel_size, stride, padding=padding, bias=False),
+            nn.Tanh(),
+            nn.InstanceNorm3d(out_channel),
+        )
 
     def forward(self, x):
         return self.conv_block_3d(x)
@@ -788,17 +780,20 @@ class encoder_block(nn.Module):
         self.encoder1 = nn.Sequential(
             ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),  #B, nf[0], 160, 70, 70
             ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 160, 34, 34
-            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0], dropout_rate=dropout_rate), #B, nf[1], 160, 32, 32
+            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 32, 32
+            nn.Dropout3d(p=dropout_rate),
 
             ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 30, 30
             ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 14, 14
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0], dropout_rate=dropout_rate), #B, nf[2], 160, 12, 12
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 12, 12
+            nn.Dropout3d(p=dropout_rate),
         )
 
         self.encoder2 = nn.Sequential(
             ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 10, 10
             ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 8, 8
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0], dropout_rate=dropout_rate), #B, nf[3], 160, 6, 6
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 6, 6
+            nn.Dropout3d(p=dropout_rate),
         )
 
     def forward(self, x):
