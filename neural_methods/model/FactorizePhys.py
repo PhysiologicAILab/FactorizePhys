@@ -19,6 +19,7 @@ model_config = {
     "MD_S": 1,
     "MD_STEPS": 4,
     "MD_INFERENCE": False,
+    "MD_RESIDUAL": False,
     "INV_T": 1,
     "ETA": 0.9,
     "RAND_INIT": True,
@@ -814,6 +815,7 @@ class BVP_Head(nn.Module):
         self.use_fsam = md_config["MD_FSAM"]
         self.md_type = md_config["MD_TYPE"]
         self.md_infer = md_config["MD_INFERENCE"]
+        self.md_res = md_config["MD_RESIDUAL"]
 
         if self.use_fsam:
             inC = nf[3]
@@ -852,15 +854,16 @@ class BVP_Head(nn.Module):
             # # Residual connection: 
             # factorized_embeddings = voxel_embeddings + self.fsam_norm(att_mask)
 
-            # Multiplication
-            x = torch.mul(voxel_embeddings - voxel_embeddings.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
-            factorized_embeddings = self.fsam_norm(x)
+            if self.md_res:
+                # Multiplication with Residual connection
+                x = torch.mul(voxel_embeddings - voxel_embeddings.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
+                factorized_embeddings = self.fsam_norm(x)
+                factorized_embeddings = voxel_embeddings + factorized_embeddings
+            else:
+                # Multiplication
+                x = torch.mul(voxel_embeddings - voxel_embeddings.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
+                factorized_embeddings = self.fsam_norm(x)            
 
-            # # Multiplication with Residual connection
-            # x = torch.mul(voxel_embeddings - voxel_embeddings.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
-            # factorized_embeddings = self.fsam_norm(x)
-            # factorized_embeddings = voxel_embeddings + factorized_embeddings
-            
             # # Concatenate
             # factorized_embeddings = torch.cat([voxel_embeddings, self.fsam_norm(x)], dim=1)
 
@@ -1038,6 +1041,7 @@ if __name__ == "__main__":
     md_config["MD_FSAM"] = model_config["MD_FSAM"]
     md_config["MD_TYPE"] = model_config["MD_TYPE"]
     md_config["MD_INFERENCE"] = model_config["MD_INFERENCE"]
+    md_config["MD_RESIDUAL"] = model_config["MD_RESIDUAL"]
 
     net = nn.DataParallel(FactorizePhys(frames=frames, md_config=md_config, device=device, in_channels=in_channels, debug=debug)).to(device)
     # net.load_state_dict(torch.load(ckpt_path, map_location=device))

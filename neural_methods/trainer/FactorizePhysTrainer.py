@@ -45,6 +45,7 @@ class FactorizePhysTrainer(BaseTrainer):
         md_config["MD_R"] = self.config.MODEL.FactorizePhys.MD_R
         md_config["MD_STEPS"] = self.config.MODEL.FactorizePhys.MD_STEPS
         md_config["MD_INFERENCE"] = self.config.MODEL.FactorizePhys.MD_INFERENCE
+        md_config["MD_RESIDUAL"] = self.config.MODEL.FactorizePhys.MD_RESIDUAL
 
         self.md_infer = self.config.MODEL.FactorizePhys.MD_INFERENCE
         self.use_fsam = self.config.MODEL.FactorizePhys.MD_FSAM

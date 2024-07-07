@@ -308,6 +308,7 @@ _C.MODEL.FactorizePhys.MD_R = 1
 _C.MODEL.FactorizePhys.MD_S = 1
 _C.MODEL.FactorizePhys.MD_STEPS = 4
 _C.MODEL.FactorizePhys.MD_INFERENCE = False
+_C.MODEL.FactorizePhys.MD_RESIDUAL = False
 
 # -----------------------------------------------------------------------------
 # Model Settings for TS-CAN
