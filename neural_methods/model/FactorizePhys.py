@@ -821,7 +821,7 @@ class BVP_Head(nn.Module):
 
         self.conv_decoder = nn.Sequential(
             nn.Conv3d(inC, nf[0], (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),  #B, nf[0], 160, 3, 3
-            nn.Dropout3d(p=0.3),
+            nn.Dropout3d(p=0.2),
             nn.Tanh(),
             nn.InstanceNorm3d(nf[0]),
 
