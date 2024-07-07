@@ -787,7 +787,7 @@ class encoder_block(nn.Module):
         #                                                        Input: #B, inCh, 160, 72, 72
         self.encoder1 = nn.Sequential(
             ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),  #B, nf[0], 160, 70, 70
-            ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0], dropout_rate=dropout_rate), #B, nf[1], 160, 34, 34
+            ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 160, 34, 34
             ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0], dropout_rate=dropout_rate), #B, nf[1], 160, 32, 32
 
             ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0], dropout_rate=dropout_rate), #B, nf[1], 160, 30, 30
@@ -797,8 +797,8 @@ class encoder_block(nn.Module):
 
         self.encoder2 = nn.Sequential(
             ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0], dropout_rate=dropout_rate), #B, nf[2], 160, 10, 10
-            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0], dropout_rate=dropout_rate), #B, nf[3], 160, 8, 8
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0], dropout_rate=dropout_rate), #B, nf[3], 160, 6, 6
+            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 8, 8
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 6, 6
         )
 
     def forward(self, x):
@@ -830,7 +830,6 @@ class BVP_Head(nn.Module):
 
         self.conv_decoder = nn.Sequential(
             nn.Conv3d(inC, nf[0], (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),  #B, nf[0], 160, 3, 3
-            nn.Dropout3d(p=dropout_rate),
             nn.Tanh(),
             nn.InstanceNorm3d(nf[0]),
 
