@@ -13,7 +13,7 @@ import numpy as np
 nf = [8, 8, 8, 8]
 
 model_config = {
-    "MD_FSAM": True,
+    "MD_FSAM": False,
     "MD_TYPE": "NMF",
     "MD_R": 1,
     "MD_S": 1,
@@ -784,16 +784,16 @@ class encoder_block(nn.Module):
             ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 32, 32
             nn.Dropout3d(p=dropout_rate),
 
-            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 30, 30
-            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 14, 14
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 12, 12
+            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 160, 15, 15
+            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 13, 13
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 11, 11
             nn.Dropout3d(p=dropout_rate),
         )
 
         self.encoder2 = nn.Sequential(
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 10, 10
-            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 8, 8
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 6, 6
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 9, 9
+            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 7, 7
+            ConvBlock3D(nf[3], nf[3], [3, 1, 1], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 7, 7
             nn.Dropout3d(p=dropout_rate),
         )
 
@@ -826,7 +826,7 @@ class BVP_Head(nn.Module):
             inC = nf[3]
 
         self.conv_decoder = nn.Sequential(
-            nn.Conv3d(inC, nf[0], (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),  #B, nf[0], 160, 3, 3
+            nn.Conv3d(inC, nf[0], (3, 5, 5), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),  #B, nf[0], 160, 3, 3
             nn.Tanh(),
             nn.InstanceNorm3d(nf[0]),
 
