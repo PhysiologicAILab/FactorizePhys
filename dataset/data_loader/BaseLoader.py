@@ -223,7 +223,7 @@ class BaseLoader(Dataset):
         self.load_preprocessed_data()  # load all data and corresponding labels (sorted for consistency)
         print("Total Number of raw files preprocessed:", len(data_dirs_split), end='\n\n')
 
-    def preprocess(self, frames, bvps, config_preprocess):
+    def preprocess(self, frames, bvps, config_preprocess, resp=None, process_frames=True):
         """Preprocesses a pair of data.
 
         Args:
@@ -234,35 +234,39 @@ class BaseLoader(Dataset):
             frame_clips(np.array): processed video data by frames
             bvps_clips(np.array): processed bvp (ppg) labels by frames
         """
-        # resize frames and crop for face region
-        frames = self.crop_face_resize(
-            frames,
-            config_preprocess.CROP_FACE.DO_CROP_FACE,
-            config_preprocess.CROP_FACE.BACKEND,
-            config_preprocess.CROP_FACE.USE_LARGE_FACE_BOX,
-            config_preprocess.CROP_FACE.LARGE_BOX_COEF,
-            config_preprocess.CROP_FACE.DETECTION.DO_DYNAMIC_DETECTION,
-            config_preprocess.CROP_FACE.DETECTION.DYNAMIC_DETECTION_FREQUENCY,
-            config_preprocess.CROP_FACE.DETECTION.USE_MEDIAN_FACE_BOX,
-            config_preprocess.RESIZE.W,
-            config_preprocess.RESIZE.H)
-        # Check data transformation type
-        data = list()  # Video data
-        for data_type in config_preprocess.DATA_TYPE:
-            f_c = frames.copy()
-            if data_type == "Raw":
-                data.append(f_c)
-            elif data_type == "DiffNormalized":
-                data.append(BaseLoader.diff_normalize_data(f_c))
-            elif data_type == "Standardized":
-                data.append(BaseLoader.standardized_data(f_c))
-            else:
-                raise ValueError("Unsupported data type!")
-        data = np.concatenate(data, axis=-1)  # concatenate all channels
+        if process_frames:
+            # resize frames and crop for face region
+            frames = self.crop_face_resize(
+                frames,
+                config_preprocess.CROP_FACE.DO_CROP_FACE,
+                config_preprocess.CROP_FACE.BACKEND,
+                config_preprocess.CROP_FACE.USE_LARGE_FACE_BOX,
+                config_preprocess.CROP_FACE.LARGE_BOX_COEF,
+                config_preprocess.CROP_FACE.DETECTION.DO_DYNAMIC_DETECTION,
+                config_preprocess.CROP_FACE.DETECTION.DYNAMIC_DETECTION_FREQUENCY,
+                config_preprocess.CROP_FACE.DETECTION.USE_MEDIAN_FACE_BOX,
+                config_preprocess.RESIZE.W,
+                config_preprocess.RESIZE.H)
+            # Check data transformation type
+            data = list()  # Video data
+            for data_type in config_preprocess.DATA_TYPE:
+                f_c = frames.copy()
+                if data_type == "Raw":
+                    data.append(f_c)
+                elif data_type == "DiffNormalized":
+                    data.append(BaseLoader.diff_normalize_data(f_c))
+                elif data_type == "Standardized":
+                    data.append(BaseLoader.standardized_data(f_c))
+                else:
+                    raise ValueError("Unsupported data type!")
+            data = np.concatenate(data, axis=-1)  # concatenate all channels
+        
         if config_preprocess.LABEL_TYPE == "Raw":
             pass
         elif config_preprocess.LABEL_TYPE == "DiffNormalized":
             bvps = BaseLoader.diff_normalize_label(bvps)
+            bvps = BaseLoader.diff_normalize_label(bvps)
+
         elif config_preprocess.LABEL_TYPE == "Standardized":
             bvps = BaseLoader.standardized_label(bvps)
         else:
