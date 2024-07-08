@@ -80,10 +80,12 @@ class SCAMPSLoader(BaseLoader):
         if config_preprocess.USE_PSUEDO_PPG_LABEL:
             bvps = self.generate_pos_psuedo_labels(frames, fs=self.config_data.FS)
         else:
-            bvps = self.read_wave(matfile_path)
+            if "resp" in config_preprocess.SCAMPS.LABELS.lower():
+                bvps, resp = self.read_wave(matfile_path, opt="bvp_resp")
+            else:
+                bvps = self.read_wave(matfile_path, opt="bvp")
 
-        frames_clips, bvps_clips = self.preprocess(
-            frames, bvps, config_preprocess)
+        frames_clips, bvps_clips = self.preprocess(frames, bvps, config_preprocess)
         input_name_list, label_name_list = self.save_multi_process(frames_clips, bvps_clips, saved_filename)
         file_list_dict[i] = input_name_list
 
@@ -115,8 +117,14 @@ class SCAMPSLoader(BaseLoader):
         return np.asarray(frames)
 
     @staticmethod
-    def read_wave(wave_file):
-        """Reads a bvp signal file."""
+    def read_wave(wave_file, opt="bvp"):
+        """Reads a bvp and resp signal file."""
         mat = mat73.loadmat(wave_file)
-        ppg = mat['d_ppg']  # load raw frames
-        return np.asarray(ppg)
+        ppg = mat['d_ppg']  # load ppg signal
+        ppg = np.asarray(ppg)
+        if "resp" in opt:
+            resp = mat['d_br']  # load resp signal
+            resp = np.asarray(resp)
+            return ppg, resp
+        else:
+            return ppg

@@ -6,6 +6,35 @@ import torch
 import torch.nn as nn
 from neural_methods.model.FactorizePhys.FSAM import FeaturesFactorizationModule
 
+nf = [6, 12, 12, 12]
+
+model_config = {
+    "MD_FSAM": False,
+    "MD_TYPE": "NMF",
+    "MD_R": 1,
+    "MD_S": 1,
+    "MD_STEPS": 4,
+    "MD_INFERENCE": False,
+    "MD_RESIDUAL": False,
+    "INV_T": 1,
+    "ETA": 0.9,
+    "RAND_INIT": True,
+    "in_channels": 3,
+    "data_channels": 4,
+    "align_channels": nf[3] // 2,
+    "height": 72,
+    "weight": 72,
+    "batch_size": 2,
+    "frames": 160,
+    "debug": True,
+    "assess_latency": False,
+    "num_trials": 20,
+    "visualize": False,
+    "ckpt_path": "",
+    "data_path": "data/1003_input13.npy",
+    "label_path": "data/1003_label3.npy"
+}
+
 
 class ConvBlock3D(nn.Module):
     def __init__(self, in_channel, out_channel, kernel_size, stride, padding):
@@ -21,7 +50,7 @@ class ConvBlock3D(nn.Module):
 
 
 class encoder_block(nn.Module):
-    def __init__(self, inCh, nf, dropout_rate=0.1, debug=False):
+    def __init__(self, inCh, dropout_rate=0.1, debug=False):
         super(encoder_block, self).__init__()
         # inCh, out_channel, kernel_size, stride, padding
 
@@ -65,22 +94,21 @@ class PhysHead(nn.Module):
         self.md_type = md_config["MD_TYPE"]
         self.md_infer = md_config["MD_INFERENCE"]
         self.md_res = md_config["MD_RESIDUAL"]
-        self.nf = md_config["num_filters"]
 
         if self.use_fsam:
-            inC = self.nf[3]
+            inC = nf[3]
             self.fsam = FeaturesFactorizationModule(inC, device, md_config, dim="3D", debug=debug)
             self.fsam_norm = nn.InstanceNorm3d(inC)
             self.bias1 = nn.Parameter(torch.tensor(1.0), requires_grad=True).to(device)
         else:
-            inC = self.nf[3]
+            inC = nf[3]
 
         self.conv_decoder = nn.Sequential(
-            nn.Conv3d(inC, self.nf[0], (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),  #B, nf[0], 160, 3, 3
+            nn.Conv3d(inC, nf[0], (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),  #B, nf[0], 160, 3, 3
             nn.Tanh(),
-            nn.InstanceNorm3d(self.nf[0]),
+            nn.InstanceNorm3d(nf[0]),
 
-            nn.Conv3d(self.nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),    #B, 1, 160, 1, 1
+            nn.Conv3d(nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),    #B, 1, 160, 1, 1
         )
 
     def forward(self, voxel_embeddings, batch, length):
@@ -151,11 +179,14 @@ class FactorizePhysMT(nn.Module):
         self.use_fsam = md_config["MD_FSAM"]
         self.md_infer = md_config["MD_INFERENCE"]
 
-        nf = md_config["num_filters"]
+        for key in model_config:
+            if key not in md_config:
+                md_config[key] = model_config[key]
+
         if self.debug:
             print("nf:", nf)
 
-        self.encoder = encoder_block(self.in_channels, nf, dropout_rate=dropout, debug=debug)
+        self.encoder = encoder_block(self.in_channels, dropout_rate=dropout, debug=debug)
 
         self.rppg_head = PhysHead(md_config, device=device, dropout_rate=dropout, debug=debug)
         self.rBr_head = PhysHead(md_config, device=device, dropout_rate=dropout, debug=debug)

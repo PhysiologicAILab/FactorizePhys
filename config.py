@@ -90,6 +90,8 @@ _C.TRAIN.DATA.PREPROCESS.BIGSMALL.RESIZE.SMALL_W = 9
 _C.TRAIN.DATA.PREPROCESS.BIGSMALL.RESIZE.SMALL_H = 9
 _C.TRAIN.DATA.PREPROCESS.IBVP = CN()
 _C.TRAIN.DATA.PREPROCESS.IBVP.DATA_MODE = 'RGB'
+_C.TRAIN.DATA.PREPROCESS.SCAMPS = CN()
+_C.TRAIN.DATA.PREPROCESS.SCAMPS.LABELS = 'BVP'
 
 # -----------------------------------------------------------------------------
 # Valid settings
@@ -154,6 +156,8 @@ _C.VALID.DATA.PREPROCESS.BIGSMALL.RESIZE.SMALL_W = 9
 _C.VALID.DATA.PREPROCESS.BIGSMALL.RESIZE.SMALL_H = 9
 _C.VALID.DATA.PREPROCESS.IBVP = CN()
 _C.VALID.DATA.PREPROCESS.IBVP.DATA_MODE = 'RGB'
+_C.VALID.DATA.PREPROCESS.SCAMPS = CN()
+_C.VALID.DATA.PREPROCESS.SCAMPS.LABELS = 'BVP'
 
 # -----------------------------------------------------------------------------
 # Test settings
@@ -221,6 +225,9 @@ _C.TEST.DATA.PREPROCESS.BIGSMALL.RESIZE.SMALL_W = 9
 _C.TEST.DATA.PREPROCESS.BIGSMALL.RESIZE.SMALL_H = 9
 _C.TEST.DATA.PREPROCESS.IBVP = CN()
 _C.TEST.DATA.PREPROCESS.IBVP.DATA_MODE = 'RGB'
+_C.TEST.DATA.PREPROCESS.SCAMPS = CN()
+_C.TEST.DATA.PREPROCESS.SCAMPS.LABELS = 'BVP'
+
 # -----------------------------------------------------------------------------
 # Unsupervised method settings
 # -----------------------------------------------------------------------------\
@@ -279,6 +286,9 @@ _C.UNSUPERVISED.DATA.PREPROCESS.RESIZE.W = 128
 _C.UNSUPERVISED.DATA.PREPROCESS.RESIZE.H = 128
 _C.UNSUPERVISED.DATA.PREPROCESS.IBVP = CN()
 _C.UNSUPERVISED.DATA.PREPROCESS.IBVP.DATA_MODE = 'RGB'
+_C.UNSUPERVISED.DATA.PREPROCESS.SCAMPS = CN()
+_C.UNSUPERVISED.DATA.PREPROCESS.SCAMPS.LABELS = 'BVP'
+
 ### -----------------------------------------------------------------------------
 # Model settings
 # -----------------------------------------------------------------------------

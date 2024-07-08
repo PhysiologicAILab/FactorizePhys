@@ -10,29 +10,6 @@ from neural_methods.trainer.BaseTrainer import BaseTrainer
 from tqdm import tqdm
 
 
-model_config = {
-    "MD_FSAM": True,
-    "MD_TYPE": "NMF",
-    "MD_R": 1,
-    "MD_S": 1,
-    "MD_STEPS": 4,
-    "MD_INFERENCE": False,
-    "MD_RESIDUAL": False,
-    "INV_T": 1,
-    "ETA": 0.9,
-    "RAND_INIT": True,
-    "in_channels": 3,
-    "data_channels": 4,
-    "num_filters": [6, 12, 12, 12],
-    "align_channels": 4,
-    "height": 72,
-    "weight": 72,
-    "batch_size": 4,
-    "frames": 160,
-    "debug": False,
-}
-
-
 class FactorizePhysTrainer(BaseTrainer):
 
     def __init__(self, config, data_loader):
@@ -69,10 +46,6 @@ class FactorizePhysTrainer(BaseTrainer):
         md_config["MD_STEPS"] = self.config.MODEL.FactorizePhys.MD_STEPS
         md_config["MD_INFERENCE"] = self.config.MODEL.FactorizePhys.MD_INFERENCE
         md_config["MD_RESIDUAL"] = self.config.MODEL.FactorizePhys.MD_RESIDUAL
-
-        for key in model_config:
-            if key not in md_config:
-                md_config[key] = model_config[key]
 
         self.md_infer = self.config.MODEL.FactorizePhys.MD_INFERENCE
         self.use_fsam = self.config.MODEL.FactorizePhys.MD_FSAM
