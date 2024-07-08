@@ -793,8 +793,8 @@ class encoder_block(nn.Module):
         self.encoder2 = nn.Sequential(
             ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 9, 9
             ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 7, 7
-            ConvBlock3D(nf[3], nf[3], [3, 1, 1], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 7, 7
             nn.Dropout3d(p=dropout_rate),
+            ConvBlock3D(nf[3], nf[3], [3, 1, 1], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 7, 7
         )
 
     def forward(self, x):
