@@ -4,7 +4,7 @@ FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmogra
 
 import torch
 import torch.nn as nn
-from FSAM import FeaturesFactorizationModule
+from neural_methods.model.FactorizePhys.FSAM import FeaturesFactorizationModule
 
 
 class ConvBlock3D(nn.Module):
