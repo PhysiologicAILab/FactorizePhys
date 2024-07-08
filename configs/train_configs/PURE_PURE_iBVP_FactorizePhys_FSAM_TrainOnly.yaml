@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 30
   LR: 1e-3
-  MODEL_FILE_NAME: PURE_PURE_iBVP_FactorizePhys_FSAM_TrainOnly
+  MODEL_FILE_NAME: PURE_PURE_iBVP_FactorizePhys_FSAM_123_TrainOnly
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -108,7 +108,7 @@ MODEL:
     MD_FSAM: True
     MD_TYPE: "NMF"
     MD_R: 1
-    MD_S: 1
+    MD_S: 2
     MD_STEPS: 3
     MD_INFERENCE: False
 INFERENCE:
