@@ -1,10 +1,10 @@
 BASE: ['']
 TOOLBOX_MODE: "train_and_test"  # "train_and_test" or "only_train" or "only_test"
 TRAIN:
-  BATCH_SIZE: 4
+  BATCH_SIZE: 8
   EPOCHS: 30
   LR: 1e-3
-  MODEL_FILE_NAME: PURE_PURE_iBVP_FactorizePhys_FSAM_123_TrainOnly
+  MODEL_FILE_NAME: PURE_PURE_iBVP_FactorizePhys_FSAM_8-114_TrainOnly
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -108,11 +108,11 @@ MODEL:
     MD_FSAM: True
     MD_TYPE: "NMF"
     MD_R: 1
-    MD_S: 2
-    MD_STEPS: 3
+    MD_S: 1
+    MD_STEPS: 4
     MD_INFERENCE: False
 INFERENCE:
-  BATCH_SIZE: 4
+  BATCH_SIZE: 8
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
