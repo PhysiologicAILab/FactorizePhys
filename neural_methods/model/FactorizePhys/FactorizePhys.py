@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from neural_methods.model.FactorizePhys.FSAM import FeaturesFactorizationModule
 
-nf = [6, 12, 12, 12]
+nf = [12, 24, 24, 24]
 
 model_config = {
     "MD_FSAM": True,
