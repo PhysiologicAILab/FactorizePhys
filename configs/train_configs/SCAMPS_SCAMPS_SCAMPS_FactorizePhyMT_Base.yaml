@@ -83,6 +83,7 @@ TEST:
     BEGIN: 0.8
     END: 1.0
     PREPROCESS:
+      PREPROCESS_FRAMES: False
       DATA_TYPE: ['Raw']         #if use FactorizePhys, should be Raw
       DATA_AUG: ['None']    # 'None' or 'Motion' is supported, used if the data path points to an augmented dataset or requires augmentation
       LABEL_TYPE: Standardized
@@ -90,7 +91,6 @@ TEST:
       CHUNK_LENGTH: 160
       SCAMPS:
         LABELS: BVP_Resp
-        PREPROCESS_FRAMES: False
       CROP_FACE:
         DO_CROP_FACE: True
         BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face

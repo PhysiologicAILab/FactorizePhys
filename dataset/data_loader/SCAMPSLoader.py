@@ -85,7 +85,7 @@ class SCAMPSLoader(BaseLoader):
             else:
                 bvps = self.read_wave(matfile_path, opt="bvp")
 
-        process_frames = config_preprocess.SCAMPS.PREPROCESS_FRAMES
+        process_frames = config_preprocess.PREPROCESS_FRAMES
         frames_clips, bvps_clips, resp_clips = self.preprocess(
             frames, bvps, config_preprocess, resps=resps, process_frames=process_frames)
 

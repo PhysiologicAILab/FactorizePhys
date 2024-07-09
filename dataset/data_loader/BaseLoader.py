@@ -31,7 +31,6 @@ import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
 from retinaface import RetinaFace   # Source code: https://github.com/serengil/retinaface
-from dataset.data_loader.face_detector.YOLO5Face import YOLO5Face
 
 
 class BaseLoader(Dataset):
@@ -67,9 +66,11 @@ class BaseLoader(Dataset):
         self.preprocessed_data_len = 0
         self.data_format = config_data.DATA_FORMAT
         self.do_preprocess = config_data.DO_PREPROCESS
+        self.preprocess_frames = config_data.PREPROCESS.PREPROCESS_FRAMES
         self.config_data = config_data
 
-        if self.do_preprocess:
+        if self.do_preprocess and self.preprocess_frames:
+            from dataset.data_loader.face_detector.YOLO5Face import YOLO5Face
             if 'Y5F' in self.config_data.PREPROCESS.CROP_FACE.BACKEND:
                 self.Y5FObj = YOLO5Face(self.config_data.PREPROCESS.CROP_FACE.BACKEND, device)
 
