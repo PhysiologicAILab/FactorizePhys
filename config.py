@@ -92,6 +92,7 @@ _C.TRAIN.DATA.PREPROCESS.IBVP = CN()
 _C.TRAIN.DATA.PREPROCESS.IBVP.DATA_MODE = 'RGB'
 _C.TRAIN.DATA.PREPROCESS.SCAMPS = CN()
 _C.TRAIN.DATA.PREPROCESS.SCAMPS.LABELS = 'BVP'
+_C.TRAIN.DATA.PREPROCESS.SCAMPS.PREPROCESS_FRAMES = True
 
 # -----------------------------------------------------------------------------
 # Valid settings
@@ -158,6 +159,7 @@ _C.VALID.DATA.PREPROCESS.IBVP = CN()
 _C.VALID.DATA.PREPROCESS.IBVP.DATA_MODE = 'RGB'
 _C.VALID.DATA.PREPROCESS.SCAMPS = CN()
 _C.VALID.DATA.PREPROCESS.SCAMPS.LABELS = 'BVP'
+_C.VALID.DATA.PREPROCESS.SCAMPS.PREPROCESS_FRAMES = True
 
 # -----------------------------------------------------------------------------
 # Test settings
@@ -227,6 +229,7 @@ _C.TEST.DATA.PREPROCESS.IBVP = CN()
 _C.TEST.DATA.PREPROCESS.IBVP.DATA_MODE = 'RGB'
 _C.TEST.DATA.PREPROCESS.SCAMPS = CN()
 _C.TEST.DATA.PREPROCESS.SCAMPS.LABELS = 'BVP'
+_C.TEST.DATA.PREPROCESS.SCAMPS.PREPROCESS_FRAMES = True
 
 # -----------------------------------------------------------------------------
 # Unsupervised method settings
@@ -288,6 +291,7 @@ _C.UNSUPERVISED.DATA.PREPROCESS.IBVP = CN()
 _C.UNSUPERVISED.DATA.PREPROCESS.IBVP.DATA_MODE = 'RGB'
 _C.UNSUPERVISED.DATA.PREPROCESS.SCAMPS = CN()
 _C.UNSUPERVISED.DATA.PREPROCESS.SCAMPS.LABELS = 'BVP'
+_C.UNSUPERVISED.DATA.PREPROCESS.SCAMPS.PREPROCESS_FRAMES = True
 
 ### -----------------------------------------------------------------------------
 # Model settings
@@ -319,6 +323,20 @@ _C.MODEL.FactorizePhys.MD_S = 1
 _C.MODEL.FactorizePhys.MD_STEPS = 4
 _C.MODEL.FactorizePhys.MD_INFERENCE = False
 _C.MODEL.FactorizePhys.MD_RESIDUAL = False
+
+# -----------------------------------------------------------------------------
+# Specific parameters for FactorizePhysMT parameters
+# -----------------------------------------------------------------------------
+_C.MODEL.FactorizePhysMT = CN()
+_C.MODEL.FactorizePhysMT.FRAME_NUM = 160
+_C.MODEL.FactorizePhysMT.CHANNELS = 3
+_C.MODEL.FactorizePhysMT.MD_FSAM = False
+_C.MODEL.FactorizePhysMT.MD_TYPE = 'NMF'
+_C.MODEL.FactorizePhysMT.MD_R = 1
+_C.MODEL.FactorizePhysMT.MD_S = 1
+_C.MODEL.FactorizePhysMT.MD_STEPS = 4
+_C.MODEL.FactorizePhysMT.MD_INFERENCE = False
+_C.MODEL.FactorizePhysMT.MD_RESIDUAL = False
 
 # -----------------------------------------------------------------------------
 # Model Settings for TS-CAN

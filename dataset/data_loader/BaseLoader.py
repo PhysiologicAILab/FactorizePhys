@@ -223,7 +223,7 @@ class BaseLoader(Dataset):
         self.load_preprocessed_data()  # load all data and corresponding labels (sorted for consistency)
         print("Total Number of raw files preprocessed:", len(data_dirs_split), end='\n\n')
 
-    def preprocess(self, frames, bvps, config_preprocess, resp=None, process_frames=True):
+    def preprocess(self, frames, bvps, config_preprocess, resps=None, process_frames=True):
         """Preprocesses a pair of data.
 
         Args:
@@ -265,7 +265,7 @@ class BaseLoader(Dataset):
             pass
         elif config_preprocess.LABEL_TYPE == "DiffNormalized":
             bvps = BaseLoader.diff_normalize_label(bvps)
-            bvps = BaseLoader.diff_normalize_label(bvps)
+            ss = BaseLoader.diff_normalize_label(resps)
 
         elif config_preprocess.LABEL_TYPE == "Standardized":
             bvps = BaseLoader.standardized_label(bvps)
@@ -273,13 +273,35 @@ class BaseLoader(Dataset):
             raise ValueError("Unsupported label type!")
 
         if config_preprocess.DO_CHUNK:  # chunk data into snippets
-            frames_clips, bvps_clips = self.chunk(
-                data, bvps, config_preprocess.CHUNK_LENGTH)
+            if np.all(resps) == None:
+                if process_frames:
+                    frames_clips, bvps_clips = self.chunk(data, bvps, config_preprocess.CHUNK_LENGTH)
+                else:
+                    frames_clips, bvps_clips = self.chunk(np.empty(), bvps, config_preprocess.CHUNK_LENGTH)
+                resp_clips = np.empty()
+            else:
+                if process_frames:
+                    frames_clips, bvps_clips, resp_clips = self.chunk(data, bvps, resps, config_preprocess.CHUNK_LENGTH)
+                else:
+                    frames_clips, bvps_clips, resp_clips = self.chunk(np.empty(), bvps, resps, config_preprocess.CHUNK_LENGTH)
+
         else:
-            frames_clips = np.array([data])
+            if process_frames:
+                frames_clips = np.array([data])
+            else:
+                frames_clips = np.empty()
+    
             bvps_clips = np.array([bvps])
 
-        return frames_clips, bvps_clips
+            if np.all(resps) != None:
+                resp_clips = np.array([resps])
+            else:
+                resp_clips = np.empty()
+
+        if np.all(resps) == None:
+            return frames_clips, bvps_clips
+        else:
+            return frames_clips, bvps_clips, resp_clips
 
     def face_detection(self, frame, backend, use_larger_box=False, larger_box_coef=1.0):
         """Face detection on a single frame.
@@ -450,7 +472,7 @@ class BaseLoader(Dataset):
             resized_frames[i] = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
         return resized_frames
 
-    def chunk(self, frames, bvps, chunk_length):
+    def chunk(self, frames, bvps, chunk_length, resps=None, process_frames=True):
         """Chunk the data into small chunks.
 
         Args:
@@ -461,11 +483,19 @@ class BaseLoader(Dataset):
             frames_clips: all chunks of face cropped frames
             bvp_clips: all chunks of bvp frames
         """
-
-        clip_num = frames.shape[0] // chunk_length
-        frames_clips = [frames[i * chunk_length:(i + 1) * chunk_length] for i in range(clip_num)]
+        if process_frames:
+            clip_num = frames.shape[0] // chunk_length
+            frames_clips = [frames[i * chunk_length:(i + 1) * chunk_length] for i in range(clip_num)]
+        else:
+            clip_num = bvps.shape[0] // chunk_length
+            frames_clips = np.empty()
         bvps_clips = [bvps[i * chunk_length:(i + 1) * chunk_length] for i in range(clip_num)]
-        return np.array(frames_clips), np.array(bvps_clips)
+        
+        if np.all(resps) != None:
+            resp_clips = [resps[i * chunk_length:(i + 1) * chunk_length] for i in range(clip_num)]
+            return np.array(frames_clips), np.array(bvps_clips), np.array(resp_clips)
+        else:
+            return np.array(frames_clips), np.array(bvps_clips)
 
     def save(self, frames_clips, bvps_clips, filename):
         """Save all the chunked data.

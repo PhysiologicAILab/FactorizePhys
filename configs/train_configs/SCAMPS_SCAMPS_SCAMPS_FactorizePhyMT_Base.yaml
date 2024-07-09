@@ -22,6 +22,9 @@ TRAIN:
       LABEL_TYPE: Standardized
       DO_CHUNK: True
       CHUNK_LENGTH: 160
+      SCAMPS:
+        LABELS: BVP_Resp
+        PREPROCESS_FRAMES: False
       CROP_FACE:
         DO_CROP_FACE: True
         BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face
@@ -31,8 +34,6 @@ TRAIN:
           DO_DYNAMIC_DETECTION: True
           DYNAMIC_DETECTION_FREQUENCY : 30
           USE_MEDIAN_FACE_BOX: False    # This should be used ONLY if dynamic detection is used
-      SCAMPS:
-        LABELS: BVP_Resp
       RESIZE:
         H: 72
         W: 72
@@ -53,6 +54,9 @@ VALID:
       LABEL_TYPE: Standardized
       DO_CHUNK: True
       CHUNK_LENGTH: 160
+      SCAMPS:
+        LABELS: BVP_Resp
+        PREPROCESS_FRAMES: False
       CROP_FACE:
         DO_CROP_FACE: True
         BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face
@@ -62,8 +66,6 @@ VALID:
           DO_DYNAMIC_DETECTION: True
           DYNAMIC_DETECTION_FREQUENCY : 30
           USE_MEDIAN_FACE_BOX: False    # This should be used ONLY if dynamic detection is used
-      SCAMPS:
-        LABELS: BVP_Resp
       RESIZE:
         H: 72
         W: 72
@@ -86,6 +88,9 @@ TEST:
       LABEL_TYPE: Standardized
       DO_CHUNK: True
       CHUNK_LENGTH: 160
+      SCAMPS:
+        LABELS: BVP_Resp
+        PREPROCESS_FRAMES: False
       CROP_FACE:
         DO_CROP_FACE: True
         BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face
@@ -95,8 +100,6 @@ TEST:
           DO_DYNAMIC_DETECTION: True
           DYNAMIC_DETECTION_FREQUENCY : 30
           USE_MEDIAN_FACE_BOX: False    # This should be used ONLY if dynamic detection is used
-      SCAMPS:
-        LABELS: BVP_Resp
       RESIZE:
         H: 72
         W: 72
