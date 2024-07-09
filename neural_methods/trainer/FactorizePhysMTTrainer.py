@@ -5,35 +5,12 @@ import torch
 import torch.optim as optim
 from evaluation.metrics import calculate_metrics
 from neural_methods.loss.NegPearsonLoss import Neg_Pearson
-from neural_methods.model.FactorizePhys.FactorizePhys import FactorizePhys
+from neural_methods.model.FactorizePhys.FactorizePhysMT import FactorizePhysMT
 from neural_methods.trainer.BaseTrainer import BaseTrainer
 from tqdm import tqdm
 
 
-model_config = {
-    "MD_FSAM": True,
-    "MD_TYPE": "NMF",
-    "MD_R": 1,
-    "MD_S": 1,
-    "MD_STEPS": 4,
-    "MD_INFERENCE": False,
-    "MD_RESIDUAL": False,
-    "INV_T": 1,
-    "ETA": 0.9,
-    "RAND_INIT": True,
-    "in_channels": 3,
-    "data_channels": 4,
-    "num_filters": [8, 8, 8, 8],
-    "align_channels": 4,
-    "height": 72,
-    "weight": 72,
-    "batch_size": 4,
-    "frames": 160,
-    "debug": False,
-}
-
-
-class FactorizePhysTrainer(BaseTrainer):
+class FactorizePhysMTTrainer(BaseTrainer):
 
     def __init__(self, config, data_loader):
         """Inits parameters from args and the writer for TensorboardX."""
@@ -57,27 +34,23 @@ class FactorizePhysTrainer(BaseTrainer):
             self.device = torch.device("cpu")  # if no GPUs set device is CPU
             self.num_of_gpu = 0  # no GPUs used
 
-        frames = self.config.MODEL.FactorizePhys.FRAME_NUM
-        in_channels = self.config.MODEL.FactorizePhys.CHANNELS
+        frames = self.config.MODEL.FactorizePhysMT.FRAME_NUM
+        in_channels = self.config.MODEL.FactorizePhysMT.CHANNELS
 
         md_config = {}
-        md_config["FRAME_NUM"] = self.config.MODEL.FactorizePhys.FRAME_NUM
-        md_config["MD_TYPE"] = self.config.MODEL.FactorizePhys.MD_TYPE
-        md_config["MD_FSAM"] = self.config.MODEL.FactorizePhys.MD_FSAM
-        md_config["MD_S"] = self.config.MODEL.FactorizePhys.MD_S
-        md_config["MD_R"] = self.config.MODEL.FactorizePhys.MD_R
-        md_config["MD_STEPS"] = self.config.MODEL.FactorizePhys.MD_STEPS
-        md_config["MD_INFERENCE"] = self.config.MODEL.FactorizePhys.MD_INFERENCE
-        md_config["MD_RESIDUAL"] = self.config.MODEL.FactorizePhys.MD_RESIDUAL
+        md_config["FRAME_NUM"] = self.config.MODEL.FactorizePhysMT.FRAME_NUM
+        md_config["MD_TYPE"] = self.config.MODEL.FactorizePhysMT.MD_TYPE
+        md_config["MD_FSAM"] = self.config.MODEL.FactorizePhysMT.MD_FSAM
+        md_config["MD_S"] = self.config.MODEL.FactorizePhysMT.MD_S
+        md_config["MD_R"] = self.config.MODEL.FactorizePhysMT.MD_R
+        md_config["MD_STEPS"] = self.config.MODEL.FactorizePhysMT.MD_STEPS
+        md_config["MD_INFERENCE"] = self.config.MODEL.FactorizePhysMT.MD_INFERENCE
+        md_config["MD_RESIDUAL"] = self.config.MODEL.FactorizePhysMT.MD_RESIDUAL
 
-        for key in model_config:
-            if key not in md_config:
-                md_config[key] = model_config[key]
+        self.md_infer = self.config.MODEL.FactorizePhysMT.MD_INFERENCE
+        self.use_fsam = self.config.MODEL.FactorizePhysMT.MD_FSAM
 
-        self.md_infer = self.config.MODEL.FactorizePhys.MD_INFERENCE
-        self.use_fsam = self.config.MODEL.FactorizePhys.MD_FSAM
-
-        self.model = FactorizePhys(frames=frames, md_config=md_config, in_channels=in_channels,
+        self.model = FactorizePhysMT(frames=frames, md_config=md_config, in_channels=in_channels,
                                 dropout=self.dropout_rate, device=self.device)  # [3, T, 128,128]
 
         if torch.cuda.device_count() > 0 and self.num_of_gpu > 0:  # distribute model across GPUs
@@ -87,7 +60,8 @@ class FactorizePhysTrainer(BaseTrainer):
 
         if self.config.TOOLBOX_MODE == "train_and_test" or self.config.TOOLBOX_MODE == "only_train":
             self.num_train_batches = len(data_loader["train"])
-            self.criterion = Neg_Pearson()
+            self.criterion1 = Neg_Pearson()
+            self.criterion2 = Neg_Pearson()
             self.optimizer = optim.Adam(
                 self.model.parameters(), lr=self.config.TRAIN.LR)
             # See more details on the OneCycleLR scheduler here: https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.OneCycleLR.html
@@ -96,7 +70,7 @@ class FactorizePhysTrainer(BaseTrainer):
         elif self.config.TOOLBOX_MODE == "only_test":
             pass
         else:
-            raise ValueError("FactorizePhys trainer initialized in incorrect toolbox mode!")
+            raise ValueError("FactorizePhysMT trainer initialized in incorrect toolbox mode!")
 
     def train(self, data_loader):
         """Training routine for model"""
@@ -133,13 +107,18 @@ class FactorizePhysTrainer(BaseTrainer):
 
                 self.optimizer.zero_grad()
                 if self.model.training and self.use_fsam:
-                    pred_ppg, vox_embed, factorized_embed, att_mask, appx_error = self.model(data)
+                    pred_ppg, pred_br, vox_embed, factorized_embed, \
+                        att_mask, appx_error, factorized_embed_br, \
+                            att_mask_br, appx_error_br = self.model(data)
                 else:
-                    pred_ppg, vox_embed = self.model(data)
+                    pred_ppg, pred_br, vox_embed = self.model(data)
                 
                 pred_ppg = (pred_ppg - torch.mean(pred_ppg)) / torch.std(pred_ppg)  # normalize
+                pred_br = (pred_br - torch.mean(pred_br)) / torch.std(pred_br)  # normalize
 
-                loss = self.criterion(pred_ppg, labels)
+                loss1 = self.criterion1(pred_ppg, labels[:, 0])
+                loss2 = self.criterion2(pred_br, labels[:, 1])
+                loss = loss1 + loss2
                 
                 loss.backward()
                 running_loss += loss.item()
@@ -167,7 +146,7 @@ class FactorizePhysTrainer(BaseTrainer):
             if self.use_fsam:
                 mean_appx_error.append(np.mean(appx_error_list))
                 print("Mean train loss: {}, Mean appx error: {}".format(
-                    np.mean(train_loss), np.mean(appx_error_list)))
+                    np.round(np.mean(train_loss), 3), np.round(np.mean(appx_error_list), 3)))
 
             self.save_model(epoch)
             if not self.config.TEST.USE_LAST_EPOCH: 
@@ -217,11 +196,16 @@ class FactorizePhysTrainer(BaseTrainer):
                 # labels[torch.isnan(labels)] = 0
 
                 if self.md_infer and self.use_fsam:
-                    pred_ppg, vox_embed, factorized_embed, att_mask, appx_error = self.model(data)
+                    pred_ppg, pred_br, vox_embed, factorized_embed, att_mask, appx_error, \
+                        factorized_embed_br, att_mask_br, appx_error_br = self.model(data)
                 else:
-                    pred_ppg, vox_embed = self.model(data)
+                    pred_ppg, pred_br, vox_embed = self.model(data)
                 pred_ppg = (pred_ppg - torch.mean(pred_ppg)) / torch.std(pred_ppg)  # normalize
-                loss = self.criterion(pred_ppg, labels)
+                pred_br = (pred_br - torch.mean(pred_br)) / torch.std(pred_br)  # normalize
+                
+                loss1 = self.criterion1(pred_ppg, labels[:, 0])
+                loss2 = self.criterion2(pred_br, labels[:, 1])
+                loss = loss1 + loss2
 
                 valid_loss.append(loss.item())
                 valid_step += 1
@@ -283,14 +267,18 @@ class FactorizePhysTrainer(BaseTrainer):
                 # labels_test[torch.isnan(labels_test)] = 0
 
                 if self.md_infer and self.use_fsam:
-                    pred_ppg_test, vox_embed, factorized_embed, att_mask, appx_error = self.model(data)
+                    pred_ppg_test, pred_br_test, vox_embed, factorized_embed, att_mask, appx_error, \
+                        factorized_embed_br, att_mask_br, appx_error_br = self.model(data)
                 else:
-                    pred_ppg_test, vox_embed = self.model(data)
+                    pred_ppg_test, pred_br_test, vox_embed = self.model(data)
+                
                 pred_ppg_test = (pred_ppg_test - torch.mean(pred_ppg_test)) / torch.std(pred_ppg_test)  # normalize
+                pred_br_test = (pred_br_test - torch.mean(pred_br_test)) / torch.std(pred_br_test)  # normalize
 
                 if self.config.TEST.OUTPUT_SAVE_DIR:
                     labels_test = labels_test.cpu()
                     pred_ppg_test = pred_ppg_test.cpu()
+                    pred_br_test = pred_br_test.cpu()
 
                 for idx in range(batch_size):
                     subj_index = test_batch[2][idx]

@@ -522,7 +522,7 @@ class BaseLoader(Dataset):
             count += 1
         return count
 
-    def save_multi_process(self, frames_clips, bvps_clips, filename):
+    def save_multi_process(self, frames_clips, bvps_clips, filename, resp_clips=None, process_frames=True):
         """Save all the chunked data with multi-thread processing.
 
         Args:
@@ -540,12 +540,15 @@ class BaseLoader(Dataset):
         label_path_name_list = []
         for i in range(len(bvps_clips)):
             assert (len(self.inputs) == len(self.labels))
-            input_path_name = self.cached_path + os.sep + "{0}_input{1}.npy".format(filename, str(count))
             label_path_name = self.cached_path + os.sep + "{0}_label{1}.npy".format(filename, str(count))
-            input_path_name_list.append(input_path_name)
             label_path_name_list.append(label_path_name)
-            np.save(input_path_name, frames_clips[i])
             np.save(label_path_name, bvps_clips[i])
+
+            if process_frames:
+                input_path_name = self.cached_path + os.sep + "{0}_input{1}.npy".format(filename, str(count))
+                input_path_name_list.append(input_path_name)
+                np.save(input_path_name, frames_clips[i])
+
             count += 1
         return input_path_name_list, label_path_name_list
 

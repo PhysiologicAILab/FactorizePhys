@@ -81,13 +81,24 @@ class SCAMPSLoader(BaseLoader):
             bvps = self.generate_pos_psuedo_labels(frames, fs=self.config_data.FS)
         else:
             if "resp" in config_preprocess.SCAMPS.LABELS.lower():
-                bvps, resp = self.read_wave(matfile_path, opt="bvp_resp")
+                bvps, resps = self.read_wave(matfile_path, opt="bvp_resp")
             else:
                 bvps = self.read_wave(matfile_path, opt="bvp")
 
-        frames_clips, bvps_clips, resp_clips = self.preprocess(frames, bvps, config_preprocess, resp=resp, process_frames=False)
-        input_name_list, label_name_list = self.save_multi_process(frames_clips, bvps_clips, saved_filename)
-        file_list_dict[i] = input_name_list
+        process_frames = config_preprocess.SCAMPS.PREPROCESS_FRAMES
+        frames_clips, bvps_clips, resp_clips = self.preprocess(
+            frames, bvps, config_preprocess, resps=resps, process_frames=process_frames)
+
+        bvps_clips = np.concatenate(
+            [bvps_clips.reshape(1, -1), resp_clips.reshape(1, -1)]).T
+
+        input_name_list, label_name_list = self.save_multi_process(
+            frames_clips, bvps_clips, saved_filename, process_frames=process_frames)
+        
+        if process_frames:
+            file_list_dict[i] = input_name_list
+        else:
+            file_list_dict[i] = label_name_list
 
     def preprocess_dataset_backup(self, data_dirs, config_preprocess):
         """Preprocesses the raw data."""

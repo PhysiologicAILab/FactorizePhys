@@ -24,15 +24,15 @@ model_config = {
     "align_channels": nf[3] // 2,
     "height": 72,
     "weight": 72,
-    "batch_size": 2,
+    "batch_size": 4,
     "frames": 160,
-    "debug": True,
+    "debug": False,
     "assess_latency": False,
     "num_trials": 20,
     "visualize": False,
     "ckpt_path": "",
-    "data_path": "data/1003_input13.npy",
-    "label_path": "data/1003_label3.npy"
+    "data_path": "",
+    "label_path": ""
 }
 
 
