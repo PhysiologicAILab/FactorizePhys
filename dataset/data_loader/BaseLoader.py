@@ -495,8 +495,14 @@ class BaseLoader(Dataset):
         
         bvps_clips = [bvps[i * chunk_length:(i + 1) * chunk_length] for i in range(clip_num)]
         
+        # print("bvps.shape", bvps.shape)
+        # print("len(bvps_clips)", len(bvps_clips))
         if np.all(resps) != None:
             resp_clips = [resps[i * chunk_length:(i + 1) * chunk_length] for i in range(clip_num)]
+            # print("resps.shape", resps.shape)
+            # print("len(resp_clips)", len(resp_clips))
+            # print("np.array(bvps_clips).shape, np.array(resp_clips).shape", [np.array(bvps_clips).shape, np.array(resp_clips).shape])
+            # exit()
             return np.array(frames_clips), np.array(bvps_clips), np.array(resp_clips)
         else:
             return np.array(frames_clips), np.array(bvps_clips)
@@ -526,7 +532,7 @@ class BaseLoader(Dataset):
             count += 1
         return count
 
-    def save_multi_process(self, frames_clips, bvps_clips, filename, resp_clips=None, process_frames=True):
+    def save_multi_process(self, frames_clips, bvps_clips, filename, process_frames=True):
         """Save all the chunked data with multi-thread processing.
 
         Args:

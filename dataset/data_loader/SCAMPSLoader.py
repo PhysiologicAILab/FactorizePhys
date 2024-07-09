@@ -72,9 +72,14 @@ class SCAMPSLoader(BaseLoader):
         matfile_path = data_dirs[i]['path']
         saved_filename = data_dirs[i]['index']
 
+        process_frames = config_preprocess.PREPROCESS_FRAMES
+
         # Read Frames
-        frames = self.read_video(matfile_path)
-        frames = (np.round(frames * 255)).astype(np.uint8)
+        if process_frames:
+            frames = self.read_video(matfile_path)
+            frames = (np.round(frames * 255)).astype(np.uint8)
+        else:
+            frames = np.empty(0)
 
         # Read Labels
         if config_preprocess.USE_PSUEDO_PPG_LABEL:
@@ -85,12 +90,14 @@ class SCAMPSLoader(BaseLoader):
             else:
                 bvps = self.read_wave(matfile_path, opt="bvp")
 
-        process_frames = config_preprocess.PREPROCESS_FRAMES
         frames_clips, bvps_clips, resp_clips = self.preprocess(
             frames, bvps, config_preprocess, resps=resps, process_frames=process_frames)
 
-        bvps_clips = np.concatenate(
-            [bvps_clips.reshape(1, -1), resp_clips.reshape(1, -1)]).T
+        if "resp" in config_preprocess.SCAMPS.LABELS.lower():
+            clips = []
+            for i in range(bvps_clips.shape[0]):
+                clips.append(np.concatenate([bvps_clips[i,:].reshape(1, -1), resp_clips[i, :].reshape(1, -1)]))
+            bvps_clips = np.array(clips)
 
         input_name_list, label_name_list = self.save_multi_process(
             frames_clips, bvps_clips, saved_filename, process_frames=process_frames)
