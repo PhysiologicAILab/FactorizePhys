@@ -283,10 +283,10 @@ class BaseLoader(Dataset):
                 resp_clips = np.empty(0)
             else:
                 if process_frames:
-                    frames_clips, bvps_clips, resp_clips = self.chunk(data, bvps, resps, config_preprocess.CHUNK_LENGTH)
+                    frames_clips, bvps_clips, resp_clips = self.chunk(data, bvps, config_preprocess.CHUNK_LENGTH, resps,)
                 else:
                     frames_clips, bvps_clips, resp_clips = self.chunk(np.empty(
-                        0), bvps, resps, config_preprocess.CHUNK_LENGTH, process_frames=process_frames)
+                        0), bvps, config_preprocess.CHUNK_LENGTH, resps, process_frames=process_frames)
 
         else:
             if process_frames:
@@ -486,12 +486,13 @@ class BaseLoader(Dataset):
             frames_clips: all chunks of face cropped frames
             bvp_clips: all chunks of bvp frames
         """
+        clip_num = bvps.shape[0] // chunk_length
+        # clip_num = frames.shape[0] // chunk_length
         if process_frames:
-            clip_num = frames.shape[0] // chunk_length
             frames_clips = [frames[i * chunk_length:(i + 1) * chunk_length] for i in range(clip_num)]
         else:
-            clip_num = bvps.shape[0] // chunk_length
             frames_clips = np.empty(0)
+        
         bvps_clips = [bvps[i * chunk_length:(i + 1) * chunk_length] for i in range(clip_num)]
         
         if np.all(resps) != None:
