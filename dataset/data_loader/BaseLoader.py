@@ -278,26 +278,26 @@ class BaseLoader(Dataset):
                 if process_frames:
                     frames_clips, bvps_clips = self.chunk(data, bvps, config_preprocess.CHUNK_LENGTH)
                 else:
-                    frames_clips, bvps_clips = self.chunk(np.empty(), bvps, config_preprocess.CHUNK_LENGTH)
-                resp_clips = np.empty()
+                    frames_clips, bvps_clips = self.chunk(np.empty(0), bvps, config_preprocess.CHUNK_LENGTH)
+                resp_clips = np.empty(0)
             else:
                 if process_frames:
                     frames_clips, bvps_clips, resp_clips = self.chunk(data, bvps, resps, config_preprocess.CHUNK_LENGTH)
                 else:
-                    frames_clips, bvps_clips, resp_clips = self.chunk(np.empty(), bvps, resps, config_preprocess.CHUNK_LENGTH)
+                    frames_clips, bvps_clips, resp_clips = self.chunk(np.empty(0), bvps, resps, config_preprocess.CHUNK_LENGTH)
 
         else:
             if process_frames:
                 frames_clips = np.array([data])
             else:
-                frames_clips = np.empty()
+                frames_clips = np.empty(0)
     
             bvps_clips = np.array([bvps])
 
             if np.all(resps) != None:
                 resp_clips = np.array([resps])
             else:
-                resp_clips = np.empty()
+                resp_clips = np.empty(0)
 
         if np.all(resps) == None:
             return frames_clips, bvps_clips
@@ -489,7 +489,7 @@ class BaseLoader(Dataset):
             frames_clips = [frames[i * chunk_length:(i + 1) * chunk_length] for i in range(clip_num)]
         else:
             clip_num = bvps.shape[0] // chunk_length
-            frames_clips = np.empty()
+            frames_clips = np.empty(0)
         bvps_clips = [bvps[i * chunk_length:(i + 1) * chunk_length] for i in range(clip_num)]
         
         if np.all(resps) != None:
