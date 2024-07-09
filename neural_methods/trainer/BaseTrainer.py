@@ -26,7 +26,7 @@ class BaseTrainer:
     def test(self):
         pass
 
-    def save_test_outputs(self, predictions, labels, config):
+    def save_test_outputs(self, predictions, labels, config, suff=""):
     
         output_dir = config.TEST.OUTPUT_SAVE_DIR
         if not os.path.exists(output_dir):
@@ -40,7 +40,7 @@ class BaseTrainer:
             filename_id = model_file_root + "_" + config.TEST.DATA.DATASET
         else:
             raise ValueError('Metrics.py evaluation only supports train_and_test and only_test!')
-        output_path = os.path.join(output_dir, filename_id + '_outputs.pickle')
+        output_path = os.path.join(output_dir, filename_id + suff + '_outputs.pickle')
 
         data = dict()
         data['predictions'] = predictions

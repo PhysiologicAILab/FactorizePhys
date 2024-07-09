@@ -226,6 +226,8 @@ class FactorizePhysMTTrainer(BaseTrainer):
         print("===Testing===")
         predictions = dict()
         labels = dict()
+        predictions_br = dict()
+        labels_br = dict()
 
         if self.config.TOOLBOX_MODE == "only_test":
             if not os.path.exists(self.config.INFERENCE.MODEL_PATH):
@@ -277,6 +279,8 @@ class FactorizePhysMTTrainer(BaseTrainer):
 
                 if self.config.TEST.OUTPUT_SAVE_DIR:
                     labels_test = labels_test.cpu()
+                    labels_ppg = labels[:, 0]
+                    labels_resp = labels[:, 1]
                     pred_ppg_test = pred_ppg_test.cpu()
                     pred_br_test = pred_br_test.cpu()
 
@@ -286,14 +290,20 @@ class FactorizePhysMTTrainer(BaseTrainer):
                     if subj_index not in predictions.keys():
                         predictions[subj_index] = dict()
                         labels[subj_index] = dict()
+                        predictions_br[subj_index] = dict()
+                        labels_br[subj_index] = dict()
                     predictions[subj_index][sort_index] = pred_ppg_test[idx]
-                    labels[subj_index][sort_index] = labels_test[idx]
+                    labels[subj_index][sort_index] = labels_ppg[idx]
+                    predictions_br[subj_index][sort_index] = pred_br_test[idx]
+                    labels_br[subj_index][sort_index] = labels_resp[idx]
 
 
         print('')
         calculate_metrics(predictions, labels, self.config)
+        calculate_metrics(predictions_br, labels_br, self.config)
         if self.config.TEST.OUTPUT_SAVE_DIR: # saving test outputs 
-            self.save_test_outputs(predictions, labels, self.config)
+            self.save_test_outputs(predictions, labels, self.config, suff="_bvp")
+            self.save_test_outputs(predictions_br, labels_br, self.config, suff="_resp")
 
     def save_model(self, index):
         if not os.path.exists(self.model_dir):

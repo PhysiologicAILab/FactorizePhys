@@ -9,7 +9,7 @@ TRAIN:
   DATA:
     FS: 30
     DATASET: SCAMPS
-    DO_PREPROCESS: False            # if first time, should be true
+    DO_PREPROCESS: True            # if first time, should be true
     DATA_FORMAT: NCDHW
     DATA_PATH: "/mnt/sda/data/jitesh/SCAMPS/scamps_videos"          # Raw dataset path, need to be updated
     CACHED_PATH: "/home/jitesh/data/SCAMPS"    # Processed dataset save path, need to be updated
@@ -41,7 +41,7 @@ VALID:
   DATA:
     FS: 30
     DATASET: SCAMPS
-    DO_PREPROCESS: False            # if first time, should be true
+    DO_PREPROCESS: True            # if first time, should be true
     DATA_FORMAT: NCDHW
     DATA_PATH: "/mnt/sda/data/jitesh/SCAMPS/scamps_videos"          # Raw dataset path, need to be updated
     CACHED_PATH: "/home/jitesh/data/SCAMPS"    # Processed dataset save path, need to be updated
@@ -75,7 +75,7 @@ TEST:
   DATA:
     FS: 30
     DATASET: SCAMPS
-    DO_PREPROCESS: False            # if first time, should be true
+    DO_PREPROCESS: True            # if first time, should be true
     DATA_FORMAT: NCDHW
     DATA_PATH: "/mnt/sda/data/jitesh/SCAMPS/scamps_videos"          # Raw dataset path, need to be updated
     CACHED_PATH: "/home/jitesh/data/SCAMPS"    # Processed dataset save path, need to be updated
