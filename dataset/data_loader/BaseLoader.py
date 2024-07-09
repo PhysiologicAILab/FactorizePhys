@@ -278,13 +278,15 @@ class BaseLoader(Dataset):
                 if process_frames:
                     frames_clips, bvps_clips = self.chunk(data, bvps, config_preprocess.CHUNK_LENGTH)
                 else:
-                    frames_clips, bvps_clips = self.chunk(np.empty(0), bvps, config_preprocess.CHUNK_LENGTH)
+                    frames_clips, bvps_clips = self.chunk(np.empty(
+                        0), bvps, config_preprocess.CHUNK_LENGTH, process_frames=process_frames)
                 resp_clips = np.empty(0)
             else:
                 if process_frames:
                     frames_clips, bvps_clips, resp_clips = self.chunk(data, bvps, resps, config_preprocess.CHUNK_LENGTH)
                 else:
-                    frames_clips, bvps_clips, resp_clips = self.chunk(np.empty(0), bvps, resps, config_preprocess.CHUNK_LENGTH)
+                    frames_clips, bvps_clips, resp_clips = self.chunk(np.empty(
+                        0), bvps, resps, config_preprocess.CHUNK_LENGTH, process_frames=process_frames)
 
         else:
             if process_frames:
