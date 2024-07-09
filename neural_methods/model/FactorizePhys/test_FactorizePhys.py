@@ -5,8 +5,30 @@ FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmogra
 import torch
 import torch.nn as nn
 import numpy as np
-from neural_methods.model.FactorizePhys.FactorizePhys import FactorizePhys, model_config
+from neural_methods.model.FactorizePhys.FactorizePhys import FactorizePhys
 
+model_config = {
+    "MD_FSAM": True,
+    "MD_TYPE": "NMF",
+    "MD_R": 1,
+    "MD_S": 1,
+    "MD_STEPS": 4,
+    "MD_INFERENCE": False,
+    "MD_RESIDUAL": False,
+    "in_channels": 3,
+    "data_channels": 4,
+    "height": 72,
+    "weight": 72,
+    "batch_size": 2,
+    "frames": 160,
+    "debug": True,
+    "assess_latency": False,
+    "num_trials": 20,
+    "visualize": False,
+    "ckpt_path": "",
+    "data_path": "",
+    "label_path": ""
+}
 
 if __name__ == "__main__":
     import time

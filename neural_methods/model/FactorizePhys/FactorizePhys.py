@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from neural_methods.model.FactorizePhys.FSAM import FeaturesFactorizationModule
 
-nf = [8, 16, 16, 16]
+nf = [6, 12, 12, 12]
 
 model_config = {
     "MD_FSAM": True,
@@ -24,15 +24,15 @@ model_config = {
     "align_channels": nf[3] // 2,
     "height": 72,
     "weight": 72,
-    "batch_size": 2,
+    "batch_size": 4,
     "frames": 160,
-    "debug": True,
+    "debug": False,
     "assess_latency": False,
     "num_trials": 20,
     "visualize": False,
     "ckpt_path": "",
-    "data_path": "data/1003_input13.npy",
-    "label_path": "data/1003_label3.npy"
+    "data_path": "",
+    "label_path": ""
 }
 
 
@@ -107,8 +107,10 @@ class BVP_Head(nn.Module):
             nn.Conv3d(inC, nf[0], (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),  #B, nf[0], 160, 3, 3
             nn.Tanh(),
             nn.InstanceNorm3d(nf[0]),
+            
+            nn.Dropout3d(p=dropout_rate),
 
-            nn.Conv3d(nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),    #B, 1, 160, 1, 1
+            nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),    #B, 1, 160, 1, 1
         )
 
     def forward(self, voxel_embeddings, batch, length):
