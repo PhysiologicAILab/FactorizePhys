@@ -314,12 +314,12 @@ class _SmoothMatrixDecompositionBase(nn.Module):
             exit()
 
         P = D
-        sig0 = torch.tensor(5.0)
-        sig1 = sig0 * 2
-        sig2 = sig0 * 4
-        sig3 = sig0 * 6
-        sig4 = sig0 * 8
-        sig5 = sig0 * 10
+        sig0 = torch.tensor(6.0)
+        sig1 = torch.tensor(8.0)
+        sig2 = torch.tensor(12.0)
+        sig3 = torch.tensor(15.0)
+        sig4 = torch.tensor(18.0)
+        sig5 = torch.tensor(24.0)
 
         # dt = torch.tensor((P - 1) / (D - 1))
         tt = torch.arange(0, D).unsqueeze(1)
@@ -336,13 +336,13 @@ class _SmoothMatrixDecompositionBase(nn.Module):
 
         rbfs = torch.cat([
             rbf0[:, torch.arange(0, P, 1)],
-            rbf1[:, torch.arange(0, P, 2)],
-            rbf2[:, torch.arange(0, P, 4)],
-            rbf3[:, torch.arange(0, P, 6)],
-            rbf4[:, torch.arange(0, P, 8)],
-            rbf5[:, torch.arange(0, P, 10)],
+            rbf1[:, torch.arange(0, P, 1)],
+            rbf2[:, torch.arange(0, P, 2)],
+            rbf3[:, torch.arange(0, P, 2)],
+            rbf4[:, torch.arange(0, P, 3)],
+            rbf5[:, torch.arange(0, P, 3)],
             rbfN,
-            ], dim=1)
+        ], dim=1)
 
         rbfs = rbfs.repeat(B * self.S, 1, 1).to(self.device)
         rbf_shape2 = rbfs.shape[2]
