@@ -9,7 +9,7 @@ from neural_methods.model.FactorizePhys.FactorizePhys import FactorizePhys
 
 model_config = {
     "MD_FSAM": True,
-    "MD_TYPE": "NMF",
+    "MD_TYPE": "Smooth_NMF",
     "MD_R": 1,
     "MD_S": 1,
     "MD_STEPS": 4,

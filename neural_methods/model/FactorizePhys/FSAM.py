@@ -3,6 +3,35 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.batchnorm import _BatchNorm
 import numpy as np
+import neurokit2 as nk
+
+hr_range = np.arange(30, 180)
+ppg = []
+for iter in range(5):
+    for hr in hr_range:
+        sig = nk.ppg_simulate(
+            duration=20,
+            sampling_rate=30,
+            heart_rate=hr,
+            frequency_modulation=0.1,
+            ibi_randomness=0.03,
+            drift=0,
+            motion_amplitude=0.1,
+            powerline_amplitude=0.01,
+            burst_number=0,
+            burst_amplitude=1,
+            random_state=None,
+            show=False,
+        )
+        start = int(np.random.randint(100, 260))
+        sig_seg = sig[start: start + 160]
+        mx = np.max(sig_seg)
+        mn = np.min(sig_seg)
+        sig_seg = (sig_seg - mn)/(mx - mn)
+        ppg.append(sig_seg)
+
+ppg = np.asarray(ppg).T
+
 
 class _MatrixDecompositionBase(nn.Module):
     def __init__(self, device, md_config, debug=False, dim="3D"):
@@ -313,36 +342,41 @@ class _SmoothMatrixDecompositionBase(nn.Module):
             print("Dimension not supported")
             exit()
 
-        P = D
-        sig0 = torch.tensor(6.0)
-        sig1 = torch.tensor(8.0)
-        sig2 = torch.tensor(12.0)
-        sig3 = torch.tensor(15.0)
-        sig4 = torch.tensor(18.0)
-        sig5 = torch.tensor(24.0)
+        opt = "bvp"
 
-        # dt = torch.tensor((P - 1) / (D - 1))
-        tt = torch.arange(0, D).unsqueeze(1)
-        nn = torch.arange(0, P).unsqueeze(0)
-        # print(tt.shape, nn.shape)
-        dd = torch.pow(tt - nn, 2)
-        rbf0 = torch.exp((-0.5 * dd)/(2 * torch.pow(sig0, 2)))
-        rbf1 = torch.exp((-0.5 * dd)/(2 * torch.pow(sig1, 2)))
-        rbf2 = torch.exp((-0.5 * dd)/(2 * torch.pow(sig2, 2)))
-        rbf3 = torch.exp((-0.5 * dd)/(2 * torch.pow(sig3, 2)))
-        rbf4 = torch.exp((-0.5 * dd)/(2 * torch.pow(sig4, 2)))
-        rbf5 = torch.exp((-0.5 * dd)/(2 * torch.pow(sig5, 2)))
-        rbfN = torch.ones(P, 1)
+        if opt == "smooth":
+            P = D
+            sig0 = torch.tensor(6.0)
+            sig1 = torch.tensor(8.0)
+            sig2 = torch.tensor(12.0)
+            sig3 = torch.tensor(15.0)
+            sig4 = torch.tensor(18.0)
+            sig5 = torch.tensor(24.0)
 
-        rbfs = torch.cat([
-            rbf0[:, torch.arange(0, P, 1)],
-            rbf1[:, torch.arange(0, P, 1)],
-            rbf2[:, torch.arange(0, P, 2)],
-            rbf3[:, torch.arange(0, P, 2)],
-            rbf4[:, torch.arange(0, P, 3)],
-            rbf5[:, torch.arange(0, P, 3)],
-            rbfN,
-        ], dim=1)
+            # dt = torch.tensor((P - 1) / (D - 1))
+            tt = torch.arange(0, D).unsqueeze(1)
+            nn = torch.arange(0, P).unsqueeze(0)
+            # print(tt.shape, nn.shape)
+            dd = torch.pow(tt - nn, 2)
+            rbf0 = torch.exp((-0.5 * dd)/(2 * torch.pow(sig0, 2)))
+            rbf1 = torch.exp((-0.5 * dd)/(2 * torch.pow(sig1, 2)))
+            rbf2 = torch.exp((-0.5 * dd)/(2 * torch.pow(sig2, 2)))
+            rbf3 = torch.exp((-0.5 * dd)/(2 * torch.pow(sig3, 2)))
+            rbf4 = torch.exp((-0.5 * dd)/(2 * torch.pow(sig4, 2)))
+            rbf5 = torch.exp((-0.5 * dd)/(2 * torch.pow(sig5, 2)))
+            rbfN = torch.ones(P, 1)
+
+            rbfs = torch.cat([
+                rbf0[:, torch.arange(0, P, 1)],
+                rbf1[:, torch.arange(0, P, 1)],
+                rbf2[:, torch.arange(0, P, 2)],
+                rbf3[:, torch.arange(0, P, 2)],
+                rbf4[:, torch.arange(0, P, 3)],
+                rbf5[:, torch.arange(0, P, 3)],
+                rbfN,
+            ], dim=1)
+        else:
+            rbfs = torch.FloatTensor(ppg)
 
         rbfs = rbfs.repeat(B * self.S, 1, 1).to(self.device)
         rbf_shape2 = rbfs.shape[2]
