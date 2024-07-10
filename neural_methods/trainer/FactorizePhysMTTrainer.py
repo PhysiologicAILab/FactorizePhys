@@ -116,8 +116,8 @@ class FactorizePhysMTTrainer(BaseTrainer):
                 pred_ppg = (pred_ppg - torch.mean(pred_ppg)) / torch.std(pred_ppg)  # normalize
                 pred_br = (pred_br - torch.mean(pred_br)) / torch.std(pred_br)  # normalize
 
-                loss1 = self.criterion1(pred_ppg, labels[:, 0])
-                loss2 = self.criterion2(pred_br, labels[:, 1])
+                loss1 = self.criterion1(pred_ppg, labels[..., 0])
+                loss2 = self.criterion2(pred_br, labels[..., 1])
                 loss = loss1 + loss2
                 
                 loss.backward()
@@ -203,8 +203,8 @@ class FactorizePhysMTTrainer(BaseTrainer):
                 pred_ppg = (pred_ppg - torch.mean(pred_ppg)) / torch.std(pred_ppg)  # normalize
                 pred_br = (pred_br - torch.mean(pred_br)) / torch.std(pred_br)  # normalize
                 
-                loss1 = self.criterion1(pred_ppg, labels[:, 0])
-                loss2 = self.criterion2(pred_br, labels[:, 1])
+                loss1 = self.criterion1(pred_ppg, labels[..., 0])
+                loss2 = self.criterion2(pred_br, labels[..., 1])
                 loss = loss1 + loss2
 
                 valid_loss.append(loss.item())
@@ -279,8 +279,8 @@ class FactorizePhysMTTrainer(BaseTrainer):
 
                 if self.config.TEST.OUTPUT_SAVE_DIR:
                     labels_test = labels_test.cpu()
-                    labels_ppg = labels[:, 0]
-                    labels_resp = labels[:, 1]
+                    labels_ppg = labels[..., 0]
+                    labels_resp = labels[..., 1]
                     pred_ppg_test = pred_ppg_test.cpu()
                     pred_br_test = pred_br_test.cpu()
 
