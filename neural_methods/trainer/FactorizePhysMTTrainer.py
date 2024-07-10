@@ -279,8 +279,8 @@ class FactorizePhysMTTrainer(BaseTrainer):
 
                 if self.config.TEST.OUTPUT_SAVE_DIR:
                     labels_test = labels_test.cpu()
-                    labels_ppg = labels[..., 0]
-                    labels_resp = labels[..., 1]
+                    labels_ppg = labels_test[..., 0]
+                    labels_resp = labels_test[..., 1]
                     pred_ppg_test = pred_ppg_test.cpu()
                     pred_br_test = pred_br_test.cpu()
 
