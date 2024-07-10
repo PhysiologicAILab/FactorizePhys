@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 30
   LR: 1e-3
-  MODEL_FILE_NAME: PURE_PURE_iBVP_FactorizePhys_FSAM_Smooth_BVP
+  MODEL_FILE_NAME: PURE_PURE_iBVP_FactorizePhys_FSAM_Smooth_BVP_Res
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -109,7 +109,8 @@ MODEL:
     MD_TYPE: "Smooth_NMF"
     MD_R: 1
     MD_S: 1
-    MD_STEPS: 6
+    MD_STEPS: 4
+    MD_RESIDUAL: True
     MD_INFERENCE: True
 INFERENCE:
   BATCH_SIZE: 4

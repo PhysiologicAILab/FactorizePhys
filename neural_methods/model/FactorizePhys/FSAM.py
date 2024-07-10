@@ -5,33 +5,6 @@ from torch.nn.modules.batchnorm import _BatchNorm
 import numpy as np
 import neurokit2 as nk
 
-hr_range = np.arange(30, 180)
-ppg = []
-for iter in range(5):
-    for hr in hr_range:
-        sig = nk.ppg_simulate(
-            duration=20,
-            sampling_rate=30,
-            heart_rate=hr,
-            frequency_modulation=0.1,
-            ibi_randomness=0.03,
-            drift=0,
-            motion_amplitude=0.1,
-            powerline_amplitude=0.01,
-            burst_number=0,
-            burst_amplitude=1,
-            random_state=None,
-            show=False,
-        )
-        start = int(np.random.randint(100, 260))
-        sig_seg = sig[start: start + 160]
-        mx = np.max(sig_seg)
-        mn = np.min(sig_seg)
-        sig_seg = (sig_seg - mn)/(mx - mn)
-        ppg.append(sig_seg)
-
-ppg = np.asarray(ppg).T
-
 
 class _MatrixDecompositionBase(nn.Module):
     def __init__(self, device, md_config, debug=False, dim="3D"):
@@ -342,10 +315,9 @@ class _SmoothMatrixDecompositionBase(nn.Module):
             print("Dimension not supported")
             exit()
 
+        P = D
         opt = "bvp"
-
-        if opt == "smooth":
-            P = D
+        if opt == "radial_basis":
             sig0 = torch.tensor(6.0)
             sig1 = torch.tensor(8.0)
             sig2 = torch.tensor(12.0)
@@ -376,6 +348,32 @@ class _SmoothMatrixDecompositionBase(nn.Module):
                 rbfN,
             ], dim=1)
         else:
+            hr_range = np.arange(30, 180)
+            ppg = []
+            for iter in range(5):
+                for hr in hr_range:
+                    sig = nk.ppg_simulate(
+                        duration=20,
+                        sampling_rate=30,
+                        heart_rate=hr,
+                        frequency_modulation=0.1,
+                        ibi_randomness=0.03,
+                        drift=0,
+                        motion_amplitude=0.1,
+                        powerline_amplitude=0.01,
+                        burst_number=0,
+                        burst_amplitude=1,
+                        random_state=None,
+                        show=False,
+                    )
+                    start = int(np.random.randint(100, 300))
+                    sig_seg = sig[start: start + P]
+                    mx = np.max(sig_seg)
+                    mn = np.min(sig_seg)
+                    sig_seg = (sig_seg - mn)/(mx - mn)
+                    ppg.append(sig_seg)
+
+            ppg = np.asarray(ppg).T
             rbfs = torch.FloatTensor(ppg)
 
         rbfs = rbfs.repeat(B * self.S, 1, 1).to(self.device)
