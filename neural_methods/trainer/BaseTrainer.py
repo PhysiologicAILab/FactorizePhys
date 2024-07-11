@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter, MaxNLocator
 import os
 import pickle
+import numpy as np
 
 
 class BaseTrainer:
@@ -53,7 +54,7 @@ class BaseTrainer:
 
         print('Saving outputs to:', output_path)
 
-    def plot_losses_and_lrs(self, train_loss, valid_loss, lrs, config):
+    def plot_losses_and_lrs(self, train_loss, valid_loss, lrs, config, train_loss2=None, valid_loss2=None):
 
         output_dir = os.path.join(config.LOG.PATH, config.TRAIN.DATA.EXP_DATA_NAME, 'plots')
         if not os.path.exists(output_dir):
@@ -71,6 +72,9 @@ class BaseTrainer:
         data['lrs'] = lrs
         data['train_loss'] = train_loss
         data['valid_loss'] = valid_loss
+        if np.all(train_loss2) != None:
+            data['train_loss2'] = train_loss2
+            data['valid_loss2'] = valid_loss2
 
         with open(log_filepath, 'wb') as handle:  # save out training dict pickle file
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -81,8 +85,13 @@ class BaseTrainer:
         plt.figure(figsize=(10, 6))
         epochs = range(0, len(train_loss))  # Integer values for x-axis
         plt.plot(epochs, train_loss, label='Training Loss')
+        if np.all(train_loss2) != None:
+            plt.plot(epochs, train_loss2, label='Training Loss 2')
+        
         if len(valid_loss) > 0:
             plt.plot(epochs, valid_loss, label='Validation Loss')
+            if np.all(train_loss2) != None:
+                plt.plot(epochs, valid_loss2, label='Validation Loss 2')
         else:
             print("The list of validation losses is empty. The validation loss will not be plotted!")
         plt.xlabel('Epoch')

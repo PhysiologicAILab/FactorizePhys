@@ -58,17 +58,16 @@ class encoder_block(nn.Module):
         #                                                        Input: #B, inCh, 160, 72, 72
         self.encoder = nn.Sequential(
             ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),  #B, nf[0], 160, 70, 70
-            ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 68, 68
-            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 66, 66
+            ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 160, 34, 34
+            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 32, 32
             nn.Dropout3d(p=dropout_rate),
 
-            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 160, 32, 32
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 30, 30
+            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 30, 30
             ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 28, 28
             nn.Dropout3d(p=dropout_rate),
 
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 26, 26
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 24, 24
+            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 26, 26
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 24, 24
             nn.Dropout3d(p=dropout_rate),
         )
 
@@ -80,9 +79,9 @@ class encoder_block(nn.Module):
         return voxel_embeddings
 
 
-class BVPHead(nn.Module):
+class BVP_Head(nn.Module):
     def __init__(self, md_config, device, dropout_rate=0.1, debug=False):
-        super(BVPHead, self).__init__()
+        super(BVP_Head, self).__init__()
         self.debug = debug
 
         self.use_fsam = md_config["MD_FSAM"]
@@ -91,11 +90,11 @@ class BVPHead(nn.Module):
         self.md_res = md_config["MD_RESIDUAL"]
 
         self.conv_block = nn.Sequential(
-            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 11, 11
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 11, 11
             ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 9, 9
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]),   #B, inC, 160, 7, 7
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 7, 7
         )
-
+        
         if self.use_fsam:
             inC = nf[3]
             self.fsam = FeaturesFactorizationModule(inC, device, md_config, dim="3D", debug=debug)
@@ -105,8 +104,8 @@ class BVPHead(nn.Module):
             inC = nf[3]
 
         self.conv_decoder = nn.Sequential(
-            ConvBlock3D(inC, nf[0], [3, 3, 3], [1, 2, 2], [1, 0, 0]),                           #B, inC, 160, 3, 3
-            nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),    #B, 1, 160, 1, 1
+            ConvBlock3D(inC, nf[0], [3, 5, 5], [1, 1, 1], [1, 0, 0]),                           #B, nf[0], 160, 3, 3
+            nn.Conv3d(nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),    #B, 1, 160, 1, 1
         )
 
     def forward(self, voxel_embeddings, batch, length):
@@ -161,19 +160,22 @@ class BVPHead(nn.Module):
             return rPPG
 
 
-class RespHead(nn.Module):
+class Resp_Head(nn.Module):
     def __init__(self, md_config, device, dropout_rate=0.1, debug=False):
-        super(RespHead, self).__init__()
+        super(Resp_Head, self).__init__()
         self.debug = debug
 
         self.use_fsam = md_config["MD_FSAM"]
         self.md_type = md_config["MD_TYPE"]
         self.md_infer = md_config["MD_INFERENCE"]
         self.md_res = md_config["MD_RESIDUAL"]
+        # md_config["MD_R"] = 4
+        # md_config["MD_S"] = 1
+        # md_config["MD_STEPS"] = 5
 
         self.conv_block = nn.Sequential(
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 22, 22
-            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 20, 20
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 22, 22
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[3], 160, 10, 10
         )
 
         if self.use_fsam:
@@ -185,9 +187,8 @@ class RespHead(nn.Module):
             inC = nf[3]
 
         self.conv_decoder = nn.Sequential(
-            ConvBlock3D(inC, nf[0], [3, 3, 3], [1, 2, 2], [1, 0, 0]),                           #B, inC, 160, 9, 9
-            ConvBlock3D(nf[0], nf[0], [3, 3, 3], [1, 3, 3], [1, 0, 0]),                        #B, nf[0], 160, 3, 3
-            nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),    #B, 1, 160, 1, 1
+            ConvBlock3D(inC, nf[0], [5, 3, 3], [1, 2, 2], [2, 0, 0]),                           #B, nf[0], 160, 4, 4
+            nn.Conv3d(nf[0], 1, (5, 4, 4), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),    #B, 1, 160, 1, 1
         )
 
     def forward(self, voxel_embeddings, batch, length):
@@ -269,8 +270,8 @@ class FactorizePhysMT(nn.Module):
 
         self.encoder = encoder_block(self.in_channels, dropout_rate=dropout, debug=debug)
 
-        self.rppg_head = BVPHead(md_config, device=device, dropout_rate=dropout, debug=debug)
-        self.rBr_head = RespHead(md_config, device=device, dropout_rate=dropout, debug=debug)
+        self.rppg_head = BVP_Head(md_config, device=device, dropout_rate=dropout, debug=debug)
+        self.rBr_head = Resp_Head(md_config, device=device, dropout_rate=dropout, debug=debug)
 
 
         

@@ -77,18 +77,24 @@ class FactorizePhysMTTrainer(BaseTrainer):
         if data_loader["train"] is None:
             raise ValueError("No data for train")
 
-        mean_training_losses = []
-        mean_valid_losses = []
+        mean_training_loss1 = []
+        mean_training_loss2 = []
+        mean_valid_loss1 = []
+        mean_valid_loss2 = []
         mean_appx_error = []
         lrs = []
         for epoch in range(self.max_epoch_num):
             print('')
             print(f"====Training Epoch: {epoch}====")
-            running_loss = 0.0
+            running_loss1 = 0.0
+            running_loss2 = 0.0
+
             train_loss = []
+            train_loss1 = []
+            train_loss2 = []
             appx_error_list = []
             self.model.train()
-            tbar = tqdm(data_loader["train"], ncols=80)
+            tbar = tqdm(data_loader["train"], ncols=120)
             for idx, batch in enumerate(tbar):
                 tbar.set_description("Train epoch %s" % epoch)
                 
@@ -127,6 +133,8 @@ class FactorizePhysMTTrainer(BaseTrainer):
                         f'[{epoch}, {idx + 1:5d}] loss: {running_loss / 100:.3f}')
                     running_loss = 0.0
                 train_loss.append(loss.item())
+                train_loss1.append(loss1.item())
+                train_loss2.append(loss2.item())
                 if self.use_fsam:
                     appx_error_list.append(appx_error.item())
 
@@ -137,12 +145,13 @@ class FactorizePhysMTTrainer(BaseTrainer):
                 self.scheduler.step()
                 
                 if self.use_fsam:
-                    tbar.set_postfix({"appx_error": appx_error.item()}, loss=loss.item())
+                    tbar.set_postfix({"appx_error": appx_error.item(), "loss_bvp":loss1.item(), "loss_resp": loss2.item()}, loss=loss.item())
                 else:
-                    tbar.set_postfix(loss=loss.item())
+                    tbar.set_postfix({"loss_bvp":loss1.item(), "loss_resp": loss2.item()}, loss=loss.item())
 
             # Append the mean training loss for the epoch
-            mean_training_losses.append(np.mean(train_loss))
+            mean_training_loss1.append(np.mean(train_loss1))
+            mean_training_loss2.append(np.mean(train_loss2))
             if self.use_fsam:
                 mean_appx_error.append(np.mean(appx_error_list))
                 print("Mean train loss: {}, Mean appx error: {}".format(
@@ -150,22 +159,23 @@ class FactorizePhysMTTrainer(BaseTrainer):
 
             self.save_model(epoch)
             if not self.config.TEST.USE_LAST_EPOCH: 
-                valid_loss = self.valid(data_loader)
-                mean_valid_losses.append(valid_loss)
-                print('validation loss: ', valid_loss)
+                valid_loss1, valid_loss2 = self.valid(data_loader)
+                mean_valid_loss1.append(valid_loss1)
+                mean_valid_loss2.append(valid_loss2)
+                print('validation losses: ', valid_loss1, valid_loss2)
                 if self.min_valid_loss is None:
-                    self.min_valid_loss = valid_loss
+                    self.min_valid_loss = valid_loss1 + valid_loss2
                     self.best_epoch = epoch
                     print("Update best model! Best epoch: {}".format(self.best_epoch))
-                elif (valid_loss < self.min_valid_loss):
-                    self.min_valid_loss = valid_loss
+                elif ((valid_loss1 + valid_loss2) < self.min_valid_loss):
+                    self.min_valid_loss = valid_loss1 + valid_loss2
                     self.best_epoch = epoch
                     print("Update best model! Best epoch: {}".format(self.best_epoch))
         if not self.config.TEST.USE_LAST_EPOCH: 
             print("best trained epoch: {}, min_val_loss: {}".format(
                 self.best_epoch, self.min_valid_loss))
         if self.config.TRAIN.PLOT_LOSSES_AND_LR:
-            self.plot_losses_and_lrs(mean_training_losses, mean_valid_losses, lrs, self.config)
+            self.plot_losses_and_lrs(mean_training_loss1, mean_valid_loss1, lrs, self.config, mean_training_loss2, mean_valid_loss2)
 
     def valid(self, data_loader):
         """ Runs the model on valid sets."""
@@ -174,11 +184,12 @@ class FactorizePhysMTTrainer(BaseTrainer):
 
         print('')
         print(" ====Validing===")
-        valid_loss = []
+        valid_loss1 = []
+        valid_loss2 = []
         self.model.eval()
         valid_step = 0
         with torch.no_grad():
-            vbar = tqdm(data_loader["valid"], ncols=80)
+            vbar = tqdm(data_loader["valid"], ncols=120)
             for valid_idx, valid_batch in enumerate(vbar):
                 vbar.set_description("Validation")
 
@@ -207,15 +218,17 @@ class FactorizePhysMTTrainer(BaseTrainer):
                 loss2 = self.criterion2(pred_br, labels[..., 1])
                 loss = loss1 + loss2
 
-                valid_loss.append(loss.item())
+                valid_loss1.append(loss1.item())
+                valid_loss2.append(loss2.item())
                 valid_step += 1
                 # vbar.set_postfix(loss=loss.item())
                 if self.md_infer and self.use_fsam:
-                    vbar.set_postfix({"appx_error": appx_error.item()}, loss=loss.item())
+                    vbar.set_postfix({"appx_error": appx_error.item(), "loss_bvp":loss1.item(), "loss_resp": loss2.item()}, loss=loss.item())
                 else:
-                    vbar.set_postfix(loss=loss.item())
-            valid_loss = np.asarray(valid_loss)
-        return np.mean(valid_loss)
+                    vbar.set_postfix({"loss_bvp":loss1.item(), "loss_resp": loss2.item()}, loss=loss.item())
+            valid_loss1 = np.asarray(valid_loss1)
+            valid_loss2 = np.asarray(valid_loss2)
+        return np.mean(valid_loss1), np.mean(valid_loss2)
 
     def test(self, data_loader):
         """ Runs the model on test sets."""
