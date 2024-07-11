@@ -200,8 +200,8 @@ class Resp_Head(nn.Module):
         # md_config["MD_STEPS"] = 6
 
         self.conv_block = nn.Sequential(
-            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [2, 2, 2], [2, 0, 0]), #B, nf[2], 20, 13, 13
-            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [1, 1, 1], [2, 0, 0]), #B, nf[3], 20, 11, 11
+            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [1, 2, 2], [2, 0, 0]), #B, nf[2], 40, 13, 13
+            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [1, 1, 1], [2, 0, 0]), #B, nf[3], 40, 11, 11
             nn.Dropout3d(p=dropout_rate),            
         )
 
@@ -213,7 +213,7 @@ class Resp_Head(nn.Module):
         else:
             inC = nf[3]
 
-        self.upsample = nn.Upsample(scale_factor=(8, 1, 1))
+        self.upsample = nn.Upsample(scale_factor=(4, 1, 1))
 
         self.final_layer = nn.Sequential(
             ConvBlock3D(inC, nf[0], [5, 5, 5], [1, 3, 3], [2, 0, 0]),                           #B, nf[0], 160, 3, 3
