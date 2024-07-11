@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from neural_methods.model.FactorizePhys.FSAM import FeaturesFactorizationModule
 
-nf = [8, 16, 24, 32]
+nf = [8, 16, 16, 16]
 
 model_config = {
     "MD_FSAM": True,
@@ -58,21 +58,27 @@ class encoder_block(nn.Module):
         #                                                        Input: #B, inCh, 160, 72, 72
         self.encoder1 = nn.Sequential(
             ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),  #B, nf[0], 160, 70, 70
-            ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 160, 34, 34
-            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 32, 32
+            ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 68, 68
             nn.Dropout3d(p=dropout_rate),
 
-            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 30, 30
-            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 14, 14
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 12, 12
+            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 160, 33, 33
+            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 31, 31
+            nn.Dropout3d(p=dropout_rate),
+
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 29, 29
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 27, 27
+            nn.Dropout3d(p=dropout_rate),
+
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 25, 25
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 23, 23
             nn.Dropout3d(p=dropout_rate),
         )
 
         self.encoder2 = nn.Sequential(
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 10, 10
-            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 8, 8
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 6, 6
+            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 11, 11
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 9, 9
             nn.Dropout3d(p=dropout_rate),
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 7, 7
         )
 
     def forward(self, x):
@@ -104,11 +110,11 @@ class PhysHead(nn.Module):
             inC = nf[3]
 
         self.conv_decoder = nn.Sequential(
-            nn.Conv3d(inC, nf[0], (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),  #B, nf[0], 160, 3, 3
+            nn.Conv3d(inC, nf[0], (3, 3, 3), stride=(1, 2, 2), padding=(1, 0, 0), bias=False),  #B, nf[0], 160, 3, 3
             nn.Tanh(),
             nn.InstanceNorm3d(nf[0]),
 
-            nn.Conv3d(nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),    #B, 1, 160, 1, 1
+            nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),    #B, 1, 160, 1, 1
         )
 
     def forward(self, voxel_embeddings, batch, length):
