@@ -192,9 +192,9 @@ class Resp_Head(nn.Module):
         self.md_type = md_config["MD_TYPE"]
         self.md_infer = md_config["MD_INFERENCE"]
         self.md_res = md_config["MD_RESIDUAL"]
-        # md_config["MD_R"] = 4
-        # md_config["MD_S"] = 1
-        # md_config["MD_STEPS"] = 5
+        md_config["MD_R"] = 4
+        md_config["MD_S"] = 1
+        md_config["MD_STEPS"] = 6
 
         self.conv_block = nn.Sequential(
             ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 13, 13
