@@ -127,11 +127,12 @@ class FactorizePhysMTTrainer(BaseTrainer):
                 loss = loss1 + loss2
                 
                 loss.backward()
-                running_loss += loss.item()
+                running_loss1 += loss1.item()
+                running_loss2 += loss2.item()
                 if idx % 100 == 99:  # print every 100 mini-batches
-                    print(
-                        f'[{epoch}, {idx + 1:5d}] loss: {running_loss / 100:.3f}')
-                    running_loss = 0.0
+                    print(f'[{epoch}, {idx + 1:5d}] loss1: {running_loss1 / 100:.3f} loss2: {running_loss2 / 100:.3f}')
+                    running_loss1 = 0.0
+                    running_loss2 = 0.0
                 train_loss.append(loss.item())
                 train_loss1.append(loss1.item())
                 train_loss2.append(loss2.item())
