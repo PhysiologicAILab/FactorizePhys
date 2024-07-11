@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from neural_methods.model.FactorizePhys.FSAM import FeaturesFactorizationModule
 
-nf = [6, 12, 12, 12]
+nf = [8, 8, 8, 16]
 
 model_config = {
     "MD_FSAM": True,
@@ -63,8 +63,8 @@ class rPPG_FeatureExtractor(nn.Module):
             nn.Dropout3d(p=dropout_rate),
 
             ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 30, 30
-            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 14, 14
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 12, 12
+            ConvBlock3D(nf[2], nf[3], [5, 3, 3], [2, 2, 2], [2, 0, 0]), #B, nf[2], 80, 14, 14
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 80, 12, 12
             nn.Dropout3d(p=dropout_rate),
         )
 
@@ -87,8 +87,8 @@ class BVP_Head(nn.Module):
         self.md_res = md_config["MD_RESIDUAL"]
 
         self.conv_block = nn.Sequential(
-            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [1, 1, 1], [2, 0, 0]), #B, nf[2], 160, 10, 10
-            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [1, 1, 1], [2, 0, 0]), #B, nf[3], 160, 8, 8
+            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [1, 1, 1], [2, 0, 0]), #B, nf[2], 80, 10, 10
+            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [1, 1, 1], [2, 0, 0]), #B, nf[3], 80, 8, 8
         )
         
         if self.use_fsam:
@@ -98,6 +98,8 @@ class BVP_Head(nn.Module):
             self.bias1 = nn.Parameter(torch.tensor(1.0), requires_grad=True).to(device)
         else:
             inC = nf[3]
+
+        self.upsample = nn.Upsample(scale_factor=(2, 1, 1))
 
         self.final_layer = nn.Sequential(
             ConvBlock3D(inC, nf[1], [5, 3, 3], [1, 1, 1], [2, 0, 0]),                           #B, nf[1], 160, 6, 6
@@ -141,9 +143,11 @@ class BVP_Head(nn.Module):
             # # Concatenate
             # factorized_embeddings = torch.cat([voxel_embeddings, self.fsam_norm(x)], dim=1)
 
+            factorized_embeddings = self.upsample(factorized_embeddings)
             x = self.final_layer(factorized_embeddings)
         
         else:
+            voxel_embeddings = self.upsample(voxel_embeddings)
             x = self.final_layer(voxel_embeddings)
 
         rPPG = x.view(-1, length)
