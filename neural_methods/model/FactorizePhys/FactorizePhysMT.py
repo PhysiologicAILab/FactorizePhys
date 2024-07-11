@@ -5,9 +5,9 @@ FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmogra
 import torch
 import torch.nn as nn
 from neural_methods.model.FactorizePhys.FSAM import FeaturesFactorizationModule
-from copy import deepcopy
+# from copy import deepcopy
 
-nf = [8, 16, 16, 16]
+nf = [6, 12, 12, 12]
 
 model_config = {
     "MD_FSAM": True,
@@ -88,9 +88,8 @@ class BVP_Head(nn.Module):
         self.md_res = md_config["MD_RESIDUAL"]
 
         self.conv_block = nn.Sequential(
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 10, 10
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 8, 8
-            nn.Dropout3d(p=dropout_rate),
+            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [1, 1, 1], [2, 0, 0]), #B, nf[2], 160, 10, 10
+            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [1, 1, 1], [2, 0, 0]), #B, nf[3], 160, 8, 8
         )
         
         if self.use_fsam:
@@ -102,7 +101,8 @@ class BVP_Head(nn.Module):
             inC = nf[3]
 
         self.final_layer = nn.Sequential(
-            ConvBlock3D(inC, nf[0], [5, 4, 4], [1, 2, 2], [2, 0, 0]),                           #B, nf[0], 160, 3, 3
+            ConvBlock3D(inC, nf[1], [5, 3, 3], [1, 1, 1], [2, 0, 0]),                           #B, nf[1], 160, 6, 6
+            ConvBlock3D(nf[1], nf[0], [5, 4, 4], [1, 1, 1], [2, 0, 0]),                         #B, nf[0], 160, 3, 3
             nn.Conv3d(nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),    #B, 1, 160, 1, 1
         )
 
@@ -168,12 +168,12 @@ class rBr_FeatureExtractor(nn.Module):
         self.FeatureExtractor = nn.Sequential(
             ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),  #B, nf[0], 160, 70, 70
             ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 68, 68
-            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 66, 66
+            ConvBlock3D(nf[1], nf[1], [5, 3, 3], [2, 2, 2], [2, 0, 0]), #B, nf[1], 80, 33, 33
             nn.Dropout3d(p=dropout_rate),
 
-            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 160, 32, 32
-            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 30, 30
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 28, 28
+            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 80, 31, 31
+            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 80, 29, 29
+            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [2, 1, 1], [2, 0, 0]), #B, nf[2], 40, 27, 27
             nn.Dropout3d(p=dropout_rate),
         )
 
@@ -194,14 +194,14 @@ class Resp_Head(nn.Module):
         self.md_infer = md_config["MD_INFERENCE"]
         self.md_res = md_config["MD_RESIDUAL"]
 
-        md_config = deepcopy(md_config)
-        md_config["MD_R"] = 4
-        md_config["MD_S"] = 1
-        md_config["MD_STEPS"] = 6
+        # md_config = deepcopy(md_config)
+        # md_config["MD_R"] = 4
+        # md_config["MD_S"] = 1
+        # md_config["MD_STEPS"] = 6
 
         self.conv_block = nn.Sequential(
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 13, 13
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 11, 11
+            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [2, 2, 2], [2, 0, 0]), #B, nf[2], 20, 13, 13
+            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [1, 1, 1], [2, 0, 0]), #B, nf[3], 20, 11, 11
             nn.Dropout3d(p=dropout_rate),            
         )
 
@@ -212,6 +212,8 @@ class Resp_Head(nn.Module):
             self.bias1 = nn.Parameter(torch.tensor(1.0), requires_grad=True).to(device)
         else:
             inC = nf[3]
+
+        self.upsample = nn.Upsample(scale_factor=(8, 1, 1))
 
         self.final_layer = nn.Sequential(
             ConvBlock3D(inC, nf[0], [5, 5, 5], [1, 3, 3], [2, 0, 0]),                           #B, nf[0], 160, 3, 3
@@ -254,9 +256,11 @@ class Resp_Head(nn.Module):
             # # Concatenate
             # factorized_embeddings = torch.cat([voxel_embeddings, self.fsam_norm(x)], dim=1)
 
+            factorized_embeddings = self.upsample(factorized_embeddings)
             x = self.final_layer(factorized_embeddings)
         
         else:
+            voxel_embeddings = self.upsample(voxel_embeddings)
             x = self.final_layer(voxel_embeddings)
 
         rPPG = x.view(-1, length)
