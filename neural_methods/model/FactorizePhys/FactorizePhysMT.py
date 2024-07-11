@@ -5,6 +5,7 @@ FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmogra
 import torch
 import torch.nn as nn
 from neural_methods.model.FactorizePhys.FSAM import FeaturesFactorizationModule
+from copy import deepcopy
 
 nf = [8, 16, 16, 16]
 
@@ -192,6 +193,8 @@ class Resp_Head(nn.Module):
         self.md_type = md_config["MD_TYPE"]
         self.md_infer = md_config["MD_INFERENCE"]
         self.md_res = md_config["MD_RESIDUAL"]
+
+        md_config = deepcopy(md_config)
         md_config["MD_R"] = 4
         md_config["MD_S"] = 1
         md_config["MD_STEPS"] = 6
