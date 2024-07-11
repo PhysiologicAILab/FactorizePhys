@@ -124,7 +124,7 @@ class FactorizePhysMTTrainer(BaseTrainer):
 
                 loss1 = self.criterion1(pred_ppg, labels[..., 0])
                 loss2 = self.criterion2(pred_br, labels[..., 1])
-                loss = loss1 + loss2
+                loss = loss1 + 5*loss2
                 
                 loss.backward()
                 running_loss1 += loss1.item()
@@ -217,7 +217,7 @@ class FactorizePhysMTTrainer(BaseTrainer):
                 
                 loss1 = self.criterion1(pred_ppg, labels[..., 0])
                 loss2 = self.criterion2(pred_br, labels[..., 1])
-                loss = loss1 + loss2
+                loss = loss1 + 5*loss2
 
                 valid_loss1.append(loss1.item())
                 valid_loss2.append(loss2.item())
