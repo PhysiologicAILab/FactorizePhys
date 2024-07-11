@@ -651,7 +651,7 @@ class FeaturesFactorizationModule(nn.Module):
         self.device = device
         self.dim = dim
         md_type = md_config["MD_TYPE"]
-        align_C = md_config["align_channels"]    #inC // 2  # // 2 #// 8
+        align_C = inC // 2      #md_config["align_channels"]  # inC // 2  # // 2 #// 8
 
         if self.dim == "3D":
             if "nmf" in md_type.lower():

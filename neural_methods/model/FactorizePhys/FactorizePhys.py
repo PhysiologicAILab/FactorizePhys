@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from neural_methods.model.FactorizePhys.FSAM import FeaturesFactorizationModule
 
-nf = [12, 12, 12, 24]
+nf = [8, 16, 16, 16]
 
 model_config = {
     "MD_FSAM": True,
@@ -56,7 +56,7 @@ class encoder_block(nn.Module):
 
         self.debug = debug
         #                                                        Input: #B, inCh, 160, 72, 72
-        self.encoder1 = nn.Sequential(
+        self.encoder = nn.Sequential(
             ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),  #B, nf[0], 160, 70, 70
             ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 68, 68
             ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 66, 66
@@ -72,19 +72,12 @@ class encoder_block(nn.Module):
             nn.Dropout3d(p=dropout_rate),
         )
 
-        self.encoder2 = nn.Sequential(
-            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 11, 11
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 9, 9
-        )
-
     def forward(self, x):
-        hidden_embeddings = self.encoder1(x)
-        voxel_embeddings = self.encoder2(hidden_embeddings)
+        voxel_embeddings = self.encoder(x)
         if self.debug:
             print("Encoder")
-            print("     hidden_embeddings.shape", hidden_embeddings.shape)
             print("     voxel_embeddings.shape", voxel_embeddings.shape)
-        return hidden_embeddings, voxel_embeddings
+        return voxel_embeddings
 
 
 class BVP_Head(nn.Module):
@@ -97,6 +90,12 @@ class BVP_Head(nn.Module):
         self.md_infer = md_config["MD_INFERENCE"]
         self.md_res = md_config["MD_RESIDUAL"]
 
+        self.conv_block = nn.Sequential(
+            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 11, 11
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 9, 9
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]),   #B, inC, 160, 7, 7
+        )
+
         if self.use_fsam:
             inC = nf[3]
             self.fsam = FeaturesFactorizationModule(inC, device, md_config, dim="3D", debug=debug)
@@ -106,10 +105,7 @@ class BVP_Head(nn.Module):
             inC = nf[3]
 
         self.conv_decoder = nn.Sequential(
-            nn.Conv3d(inC, nf[0], (3, 3, 3), stride=(1, 3, 3), padding=(1, 0, 0), bias=False),  #B, nf[0], 160, 3, 3
-            nn.Tanh(),
-            nn.InstanceNorm3d(nf[0]),
-
+            ConvBlock3D(inC, nf[0], [3, 3, 3], [1, 2, 2], [1, 0, 0]),                           #B, inC, 160, 3, 3
             nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),    #B, 1, 160, 1, 1
         )
 
@@ -118,6 +114,8 @@ class BVP_Head(nn.Module):
         if self.debug:
             print("Decoder")
             print("     voxel_embeddings.shape", voxel_embeddings.shape)
+
+        voxel_embeddings = self.conv_block(voxel_embeddings)
 
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
             if "NMF" in self.md_type:
@@ -231,10 +229,7 @@ class FactorizePhys(nn.Module):
         if self.debug:
             print("Diff Normalized shape", x.shape)
 
-        hidden_embeddings, voxel_embeddings = self.encoder(x)
-        # if self.debug:
-        #     print("hidden_embeddings.shape", hidden_embeddings.shape)
-        #     print("voxel_embeddings.shape", voxel_embeddings.shape)
+        voxel_embeddings = self.encoder(x)
         
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
             rPPG, factorized_embeddings, att_mask, appx_error = self.rppg_head(voxel_embeddings, batch, length-1)
