@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from neural_methods.model.FactorizePhys.FSAM import FeaturesFactorizationModule
 
-nf = [8, 8, 8, 16]
+nf = [8, 16, 16, 16]
 
 model_config = {
     "MD_FSAM": True,
@@ -63,7 +63,7 @@ class rPPG_FeatureExtractor(nn.Module):
             nn.Dropout3d(p=dropout_rate),
 
             ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 30, 30
-            ConvBlock3D(nf[2], nf[3], [5, 3, 3], [2, 2, 2], [2, 0, 0]), #B, nf[2], 80, 14, 14
+            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [2, 2, 2], [1, 0, 0]), #B, nf[2], 80, 14, 14
             ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 80, 12, 12
             nn.Dropout3d(p=dropout_rate),
         )
@@ -87,8 +87,9 @@ class BVP_Head(nn.Module):
         self.md_res = md_config["MD_RESIDUAL"]
 
         self.conv_block = nn.Sequential(
-            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [1, 1, 1], [2, 0, 0]), #B, nf[2], 80, 10, 10
-            ConvBlock3D(nf[3], nf[3], [5, 3, 3], [1, 1, 1], [2, 0, 0]), #B, nf[3], 80, 8, 8
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 80, 10, 10
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 80, 8, 8
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 80, 6, 6
         )
         
         if self.use_fsam:
@@ -102,9 +103,8 @@ class BVP_Head(nn.Module):
         self.upsample = nn.Upsample(scale_factor=(2, 1, 1))
 
         self.final_layer = nn.Sequential(
-            ConvBlock3D(inC, nf[1], [5, 3, 3], [1, 1, 1], [2, 0, 0]),                           #B, nf[1], 160, 6, 6
-            ConvBlock3D(nf[1], nf[0], [5, 4, 4], [1, 1, 1], [2, 0, 0]),                         #B, nf[0], 160, 3, 3
-            nn.Conv3d(nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),    #B, 1, 160, 1, 1
+            ConvBlock3D(inC, nf[0], [3, 4, 4], [1, 1, 1], [1, 0, 0]),                         #B, nf[0], 160, 3, 3
+            nn.Conv3d(nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),  #B, 1, 160, 1, 1
         )
 
     def forward(self, voxel_embeddings, batch, length):
