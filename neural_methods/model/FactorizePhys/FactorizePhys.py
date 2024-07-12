@@ -40,7 +40,7 @@ class ConvBlock3D(nn.Module):
     def __init__(self, in_channel, out_channel, kernel_size, stride, padding):
         super(ConvBlock3D, self).__init__()
         self.conv_block_3d = nn.Sequential(
-            nn.Conv3d(in_channel, out_channel, kernel_size, stride, padding=padding, bias=False),
+            nn.Conv3d(in_channel, out_channel, kernel_size, stride, padding=padding, bias=True),
             nn.Tanh(),
             nn.InstanceNorm3d(out_channel),
         )
@@ -63,7 +63,7 @@ class rPPG_FeatureExtractor(nn.Module):
             nn.Dropout3d(p=dropout_rate),
 
             ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 30, 30
-            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [2, 2, 2], [1, 0, 0]), #B, nf[2], 80, 14, 14
+            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 14, 14
             nn.Dropout3d(p=dropout_rate),
         )
 
@@ -91,7 +91,7 @@ class BVP_Head(nn.Module):
         #     ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 80, 6, 6
         # )
         self.conv_block = nn.Sequential(
-            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[3], 80, 6, 6
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [2, 2, 2], [1, 0, 0]), #B, nf[3], 80, 6, 6
         )
 
         if self.use_fsam:
@@ -105,8 +105,8 @@ class BVP_Head(nn.Module):
         self.upsample = nn.Upsample(scale_factor=(2, 1, 1))
 
         self.final_layer = nn.Sequential(
-            ConvBlock3D(inC, nf[0], [3, 3, 3], [1, 2, 2], [1, 0, 0]),                         #B, nf[0], 160, 2, 2
-            nn.Conv3d(nf[0], 1, (3, 2, 2), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),  #B, 1, 160, 1, 1
+            ConvBlock3D(inC, nf[0], [3, 4, 4], [1, 1, 1], [1, 0, 0]),                         #B, nf[0], 160, 3, 3
+            nn.Conv3d(nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=True),  #B, 1, 160, 1, 1
         )
 
     def forward(self, voxel_embeddings, batch, length):
