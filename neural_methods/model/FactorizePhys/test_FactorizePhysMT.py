@@ -64,10 +64,10 @@ if __name__ == "__main__":
     num_trials = model_config["num_trials"]
     visualize = model_config["visualize"]
 
-    # if torch.cuda.is_available():
-    #     device = torch.device(0)
-    # else:
-    device = torch.device("cpu")
+    if torch.cuda.is_available():
+        device = torch.device(0)
+    else:
+        device = torch.device("cpu")
 
     if visualize:
         np_data = np.load(data_path)
