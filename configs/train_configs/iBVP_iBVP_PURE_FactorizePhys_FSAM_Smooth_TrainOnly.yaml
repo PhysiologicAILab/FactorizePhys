@@ -111,7 +111,7 @@ MODEL:
     MD_TYPE: "Smooth_NMF"
     MD_R: 1
     MD_S: 1
-    MD_STEPS: 3
+    MD_STEPS: 5
     MD_INFERENCE: False
 INFERENCE:
   BATCH_SIZE: 4
