@@ -161,7 +161,7 @@ class BVP_Head(nn.Module):
 
 
 class FactorizePhys(nn.Module):
-    def __init__(self, frames, md_config, in_channels=3, dropout=0.2, device=torch.device("cpu"), debug=False):
+    def __init__(self, frames, md_config, in_channels=3, dropout=0.1, device=torch.device("cpu"), debug=False):
         super(FactorizePhys, self).__init__()
         self.debug = debug
 
