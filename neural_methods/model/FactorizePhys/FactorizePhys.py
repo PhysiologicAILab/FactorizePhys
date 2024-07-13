@@ -89,7 +89,7 @@ class BVP_Head(nn.Module):
         self.conv_block = nn.Sequential(
             ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 10, 10
             ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 8, 8
-            # ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 6, 6
+            ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 6, 6
         )
 
         if self.use_fsam:
@@ -101,9 +101,9 @@ class BVP_Head(nn.Module):
             inC = nf[3]
 
         self.final_layer = nn.Sequential(
-            ConvBlock3D(inC, nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]),                          #B, nf[1], 160, 6, 6
-            ConvBlock3D(nf[1], nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),                        #B, nf[0], 160, 4, 4
-            nn.Conv3d(nf[0], 1, (3, 4, 4), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),   #B, 1, 160, 1, 1
+            ConvBlock3D(inC, nf[0], [3, 4, 4], [1, 1, 1], [1, 0, 0]),                          #B, nf[0], 160, 3, 3
+            ConvBlock3D(nf[0], nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),                        #B, nf[0], 160, 1, 1
+            nn.Conv3d(nf[0], 1, (3, 1, 1), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),   #B, 1, 160, 1, 1
         )
 
     def forward(self, voxel_embeddings, batch, length):
