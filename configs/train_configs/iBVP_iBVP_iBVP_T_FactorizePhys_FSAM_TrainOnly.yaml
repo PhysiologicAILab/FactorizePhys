@@ -111,9 +111,9 @@ MODEL:
     FRAME_NUM: 160
     MD_FSAM: True
     MD_TYPE: "NMF"
-    MD_R: 4
+    MD_R: 2
     MD_S: 1
-    MD_STEPS: 4
+    MD_STEPS: 6
     MD_INFERENCE: False
 INFERENCE:
   BATCH_SIZE: 4
