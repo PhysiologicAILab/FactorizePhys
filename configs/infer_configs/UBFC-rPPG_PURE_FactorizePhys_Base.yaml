@@ -46,4 +46,4 @@ INFERENCE:
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
     WINDOW_SIZE: 30        # In seconds
-  MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_Base_Epoch23.pth"
+  MODEL_PATH: "./runs/exp/UBFC-rPPG_Raw_160_72x72/PreTrainedModels/UBFC_UBFC_PURE_FactorizePhys_Base_Epoch20.pth"
