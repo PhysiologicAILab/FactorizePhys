@@ -115,7 +115,7 @@ class BVP_Head(nn.Module):
         self.md_res = md_config["MD_RESIDUAL"]
         self.mode = md_config["MODE"]
 
-        if self.mode == "rgb":
+        if self.mode.lower() == "rgb":
             self.conv_block = nn.Sequential(
                 ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 10, 10
                 ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 8, 8
@@ -138,7 +138,7 @@ class BVP_Head(nn.Module):
         else:
             inC = nf[3]
 
-        if self.mode == "rgb":
+        if self.mode.lower() == "rgb":
             self.final_layer = nn.Sequential(
                 ConvBlock3D(inC, nf[0], [3, 4, 4], [1, 1, 1], [1, 0, 0]),                          #B, nf[0], 160, 3, 3
                 nn.Conv3d(nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),   #B, 1, 160, 1, 1
@@ -227,7 +227,7 @@ class FactorizePhys(nn.Module):
         if self.debug:
             print("nf:", nf)
 
-        if self.mode == "rgb":
+        if self.mode.lower() == "rgb":
             self.rppg_feature_extractor = rPPG_FeatureExtractor(self.in_channels, dropout_rate=dropout, debug=debug)
         else:
             self.rppg_feature_extractor = rPPG_ThermalFeatureExtractor(self.in_channels, dropout_rate=dropout, debug=debug)
