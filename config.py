@@ -316,6 +316,7 @@ _C.MODEL.PHYSNET.CHANNELS = 3
 _C.MODEL.FactorizePhys = CN()
 _C.MODEL.FactorizePhys.FRAME_NUM = 160
 _C.MODEL.FactorizePhys.CHANNELS = 3
+_C.MODEL.FactorizePhys.MODE = "RGB"
 _C.MODEL.FactorizePhys.MD_FSAM = False
 _C.MODEL.FactorizePhys.MD_TYPE = 'NMF'
 _C.MODEL.FactorizePhys.MD_R = 1
@@ -325,18 +326,18 @@ _C.MODEL.FactorizePhys.MD_INFERENCE = False
 _C.MODEL.FactorizePhys.MD_RESIDUAL = False
 
 # -----------------------------------------------------------------------------
-# Specific parameters for FactorizePhysMT parameters
+# Specific parameters for MMRPhys parameters
 # -----------------------------------------------------------------------------
-_C.MODEL.FactorizePhysMT = CN()
-_C.MODEL.FactorizePhysMT.FRAME_NUM = 160
-_C.MODEL.FactorizePhysMT.CHANNELS = 3
-_C.MODEL.FactorizePhysMT.MD_FSAM = False
-_C.MODEL.FactorizePhysMT.MD_TYPE = 'NMF'
-_C.MODEL.FactorizePhysMT.MD_R = 1
-_C.MODEL.FactorizePhysMT.MD_S = 1
-_C.MODEL.FactorizePhysMT.MD_STEPS = 4
-_C.MODEL.FactorizePhysMT.MD_INFERENCE = False
-_C.MODEL.FactorizePhysMT.MD_RESIDUAL = False
+_C.MODEL.MMRPhys = CN()
+_C.MODEL.MMRPhys.FRAME_NUM = 160
+_C.MODEL.MMRPhys.CHANNELS = 3
+_C.MODEL.MMRPhys.MD_FSAM = False
+_C.MODEL.MMRPhys.MD_TYPE = 'NMF'
+_C.MODEL.MMRPhys.MD_R = 1
+_C.MODEL.MMRPhys.MD_S = 1
+_C.MODEL.MMRPhys.MD_STEPS = 4
+_C.MODEL.MMRPhys.MD_INFERENCE = False
+_C.MODEL.MMRPhys.MD_RESIDUAL = False
 
 # -----------------------------------------------------------------------------
 # Model Settings for TS-CAN

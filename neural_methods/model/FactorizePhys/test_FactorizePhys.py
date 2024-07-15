@@ -17,6 +17,7 @@ model_config = {
     "MD_RESIDUAL": False,
     "in_channels": 3,
     "data_channels": 4,
+    "MODE": "Thermal",
     "height": 72,
     "weight": 72,
     "batch_size": 2,
@@ -94,6 +95,7 @@ if __name__ == "__main__":
     # exit()
     md_config = {}
     md_config["FRAME_NUM"] = frames
+    md_config["MODE"] = model_config["MODE"]
     md_config["MD_S"] = model_config["MD_S"]
     md_config["MD_R"] = model_config["MD_R"]
     md_config["MD_STEPS"] = model_config["MD_STEPS"]

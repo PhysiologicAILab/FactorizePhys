@@ -5,7 +5,7 @@ FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmogra
 import torch
 import torch.nn as nn
 import numpy as np
-from neural_methods.model.FactorizePhys.FactorizePhysMT import FactorizePhysMT
+from neural_methods.model.FactorizePhys.MMRPhys import MMRPhys
 
 model_config = {
     "MD_FSAM": True,
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     md_config["MD_INFERENCE"] = model_config["MD_INFERENCE"]
     md_config["MD_RESIDUAL"] = model_config["MD_RESIDUAL"]
 
-    net = nn.DataParallel(FactorizePhysMT(frames=frames, md_config=md_config,
+    net = nn.DataParallel(MMRPhys(frames=frames, md_config=md_config,
                           device=device, in_channels=in_channels, debug=debug)).to(device)
     # net.load_state_dict(torch.load(ckpt_path, map_location=device))
     net.eval()

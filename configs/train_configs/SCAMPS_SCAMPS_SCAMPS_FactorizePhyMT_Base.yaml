@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 10
   LR: 1e-3
-  MODEL_FILE_NAME: SCAMPS_SCAMPS_SCAMPS_FactorizePhysMT_Base
+  MODEL_FILE_NAME: SCAMPS_SCAMPS_SCAMPS_MMRPhys_Base
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -109,8 +109,8 @@ LOG:
   PATH: runs/exp
 MODEL:
   DROP_RATE: 0.1
-  NAME: FactorizePhysMT
-  FactorizePhysMT:
+  NAME: MMRPhys
+  MMRPhys:
     CHANNELS: 3
     FRAME_NUM: 160
 INFERENCE:

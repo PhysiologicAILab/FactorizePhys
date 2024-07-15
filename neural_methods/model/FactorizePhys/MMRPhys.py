@@ -275,9 +275,9 @@ class Resp_Head(nn.Module):
 
 
 
-class FactorizePhysMT(nn.Module):
+class MMRPhys(nn.Module):
     def __init__(self, frames, md_config, in_channels=3, dropout=0.2, device=torch.device("cpu"), debug=False):
-        super(FactorizePhysMT, self).__init__()
+        super(MMRPhys, self).__init__()
         self.debug = debug
 
         self.in_channels = in_channels

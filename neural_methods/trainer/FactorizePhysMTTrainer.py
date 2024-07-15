@@ -5,12 +5,12 @@ import torch
 import torch.optim as optim
 from evaluation.metrics import calculate_metrics
 from neural_methods.loss.NegPearsonLoss import Neg_Pearson
-from neural_methods.model.FactorizePhys.FactorizePhysMT import FactorizePhysMT
+from neural_methods.model.FactorizePhys.MMRPhys import MMRPhys
 from neural_methods.trainer.BaseTrainer import BaseTrainer
 from tqdm import tqdm
 
 
-class FactorizePhysMTTrainer(BaseTrainer):
+class MMRPhysTrainer(BaseTrainer):
 
     def __init__(self, config, data_loader):
         """Inits parameters from args and the writer for TensorboardX."""
@@ -34,23 +34,23 @@ class FactorizePhysMTTrainer(BaseTrainer):
             self.device = torch.device("cpu")  # if no GPUs set device is CPU
             self.num_of_gpu = 0  # no GPUs used
 
-        frames = self.config.MODEL.FactorizePhysMT.FRAME_NUM
-        in_channels = self.config.MODEL.FactorizePhysMT.CHANNELS
+        frames = self.config.MODEL.MMRPhys.FRAME_NUM
+        in_channels = self.config.MODEL.MMRPhys.CHANNELS
 
         md_config = {}
-        md_config["FRAME_NUM"] = self.config.MODEL.FactorizePhysMT.FRAME_NUM
-        md_config["MD_TYPE"] = self.config.MODEL.FactorizePhysMT.MD_TYPE
-        md_config["MD_FSAM"] = self.config.MODEL.FactorizePhysMT.MD_FSAM
-        md_config["MD_S"] = self.config.MODEL.FactorizePhysMT.MD_S
-        md_config["MD_R"] = self.config.MODEL.FactorizePhysMT.MD_R
-        md_config["MD_STEPS"] = self.config.MODEL.FactorizePhysMT.MD_STEPS
-        md_config["MD_INFERENCE"] = self.config.MODEL.FactorizePhysMT.MD_INFERENCE
-        md_config["MD_RESIDUAL"] = self.config.MODEL.FactorizePhysMT.MD_RESIDUAL
+        md_config["FRAME_NUM"] = self.config.MODEL.MMRPhys.FRAME_NUM
+        md_config["MD_TYPE"] = self.config.MODEL.MMRPhys.MD_TYPE
+        md_config["MD_FSAM"] = self.config.MODEL.MMRPhys.MD_FSAM
+        md_config["MD_S"] = self.config.MODEL.MMRPhys.MD_S
+        md_config["MD_R"] = self.config.MODEL.MMRPhys.MD_R
+        md_config["MD_STEPS"] = self.config.MODEL.MMRPhys.MD_STEPS
+        md_config["MD_INFERENCE"] = self.config.MODEL.MMRPhys.MD_INFERENCE
+        md_config["MD_RESIDUAL"] = self.config.MODEL.MMRPhys.MD_RESIDUAL
 
-        self.md_infer = self.config.MODEL.FactorizePhysMT.MD_INFERENCE
-        self.use_fsam = self.config.MODEL.FactorizePhysMT.MD_FSAM
+        self.md_infer = self.config.MODEL.MMRPhys.MD_INFERENCE
+        self.use_fsam = self.config.MODEL.MMRPhys.MD_FSAM
 
-        self.model = FactorizePhysMT(frames=frames, md_config=md_config, in_channels=in_channels,
+        self.model = MMRPhys(frames=frames, md_config=md_config, in_channels=in_channels,
                                 dropout=self.dropout_rate, device=self.device)  # [3, T, 128,128]
 
         if torch.cuda.device_count() > 0 and self.num_of_gpu > 0:  # distribute model across GPUs
@@ -70,7 +70,7 @@ class FactorizePhysMTTrainer(BaseTrainer):
         elif self.config.TOOLBOX_MODE == "only_test":
             pass
         else:
-            raise ValueError("FactorizePhysMT trainer initialized in incorrect toolbox mode!")
+            raise ValueError("MMRPhys trainer initialized in incorrect toolbox mode!")
 
     def train(self, data_loader):
         """Training routine for model"""

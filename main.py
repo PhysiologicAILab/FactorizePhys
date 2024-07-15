@@ -67,8 +67,8 @@ def train_and_test(config, data_loader_dict, train=False, test=False):
         model_trainer = trainer.PhysnetTrainer.PhysnetTrainer(config, data_loader_dict)
     elif config.MODEL.NAME == "FactorizePhys":
         model_trainer = trainer.FactorizePhysTrainer.FactorizePhysTrainer(config, data_loader_dict)
-    elif config.MODEL.NAME == "FactorizePhysMT":
-        model_trainer = trainer.FactorizePhysMTTrainer.FactorizePhysMTTrainer(config, data_loader_dict)
+    elif config.MODEL.NAME == "MMRPhys":
+        model_trainer = trainer.MMRPhysTrainer.MMRPhysTrainer(config, data_loader_dict)
     elif config.MODEL.NAME == "Tscan":
         model_trainer = trainer.TscanTrainer.TscanTrainer(config, data_loader_dict)
     elif config.MODEL.NAME == "EfficientPhys" or config.MODEL.NAME == "EfficientPhysFM":

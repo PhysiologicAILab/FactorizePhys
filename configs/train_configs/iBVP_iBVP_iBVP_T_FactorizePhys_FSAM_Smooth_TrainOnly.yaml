@@ -109,6 +109,7 @@ MODEL:
   FactorizePhys:
     CHANNELS: 1
     FRAME_NUM: 160
+    MODE: "Thermal"
     MD_FSAM: True
     MD_TYPE: "Smooth_NMF"
     MD_R: 1
