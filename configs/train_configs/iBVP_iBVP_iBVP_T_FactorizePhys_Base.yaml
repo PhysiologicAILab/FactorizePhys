@@ -109,6 +109,7 @@ MODEL:
   FactorizePhys:
     CHANNELS: 1
     FRAME_NUM: 160
+    MODE: "Thermal"
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
