@@ -124,9 +124,9 @@ class BVP_Head(nn.Module):
             )
         else:
             self.conv_block = nn.Sequential(
-                ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[3], 160, 13, 13
-                ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 11, 11
-                ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 9, 9
+                ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 26, 26
+                ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 24, 24
+                ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[3], 160, 11, 11
                 nn.Dropout3d(p=dropout_rate),
             )
 
@@ -145,8 +145,8 @@ class BVP_Head(nn.Module):
             )
         else:
             self.final_layer = nn.Sequential(
-                ConvBlock3D(inC, nf[0], [3, 4, 4], [1, 2, 2], [1, 0, 0]),                          #B, nf[0], 160, 3, 3
-                nn.Conv3d(nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),   #B, 1, 160, 1, 1
+                ConvBlock3D(inC, nf[0], [3, 3, 3], [1, 2, 2], [1, 0, 0]),                          #B, nf[0], 160, 5, 5
+                nn.Conv3d(nf[0], 1, (5, 5, 5), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),   #B, 1, 160, 1, 1
             )
 
     def forward(self, voxel_embeddings, batch, length):
