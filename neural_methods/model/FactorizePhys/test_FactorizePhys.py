@@ -41,12 +41,7 @@ if __name__ == "__main__":
     # default `log_dir` is "runs" - we'll be more specific here
     # writer = SummaryWriter('runs/FactorizePhys')
 
-    # ckpt_path = "/Users/jiteshjoshi/Downloads/rPPG_Testing/models/PURE_PURE_iBVP_FactorizePhys_FactorizePhys_5_Epoch6.pth"
-    # ckpt_path = "/Users/jiteshjoshi/Downloads/rPPG_Testing/models/PURE_PURE_iBVP_FactorizePhys_FactorizePhys_5_Epoch12.pth"
-    # ckpt_path = "/Users/jiteshjoshi/Downloads/rPPG_Testing/models/PURE_PURE_iBVP_FactorizePhys_FactorizePhys_5_Epoch19.pth"
     ckpt_path = model_config["ckpt_path"]
-
-    # data_path = "/Users/jiteshjoshi/Downloads/rPPG_Testing/data/subject36_input9.npy"
     data_path = model_config["data_path"]
 
     label_path = model_config["label_path"]

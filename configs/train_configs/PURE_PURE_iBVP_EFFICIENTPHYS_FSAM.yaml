@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 30
   LR: 1e-3
-  MODEL_FILE_NAME: PURE_PURE_EfficientPhys_FSAM_FD20_V14
+  MODEL_FILE_NAME: PURE_PURE_EfficientPhys_FSAM
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -77,7 +77,7 @@ TEST:
     BEGIN: 0.0
     END: 1.0
     PREPROCESS:
-      DATA_TYPE: ['Raw']         #if use EfficientPhys, Data_Type should be Raw and Label_Type should be Standardized
+      DATA_TYPE: ['Raw']         #if use EfficientPhys, Data_Type should be Raw and Label_Type should be Raw
       LABEL_TYPE: Standardized
       DO_CHUNK: True
       CHUNK_LENGTH: 160
@@ -95,7 +95,7 @@ TEST:
       RESIZE:
         H: 72
         W: 72
-DEVICE: cuda:0
+DEVICE: cuda:1
 NUM_OF_GPU_TRAIN: 1
 LOG:
   PATH: runs/exp

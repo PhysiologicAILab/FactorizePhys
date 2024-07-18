@@ -1,3 +1,7 @@
+"""
+FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmography through Factorization of Voxel Embeddings
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
