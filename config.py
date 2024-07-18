@@ -493,6 +493,8 @@ def update_config(config, args):
         if ext == '.csv' and config.VALID.DATA.DO_PREPROCESS:
             raise ValueError('User specified VALIDATION dataset FILE_LIST_PATH .csv file already exists. \
                             Please turn DO_PREPROCESS to False or delete existing VALIDATION dataset FILE_LIST_PATH .csv file.')
+    elif config.TOOLBOX_MODE == 'only_test' and config.VALID.DATA.DATASET is None:
+        pass
     elif not config.TEST.USE_LAST_EPOCH and config.VALID.DATA.DATASET is None:
         raise ValueError('VALIDATION dataset is not provided despite USE_LAST_EPOCH being False!')
 
