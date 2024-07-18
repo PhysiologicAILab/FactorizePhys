@@ -2,7 +2,7 @@ from copy import deepcopy
 import os
 import cv2
 import torch
-from model.yolo import Model
+from dataset.data_loader.face_detector.model.yolo import Model
 from dataset.data_loader.face_detector.utils.data_ops import letterbox, scale_coords_landmarks, show_results, check_img_size, non_max_suppression_face, scale_coords
 
 class YOLO5Face(object):
