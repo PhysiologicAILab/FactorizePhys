@@ -9,6 +9,7 @@ import numpy as np
 import torch.nn.functional as F
 import pdb
 import torch.nn as nn
+from neural_methods.loss.FocalLoss import FocalLoss
 
 def normal_sampling(mean, label_k, std):
     return math.exp(-(label_k-mean)**2/(2*std**2))/(math.sqrt(2*math.pi)*std)
@@ -28,9 +29,9 @@ class TorchLossComputer(object):
         two_pi_n_over_N = torch.autograd.Variable(2 * math.pi * torch.arange(0, N, dtype=torch.float), requires_grad=True) / N
         hanning = torch.autograd.Variable(torch.from_numpy(np.hanning(N)).type(torch.FloatTensor), requires_grad=True).view(1, -1)
 
-        k = k.type(torch.FloatTensor).cuda()
-        two_pi_n_over_N = two_pi_n_over_N.cuda()
-        hanning = hanning.cuda()
+        k = k.type(torch.FloatTensor).to(output.device)
+        two_pi_n_over_N = two_pi_n_over_N.to(output.device)
+        hanning = hanning.to(output.device)
             
         output = output.view(1, -1) * hanning
         output = output.view(1, 1, -1).type(torch.cuda.FloatTensor)
@@ -60,7 +61,7 @@ class TorchLossComputer(object):
     def cross_entropy_power_spectrum_loss(inputs, target, Fs):
         inputs = inputs.view(1, -1)
         target = target.view(1, -1)
-        bpm_range = torch.arange(40, 180, dtype=torch.float).cuda()
+        bpm_range = torch.arange(40, 180, dtype=torch.float).to(inputs.device)
 
         complex_absolute = TorchLossComputer.complex_absolute(inputs, Fs, bpm_range)
 
@@ -73,7 +74,7 @@ class TorchLossComputer(object):
     def cross_entropy_power_spectrum_focal_loss(inputs, target, Fs, gamma):
         inputs = inputs.view(1, -1)
         target = target.view(1, -1)
-        bpm_range = torch.arange(40, 180, dtype=torch.float).cuda()
+        bpm_range = torch.arange(40, 180, dtype=torch.float).to(inputs.device)
 
         complex_absolute = TorchLossComputer.complex_absolute(inputs, Fs, bpm_range)
 
@@ -89,7 +90,7 @@ class TorchLossComputer(object):
     @staticmethod
     def cross_entropy_power_spectrum_forward_pred(inputs, Fs):
         inputs = inputs.view(1, -1)
-        bpm_range = torch.arange(40, 190, dtype=torch.float).cuda()
+        bpm_range = torch.arange(40, 190, dtype=torch.float).to(inputs.device)
 
         complex_absolute = TorchLossComputer.complex_absolute(inputs, Fs, bpm_range)
 
@@ -104,12 +105,12 @@ class TorchLossComputer(object):
         target[target >= 180] = 180
         target_distribution = [normal_sampling(int(target), i, std) for i in range(40, 180)]
         target_distribution = [i if i > 1e-15 else 1e-15 for i in target_distribution]
-        target_distribution = torch.Tensor(target_distribution).to(torch.device('cuda'))
+        target_distribution = torch.Tensor(target_distribution).to(inputs.device)
         
         inputs = inputs.view(1, -1)
         target = target.view(1, -1)
         
-        bpm_range = torch.arange(40, 180, dtype=torch.float).to(torch.device('cuda'))
+        bpm_range = torch.arange(40, 180, dtype=torch.float).to(inputs.device)
 
         ca = TorchLossComputer.complex_absolute(inputs, Fs, bpm_range)
         

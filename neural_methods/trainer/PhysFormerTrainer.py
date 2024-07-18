@@ -146,7 +146,8 @@ class PhysFormerTrainer(BaseTrainer):
                         rPPG[bb],
                         hr[bb],
                         self.frame_rate,
-                        std=1.0
+                        std=1.0,
+                        device=self.device
                     )
                     fre_loss = fre_loss+fre_loss_temp
                     kl_loss = kl_loss+loss_distribution_kl
