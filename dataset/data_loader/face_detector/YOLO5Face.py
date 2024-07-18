@@ -2,8 +2,36 @@ from copy import deepcopy
 import os
 import cv2
 import torch
+import torch.nn as nn
 from dataset.data_loader.face_detector.model.yolo import Model
 from dataset.data_loader.face_detector.utils.data_ops import letterbox, scale_coords_landmarks, show_results, check_img_size, non_max_suppression_face, scale_coords
+
+
+def autopad(k, p=None):  # kernel, padding
+    # Pad to 'same'
+    if p is None:
+        p = k // 2 if isinstance(k, int) else [x // 2 for x in k]  # auto-pad
+    return p
+
+
+class Conv(nn.Module):
+    # Standard convolution
+    # ch_in, ch_out, kernel, stride, padding, groups
+    def __init__(self, c1, c2, k=1, s=1, p=None, g=1, act=True):
+        super(Conv, self).__init__()
+        self.conv = nn.Conv2d(c1, c2, k, s, autopad(k, p),
+                              groups=g, bias=False)
+        self.bn = nn.BatchNorm2d(c2)
+        self.act = nn.SiLU() if act is True else (
+            act if isinstance(act, nn.Module) else nn.Identity())
+        # self.act = self.act = nn.LeakyReLU(0.1, inplace=True) if act is True else (act if isinstance(act, nn.Module) else nn.Identity())
+
+    def forward(self, x):
+        return self.act(self.bn(self.conv(x)))
+
+    def fuseforward(self, x):
+        return self.act(self.conv(x))
+
 
 class YOLO5Face(object):
     def __init__(self, backend="Y5F", device=None) -> None:
@@ -38,7 +66,15 @@ class YOLO5Face(object):
 
         checkpoint = torch.load(ckpt, map_location=self.device)
         self.model.load_state_dict(checkpoint)
-        self.model.eval()
+
+        # Compatibility updates
+        for m in self.model.modules():
+            if type(m) in [nn.Hardswish, nn.LeakyReLU, nn.ReLU, nn.ReLU6, nn.SiLU]:
+                m.inplace = True  # pytorch 1.7.0 compatibility
+            elif type(m) is Conv:
+                m._non_persistent_buffers_set = set()  # pytorch 1.6.0 compatibility
+
+        self.model.float().fuse().eval()
 
 
     def detect_face(self, frame):
