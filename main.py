@@ -167,7 +167,9 @@ if __name__ == "__main__":
             data_loader_dict['train'] = None
 
         # valid_loader
-        if config.VALID.DATA.DATASET == "UBFC-rPPG":
+        if config.TEST.USE_LAST_EPOCH:
+            config.VALID.DATA.DATASET = None
+        elif config.VALID.DATA.DATASET == "UBFC-rPPG":
             valid_loader = data_loader.UBFCrPPGLoader.UBFCrPPGLoader
         elif config.VALID.DATA.DATASET == "PURE":
             valid_loader = data_loader.PURELoader.PURELoader
