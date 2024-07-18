@@ -11,7 +11,7 @@ import torch.optim as optim
 from evaluation.metrics import calculate_metrics
 from neural_methods.loss.NegPearsonLoss import Neg_Pearson
 from neural_methods.model.EfficientPhys import EfficientPhys
-from neural_methods.model.EfficientPhysFM import EfficientPhysFM
+from neural_methods.model.EfficientPhys_FSAM import EfficientPhys_FSAM
 from neural_methods.trainer.BaseTrainer import BaseTrainer
 from tqdm import tqdm
 
@@ -51,7 +51,7 @@ class EfficientPhysTrainer(BaseTrainer):
                     batch_size=self.batch_size,
                     device=self.device)
             else:
-                self.model = EfficientPhysFM(
+                self.model = EfficientPhys_FSAM(
                     in_channels=in_channels,
                     frame_depth=self.frame_depth,
                     img_size=config.TRAIN.DATA.PREPROCESS.RESIZE.H,
@@ -84,7 +84,7 @@ class EfficientPhysTrainer(BaseTrainer):
                     batch_size=self.batch_size,
                     device=self.device)
             else:
-                self.model = EfficientPhysFM(
+                self.model = EfficientPhys_FSAM(
                     in_channels=in_channels,
                     frame_depth=self.frame_depth,
                     img_size=config.TEST.DATA.PREPROCESS.RESIZE.H,

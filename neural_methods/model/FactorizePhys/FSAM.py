@@ -93,6 +93,15 @@ class _MatrixDecompositionBase(nn.Module):
             N = H * W
             x = x.view(B * self.S, D, N)
 
+        elif self.dim == "2D_TSM":  # (B*frame_depth, C, H, W) -> (B, D, N)
+            B, C, H, W = x.shape
+            BN = B
+            B = B // self.S
+            D = self.S
+            N = C * H * W
+            x = x.view(B, D, N)
+            self.S = 1  # re-setting this for local inference
+
         elif self.dim == "1D":                       # (B, C, L) -> (B * S, D, N)
             B, C, L = x.shape
             D = L // self.S
@@ -170,6 +179,11 @@ class _MatrixDecompositionBase(nn.Module):
         elif self.dim == "2D":
             # (B * S, D, N) -> (B, C, H, W)
             x = x.view(B, C, H, W)
+
+        elif self.dim == "2D_TSM":
+            # (B, D, N) -> (B, C, H, W)
+            x = x.view(BN, C, H, W)
+
         else:
             # (B * S, D, N) -> (B, C, L)
             x = x.view(B, C, L)
@@ -557,7 +571,7 @@ class ConvBNReLU(nn.Module):
                 return (0, 0, 0)
             elif kernel_size == (3, 3, 3):
                 return (1, 1, 1)
-        elif dim == "2D":
+        elif dim == "2D" or dim == "2D_TSM":
             if kernel_size == (1, 1):
                 return (0, 0)
             elif kernel_size == (3, 3):
@@ -579,7 +593,7 @@ class ConvBNReLU(nn.Module):
         if dilation == 1:
             if self.dim == "3D":
                 dilation = (1, 1, 1)
-            elif self.dim == "2D":
+            elif self.dim == "2D" or dim == "2D_TSM":
                 dilation = (1, 1)
             else:
                 dilation = 1
@@ -587,7 +601,7 @@ class ConvBNReLU(nn.Module):
         if kernel_size == 1:
             if self.dim == "3D":
                 kernel_size = (1, 1, 1)
-            elif self.dim == "2D":
+            elif self.dim == "2D" or dim == "2D_TSM":
                 kernel_size = (1, 1)
             else:
                 kernel_size = 1
@@ -595,7 +609,7 @@ class ConvBNReLU(nn.Module):
         if stride == 1:
             if self.dim == "3D":
                 stride = (1, 1, 1)
-            elif self.dim == "2D":
+            elif self.dim == "2D" or dim == "2D_TSM":
                 stride = (1, 1)
             else:
                 stride = 1
@@ -609,7 +623,7 @@ class ConvBNReLU(nn.Module):
                                   padding=padding, dilation=dilation,
                                   groups=groups,
                                   bias=False)
-        elif self.dim == "2D":
+        elif self.dim == "2D" or dim == "2D_TSM":
             self.conv = nn.Conv2d(in_c, out_c,
                                   kernel_size=kernel_size, stride=stride,
                                   padding=padding, dilation=dilation,
@@ -630,7 +644,7 @@ class ConvBNReLU(nn.Module):
         if self.apply_bn:
             if self.dim == "3D":
                 self.bn = nn.InstanceNorm3d(out_c)
-            elif self.dim == "2D":
+            elif self.dim == "2D" or dim == "2D_TSM":
                 self.bn = nn.InstanceNorm2d(out_c)
             else:
                 self.bn = nn.InstanceNorm1d(out_c)
@@ -651,7 +665,7 @@ class FeaturesFactorizationModule(nn.Module):
         self.device = device
         self.dim = dim
         md_type = md_config["MD_TYPE"]
-        align_C = inC // 2      #md_config["align_channels"]  # inC // 2  # // 2 #// 8
+        align_C = md_config["align_channels"]  # inC // 2  # // 2 #// 8
 
         if self.dim == "3D":
             if "nmf" in md_type.lower():
@@ -660,7 +674,7 @@ class FeaturesFactorizationModule(nn.Module):
                     nn.ReLU(inplace=True))
             else:
                 self.pre_conv_block = nn.Conv3d(inC, align_C, (1, 1, 1))
-        elif self.dim == "2D":
+        elif self.dim == "2D" or self.dim == "2D_TSM":
             if "nmf" in md_type.lower():
                 self.pre_conv_block = nn.Sequential(
                     nn.Conv2d(inC, align_C, (1, 1)),
@@ -700,7 +714,7 @@ class FeaturesFactorizationModule(nn.Module):
                     ConvBNReLU(align_C, align_C, dim=self.dim, kernel_size=1, apply_act=False), 
                     nn.Conv3d(align_C, inC, 1, bias=False)
                     )
-        elif self.dim == "2D":
+        elif self.dim == "2D" or self.dim == "2D_TSM":
             if "nmf" in md_type.lower():
                 self.post_conv_block = nn.Sequential(
                     ConvBNReLU(align_C, align_C, dim=self.dim, kernel_size=1), 

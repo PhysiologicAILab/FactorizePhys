@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 30
   LR: 1e-3
-  MODEL_FILE_NAME: iBVP_iBVP_EfficientPhysFM
+  MODEL_FILE_NAME: iBVP_iBVP_EfficientPhys_FSAM
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -103,7 +103,7 @@ LOG:
   PATH: runs/exp
 MODEL:
   DROP_RATE: 0.2
-  NAME: EfficientPhysFM
+  NAME: EfficientPhys_FSAM
   EFFICIENTPHYS:
     CHANNELS: 3
     FRAME_DEPTH: 20

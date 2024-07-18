@@ -101,7 +101,7 @@ LOG:
   PATH: runs/exp
 MODEL:
   DROP_RATE: 0.2
-  NAME: EfficientPhysFM
+  NAME: EfficientPhys_FSAM
   EFFICIENTPHYS:
     CHANNELS: 3
     FRAME_DEPTH: 20
