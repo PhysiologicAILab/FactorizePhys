@@ -40,7 +40,7 @@ class YOLO5Face(object):
 
         checkpoint = torch.load(ckpt, map_location=self.device)
         self.model.load_state_dict(checkpoint)
-        self.model.float().fuse().eval()
+        self.model.float().eval()
 
 
     def detect_face(self, frame):
