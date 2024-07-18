@@ -36,6 +36,9 @@ TRAIN:
       RESIZE:
         H: 72
         W: 72
+VALID:
+  DATA:
+    DATASET: None
 TEST:
   METRICS: ['MAE', 'RMSE', 'MAPE', 'Pearson', 'SNR', 'BA', 'MACC']
   USE_LAST_EPOCH: True                   # to use provided validation dataset to find the best epoch, should be false
