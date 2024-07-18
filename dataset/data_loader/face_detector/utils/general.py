@@ -16,8 +16,6 @@ import torch
 import torchvision
 import yaml
 
-from dataset.data_loader.face_detector.utils.google_utils import gsutil_getsize
-from dataset.data_loader.face_detector.utils.metrics import fitness
 from dataset.data_loader.face_detector.utils.torch_utils import init_torch_seeds
 
 # Settings
