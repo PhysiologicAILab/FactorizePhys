@@ -45,15 +45,12 @@ class YOLO5Face(object):
 
         img0 = deepcopy(frame)
         h0, w0 = img0.shape[:2]  # orig hw
-        
-        # r = self.img_size / max(h0, w0)  # resize image to img_size
-        # if r != 1:  # always resize down, only resize up if training with augmentation
-        #     interp = cv2.INTER_AREA if r < 1  else cv2.INTER_LINEAR
-        #     img0 = cv2.resize(img0, (int(w0 * r), int(h0 * r)), interpolation=interp)
+        r = self.img_size / max(h0, w0)  # resize image to img_size
+        if r != 1:  # always resize down, only resize up if training with augmentation
+            interp = cv2.INTER_AREA if r < 1  else cv2.INTER_LINEAR
+            img0 = cv2.resize(img0, (int(w0 * r), int(h0 * r)), interpolation=interp)
 
-        # imgsz = check_img_size(self.img_size, s=self.model.stride.max())  # check img_size
-
-        imgsz = check_img_size(w0, s=self.model.stride.max())  # check img_size
+        imgsz = check_img_size(self.img_size, s=self.model.stride.max())  # check img_size
         img = letterbox(img0, new_shape=imgsz)[0]
 
         # Convert from w,h,c to c,w,h
