@@ -168,7 +168,7 @@ if __name__ == "__main__":
 
         # valid_loader
         if config.TEST.USE_LAST_EPOCH:
-            config.VALID.DATA.DATASET = None
+            pass
         elif config.VALID.DATA.DATASET == "UBFC-rPPG":
             valid_loader = data_loader.UBFCrPPGLoader.UBFCrPPGLoader
         elif config.VALID.DATA.DATASET == "PURE":
