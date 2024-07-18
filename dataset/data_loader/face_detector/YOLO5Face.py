@@ -2,8 +2,8 @@ from copy import deepcopy
 import os
 import cv2
 import torch
-from dataset.data_loader.face_detector.model_load import load_model
-from dataset.data_loader.face_detector.data_ops import letterbox, scale_coords_landmarks, show_results, check_img_size, non_max_suppression_face, scale_coords
+from model.yolo import Model
+from dataset.data_loader.face_detector.utils.data_ops import letterbox, scale_coords_landmarks, show_results, check_img_size, non_max_suppression_face, scale_coords
 
 class YOLO5Face(object):
     def __init__(self, backend="Y5F", device=None) -> None:
@@ -27,11 +27,18 @@ class YOLO5Face(object):
                 self.device = torch.device("cpu")
 
         package_dir = os.path.dirname(os.path.abspath(__file__))
+        model_config_path = os.path.join(package_dir, "model", "yolo5face.yaml")
+
         if backend == "Y5F_IR":
-            ckpt = os.path.join(package_dir, "Y5sF_iBVP_IR.pt")
+            ckpt = os.path.join(package_dir, "ckpts", "Y5sF_iBVP_IR.pth")
+            self.model = Model(cfg=model_config_path, ch=1, nc=None).to(self.device)
         else:
-            ckpt = os.path.join(package_dir, "Y5sF_WFRGB.pt")
-        self.model = load_model(ckpt, self.device)
+            self.model = Model(cfg=model_config_path, ch=3, nc=None).to(self.device)
+            ckpt = os.path.join(package_dir, "ckpts", "Y5sF_WFRGB.pth")
+
+        checkpoint = torch.load(ckpt, map_location=self.device)
+        self.model.load_state_dict(checkpoint)
+        self.model.eval()
 
 
     def detect_face(self, frame):
@@ -55,35 +62,36 @@ class YOLO5Face(object):
         if img.ndimension() == 3:
             img = img.unsqueeze(0)
 
-        # Inference
-        pred = self.model(img)[0]
-        
-        # Apply NMS
-        pred = non_max_suppression_face(pred, self.conf_thres, self.iou_thres)
+        with torch.no_grad():
+            # Inference
+            pred = self.model(img)[0]
+            
+            # Apply NMS
+            pred = non_max_suppression_face(pred, self.conf_thres, self.iou_thres)
 
-        if len(pred[0]) > 0:
-            # Process detections
-            for i, det in enumerate(pred):  # detections per image
-                if i==0 and len(det):
-                    # Rescale boxes from img_size to im0 size
-                    det[:, :4] = scale_coords(img.shape[2:], det[:, :4], frame.shape).round()
+            if len(pred[0]) > 0:
+                # Process detections
+                for i, det in enumerate(pred):  # detections per image
+                    if i==0 and len(det):
+                        # Rescale boxes from img_size to im0 size
+                        det[:, :4] = scale_coords(img.shape[2:], det[:, :4], frame.shape).round()
 
-                    # Print results
-                    for c in det[:, -1].unique():
-                        n = (det[:, -1] == c).sum()  # detections per class
+                        # Print results
+                        for c in det[:, -1].unique():
+                            n = (det[:, -1] == c).sum()  # detections per class
 
-                    det[:, 5:15] = scale_coords_landmarks(img.shape[2:], det[:, 5:15], frame.shape).round()
+                        det[:, 5:15] = scale_coords_landmarks(img.shape[2:], det[:, 5:15], frame.shape).round()
 
-                    # only process first face.
-                    # for j in range(det.size()[0]):
-                    xyxy = det[0, :4].view(-1).tolist()
+                        # only process first face.
+                        # for j in range(det.size()[0]):
+                        xyxy = det[0, :4].view(-1).tolist()
 
-                    x1 = int(xyxy[0])
-                    y1 = int(xyxy[1])
-                    x2 = int(xyxy[2])
-                    y2 = int(xyxy[3])
-                    res = [x1, y1, x2, y2]
-        else:
-            res = None
-        
-        return res
+                        x1 = int(xyxy[0])
+                        y1 = int(xyxy[1])
+                        x2 = int(xyxy[2])
+                        y2 = int(xyxy[3])
+                        res = [x1, y1, x2, y2]
+            else:
+                res = None
+            
+            return res

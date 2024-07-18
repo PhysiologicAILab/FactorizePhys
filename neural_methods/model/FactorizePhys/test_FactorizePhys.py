@@ -17,7 +17,7 @@ model_config = {
     "MD_RESIDUAL": False,
     "in_channels": 3,
     "data_channels": 4,
-    "MODE": "RGB",
+    "MODE": "BVP",
     "height": 72,
     "weight": 72,
     "batch_size": 2,
