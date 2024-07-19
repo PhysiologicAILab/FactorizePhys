@@ -102,7 +102,7 @@ MODEL:
   NAME: EfficientPhys_FSAM
   EFFICIENTPHYS:
     CHANNELS: 3
-    FRAME_DEPTH: 20
+    FRAME_DEPTH: 40
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
