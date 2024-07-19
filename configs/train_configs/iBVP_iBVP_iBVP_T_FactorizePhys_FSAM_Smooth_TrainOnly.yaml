@@ -2,7 +2,7 @@ BASE: ['']
 TOOLBOX_MODE: "train_and_test"  # "train_and_test" or "only_train" or "only_test"
 TRAIN:
   BATCH_SIZE: 4
-  EPOCHS: 20
+  EPOCHS: 30
   LR: 1e-3
   MODEL_FILE_NAME: iBVP_iBVP_iBVP_T_FactorizePhys_FSAM_Smooth_TrainOnly
   PLOT_LOSSES_AND_LR: True
@@ -112,9 +112,9 @@ MODEL:
     MODE: "BVP"
     MD_FSAM: True
     MD_TYPE: "Smooth_NMF"
-    MD_R: 1
-    MD_S: 4
-    MD_STEPS: 4
+    MD_R: 4
+    MD_S: 5
+    MD_STEPS: 5
     MD_INFERENCE: False
 INFERENCE:
   BATCH_SIZE: 4
