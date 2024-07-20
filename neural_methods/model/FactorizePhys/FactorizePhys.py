@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from neural_methods.model.FactorizePhys.FSAM import FeaturesFactorizationModule
 
-nf = [8, 8, 8, 8]
+nf = [4, 8, 8, 8]
 
 model_config = {
     "MD_FSAM": True,
@@ -140,7 +140,7 @@ class BVP_Head(nn.Module):
 
         if self.mode.lower() == "bvp":
             self.final_layer = nn.Sequential(
-                ConvBlock3D(inC, nf[0], [3, 4, 4], [1, 1, 1], [1, 0, 0]),                          #B, nf[0], 160, 3, 3
+                ConvBlock3D(inC, nf[0], [3, 2, 2], [1, 2, 2], [1, 0, 0]),                          #B, nf[0], 160, 3, 3
                 nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=True),   #B, 1, 160, 1, 1
             )
         else:
