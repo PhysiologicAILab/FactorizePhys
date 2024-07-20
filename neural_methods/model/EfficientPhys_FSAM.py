@@ -63,9 +63,7 @@ class EfficientPhys_FSAM(nn.Module):
                                   bias=True)
         self.motion_conv4 = nn.Conv2d(self.nb_filters2, self.nb_filters2, kernel_size=self.kernel_size, bias=True)
 
-        # self.feature_factorizer_1 = FeaturesFactorizationModule(
-        #     self.device, frame_depth, batch_size, self.nb_filters1, MD_R=20)
-
+        self.debug = debug
         self.model_config = {
             "MD_FSAM": True,
             "MD_TYPE": "NMF",
@@ -94,7 +92,7 @@ class EfficientPhys_FSAM(nn.Module):
             "label_path": ""
         }
 
-        self.feature_factorizer_2 = FeaturesFactorizationModule(self.nb_filters2, self.device, self.model_config, dim="2D_TSM", debug=debug)
+        self.feature_factorizer = FeaturesFactorizationModule(self.nb_filters2, self.device, self.model_config, dim="2D_TSM", debug=debug)
         self.fsam_norm = nn.InstanceNorm2d(self.nb_filters2)
         self.bias1 = nn.Parameter(torch.tensor(1.0), requires_grad=True).to(device)
 
@@ -163,8 +161,6 @@ class EfficientPhys_FSAM(nn.Module):
         d2 = torch.tanh(self.motion_conv2(d1))
         # print("d2.shape", d2.shape)
 
-        # d2 = self.feature_factorizer_1(d2)
-
         d3 = self.avg_pooling_1(d2)
         d4 = self.dropout_1(d3)
 
@@ -182,9 +178,9 @@ class EfficientPhys_FSAM(nn.Module):
 
         if self.model_config["MD_INFERENCE"] or self.training or self.debug:
             if "NMF" in self.model_config["MD_TYPE"]:
-                att_mask, appx_error = self.feature_factorizer_2(d6 - d6.min()) # to make it positive (>= 0)
+                att_mask, appx_error = self.feature_factorizer(d6 - d6.min()) # to make it positive (>= 0)
             else:
-                att_mask, appx_error = self.feature_factorizer_2(d6)
+                att_mask, appx_error = self.feature_factorizer(d6)
 
             if self.model_config["MD_RESIDUAL"]:
                 # Multiplication with Residual connection
