@@ -112,9 +112,9 @@ MODEL:
     MODE: "BVP"
     MD_FSAM: True
     MD_TYPE: "NMF"
-    MD_R: 4
-    MD_S: 5
-    MD_STEPS: 5
+    MD_R: 1
+    MD_S: 1
+    MD_STEPS: 4
     MD_INFERENCE: True
 INFERENCE:
   BATCH_SIZE: 4
