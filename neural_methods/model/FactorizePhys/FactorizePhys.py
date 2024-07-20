@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from neural_methods.model.FactorizePhys.FSAM import FeaturesFactorizationModule
 
-nf = [8, 8, 8, 8]
+nf = [8, 8, 16]
 
 model_config = {
     "MD_FSAM": True,
@@ -21,8 +21,7 @@ model_config = {
     "RAND_INIT": True,
     "in_channels": 3,
     "data_channels": 4,
-    "MODE": "BVP",
-    "align_channels": nf[3] // 1,
+    "align_channels": nf[2] // 2,
     "height": 72,
     "weight": 72,
     "batch_size": 4,
@@ -60,39 +59,12 @@ class rPPG_FeatureExtractor(nn.Module):
         self.FeatureExtractor = nn.Sequential(
             ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),  #B, nf[0], 160, 70, 70
             ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 160, 34, 34
-            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 32, 32
+            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 32, 32
             nn.Dropout3d(p=dropout_rate),
 
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 160, 15, 15
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 13, 13
-            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 11, 11
-            nn.Dropout3d(p=dropout_rate),
-        )
-
-    def forward(self, x):
-        voxel_embeddings = self.FeatureExtractor(x)
-        if self.debug:
-            print("rPPG Feature Extractor")
-            print("     voxel_embeddings.shape", voxel_embeddings.shape)
-        return voxel_embeddings
-
-
-class Resp_FeatureExtractor(nn.Module):
-    def __init__(self, inCh, dropout_rate=0.1, debug=False):
-        super(Resp_FeatureExtractor, self).__init__()
-        # inCh, out_channel, kernel_size, stride, padding
-
-        self.debug = debug
-        #                                                        Input: #B, inCh, 160, 72, 72
-        self.FeatureExtractor = nn.Sequential(
-            ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),  #B, nf[0], 160, 70, 70
-            ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 160, 34, 34
-            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 32, 32
-            nn.Dropout3d(p=dropout_rate),
-
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 30, 30
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 28, 28
-            ConvBlock3D(nf[2], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 26, 26
+            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 160, 30, 30
+            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 160, 14, 14
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 12, 12
             nn.Dropout3d(p=dropout_rate),
         )
 
@@ -113,41 +85,27 @@ class BVP_Head(nn.Module):
         self.md_type = md_config["MD_TYPE"]
         self.md_infer = md_config["MD_INFERENCE"]
         self.md_res = md_config["MD_RESIDUAL"]
-        self.mode = md_config["MODE"]
 
-        if self.mode.lower() == "bvp":
-            self.conv_block = nn.Sequential(
-                ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 9, 9
-                ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 7, 7
-                # ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 5, 5
-                nn.Dropout3d(p=dropout_rate),
-            )
-        else:
-            self.conv_block = nn.Sequential(
-                ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 24, 24
-                ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[3], 160, 11, 11
-                ConvBlock3D(nf[3], nf[3], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[3], 160, 9, 9
-                nn.Dropout3d(p=dropout_rate),
-            )
+        self.conv_block = nn.Sequential(
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 10, 10
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 8, 8
+            # ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 6, 6
+            nn.Dropout3d(p=dropout_rate),
+        )
 
         if self.use_fsam:
-            inC = nf[3]
+            inC = nf[2]
             self.fsam = FeaturesFactorizationModule(inC, device, md_config, dim="3D", debug=debug)
             self.fsam_norm = nn.InstanceNorm3d(inC)
             self.bias1 = nn.Parameter(torch.tensor(1.0), requires_grad=True).to(device)
         else:
-            inC = nf[3]
+            inC = nf[2]
 
-        if self.mode.lower() == "bvp":
-            self.final_layer = nn.Sequential(
-                ConvBlock3D(inC, nf[0], [3, 3, 3], [1, 2, 2], [1, 0, 0]),                          #B, nf[0], 160, 3, 3
-                nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),   #B, 1, 160, 1, 1
-            )
-        else:
-            self.final_layer = nn.Sequential(
-                ConvBlock3D(inC, nf[0], [3, 4, 4], [1, 1, 1], [1, 0, 0]),                          #B, nf[0], 160, 3, 3
-                nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),   #B, 1, 160, 1, 1
-            )
+        self.final_layer = nn.Sequential(
+            ConvBlock3D(inC, nf[0], [3, 4, 4], [1, 2, 2], [1, 0, 0]),                          #B, nf[0], 160, 3, 3
+            nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),   #B, 1, 160, 1, 1
+        )
+
 
     def forward(self, voxel_embeddings, batch, length):
 
@@ -216,7 +174,6 @@ class FactorizePhys(nn.Module):
         else:
             print("Unsupported input channels")
         
-        self.mode = md_config["MODE"]
         self.use_fsam = md_config["MD_FSAM"]
         self.md_infer = md_config["MD_INFERENCE"]
 
@@ -227,10 +184,7 @@ class FactorizePhys(nn.Module):
         if self.debug:
             print("nf:", nf)
 
-        if self.mode.lower() == "bvp":
-            self.rppg_feature_extractor = rPPG_FeatureExtractor(self.in_channels, dropout_rate=dropout, debug=debug)
-        else:
-            self.rppg_feature_extractor = Resp_FeatureExtractor(self.in_channels, dropout_rate=dropout, debug=debug)
+        self.rppg_feature_extractor = rPPG_FeatureExtractor(self.in_channels, dropout_rate=dropout, debug=debug)
 
         self.rppg_head = BVP_Head(md_config, device=device, dropout_rate=dropout, debug=debug)
 

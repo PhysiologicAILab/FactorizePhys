@@ -316,7 +316,6 @@ _C.MODEL.PHYSNET.CHANNELS = 3
 _C.MODEL.FactorizePhys = CN()
 _C.MODEL.FactorizePhys.FRAME_NUM = 160
 _C.MODEL.FactorizePhys.CHANNELS = 3
-_C.MODEL.FactorizePhys.MODE = "BVP"
 _C.MODEL.FactorizePhys.MD_FSAM = False
 _C.MODEL.FactorizePhys.MD_TYPE = 'NMF'
 _C.MODEL.FactorizePhys.MD_R = 1
