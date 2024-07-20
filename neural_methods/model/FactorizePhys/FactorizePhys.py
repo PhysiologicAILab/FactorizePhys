@@ -89,7 +89,7 @@ class BVP_Head(nn.Module):
         self.conv_block = nn.Sequential(
             ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 10, 10
             ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 8, 8
-            # ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 6, 6
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 160, 6, 6
             nn.Dropout3d(p=dropout_rate),
         )
 
@@ -102,8 +102,8 @@ class BVP_Head(nn.Module):
             inC = nf[2]
 
         self.final_layer = nn.Sequential(
-            ConvBlock3D(inC, nf[0], [3, 4, 4], [1, 2, 2], [1, 0, 0]),                          #B, nf[0], 160, 3, 3
-            nn.Conv3d(nf[0], 1, (5, 3, 3), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),   #B, 1, 160, 1, 1
+            ConvBlock3D(inC, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),                          #B, nf[0], 160, 4, 4
+            nn.Conv3d(nf[0], 1, (5, 4, 4), stride=(1, 1, 1), padding=(2, 0, 0), bias=False),   #B, 1, 160, 1, 1
         )
 
 
