@@ -2,7 +2,7 @@ BASE: ['']
 TOOLBOX_MODE: "train_and_test"  # "train_and_test" or "only_train" or "only_test"
 TRAIN:
   BATCH_SIZE: 4
-  EPOCHS: 30
+  EPOCHS: 10
   LR: 1e-4
   MODEL_FILE_NAME: PURE_PURE_iBVP_PhysFormer
   PLOT_LOSSES_AND_LR: True
