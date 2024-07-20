@@ -95,6 +95,9 @@ class EfficientPhys_FSAM(nn.Module):
         }
 
         self.feature_factorizer_2 = FeaturesFactorizationModule(self.nb_filters2, self.device, self.model_config, dim="2D_TSM", debug=debug)
+        self.fsam_norm = nn.InstanceNorm2d(self.nb_filters2)
+        self.bias1 = nn.Parameter(torch.tensor(1.0), requires_grad=True).to(device)
+
 
         # Avg pooling
         self.avg_pooling_1 = nn.AvgPool2d(self.pool_size)
@@ -177,9 +180,27 @@ class EfficientPhys_FSAM(nn.Module):
         d6 = self.avg_pooling_3(d6)
         d6 = self.dropout_3(d6)
 
-        d6, dist = self.feature_factorizer_2(d6)
+        if self.model_config["MD_INFERENCE"] or self.training or self.debug:
+            if "NMF" in self.model_config["MD_TYPE"]:
+                att_mask, appx_error = self.feature_factorizer_2(d6 - d6.min()) # to make it positive (>= 0)
+            else:
+                att_mask, appx_error = self.feature_factorizer_2(d6)
 
-        d7 = self.avg_pooling_4(d6)
+            if self.model_config["MD_RESIDUAL"]:
+                # Multiplication with Residual connection
+                x = torch.mul(d6 - d6.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
+                factorized_embeddings = self.fsam_norm(x)
+                factorized_embeddings = d6 + factorized_embeddings
+            else:
+                # Multiplication
+                x = torch.mul(d6 - d6.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
+                factorized_embeddings = self.fsam_norm(x)            
+
+            d7 = self.avg_pooling_4(factorized_embeddings)
+
+        else:
+            d7 = self.avg_pooling_4(d6)
+        
         d8 = self.dropout_3(d7)
 
         d9 = d8.view(d8.size(0), -1)
