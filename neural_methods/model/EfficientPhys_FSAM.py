@@ -70,7 +70,7 @@ class EfficientPhys_FSAM(nn.Module):
             "MD_R": 1,
             "MD_S": frame_depth,
             "MD_STEPS": 5,
-            "MD_INFERENCE": False,
+            "MD_INFERENCE": True,
             "MD_RESIDUAL": False,
             "INV_T": 1,
             "ETA": 0.9,
