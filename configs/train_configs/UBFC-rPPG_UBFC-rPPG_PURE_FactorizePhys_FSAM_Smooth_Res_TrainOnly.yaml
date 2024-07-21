@@ -107,7 +107,7 @@ MODEL:
     MD_TYPE: "Smooth_NMF"
     MD_R: 1
     MD_S: 1
-    MD_STEPS: 5
+    MD_STEPS: 4
     MD_RESIDUAL: True
     MD_INFERENCE: False
 INFERENCE:
