@@ -102,7 +102,7 @@ class BVP_Head(nn.Module):
             inC = nf[2]
 
         self.final_layer = nn.Sequential(
-            ConvBlock3D(inC, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),                         #B, nf[0], 160, 3, 3
+            ConvBlock3D(inC, nf[0], [5, 3, 3], [1, 1, 1], [2, 0, 0]),                         #B, nf[0], 160, 3, 3
             nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),  #B, 1, 160, 1, 1
         )
 
