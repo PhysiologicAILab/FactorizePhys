@@ -109,7 +109,6 @@ MODEL:
   FactorizePhys:
     CHANNELS: 1
     FRAME_NUM: 160
-    MODE: "BVP"
     MD_FSAM: True
     MD_TYPE: "NMF"
     MD_R: 1
