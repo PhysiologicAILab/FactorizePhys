@@ -3,7 +3,7 @@ TOOLBOX_MODE: "train_and_test"  # "train_and_test" or "only_train" or "only_test
 TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 30
-  LR: 5e-4
+  LR: 1e-3
   MODEL_FILE_NAME: UBFC_UBFC_PURE_FactorizePhys_FSAM_Smooth_BVP_Res_TrainOnly
   PLOT_LOSSES_AND_LR: True
   DATA:
@@ -107,7 +107,7 @@ MODEL:
     MD_TYPE: "Smooth_NMF"
     MD_R: 1
     MD_S: 1
-    MD_STEPS: 4
+    MD_STEPS: 5
     MD_RESIDUAL: True
     MD_INFERENCE: False
 INFERENCE:
