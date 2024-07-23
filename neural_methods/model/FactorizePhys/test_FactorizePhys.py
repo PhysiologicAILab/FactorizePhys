@@ -21,8 +21,8 @@ model_config = {
     "weight": 72,
     "batch_size": 2,
     "frames": 160,
-    "debug": True,
-    "assess_latency": False,
+    "debug": False,
+    "assess_latency": True,
     "num_trials": 20,
     "visualize": False,
     "ckpt_path": "",
@@ -59,10 +59,10 @@ if __name__ == "__main__":
     num_trials = model_config["num_trials"]
     visualize = model_config["visualize"]
 
-    if torch.cuda.is_available():
-        device = torch.device(0)
-    else:
-        device = torch.device("cpu")
+    # if torch.cuda.is_available():
+    #     device = torch.device(0)
+    # else:
+    device = torch.device("cpu")
 
     if visualize:
         np_data = np.load(data_path)
@@ -97,7 +97,8 @@ if __name__ == "__main__":
     md_config["MD_INFERENCE"] = model_config["MD_INFERENCE"]
     md_config["MD_RESIDUAL"] = model_config["MD_RESIDUAL"]
 
-    net = nn.DataParallel(FactorizePhys(frames=frames, md_config=md_config, device=device, in_channels=in_channels, debug=debug)).to(device)
+    # net = nn.DataParallel(FactorizePhys(frames=frames, md_config=md_config, device=device, in_channels=in_channels, debug=debug)).to(device)
+    net = FactorizePhys(frames=frames, md_config=md_config, device=device, in_channels=in_channels, debug=debug).to(device)
     # net.load_state_dict(torch.load(ckpt_path, map_location=device))
     net.eval()
 

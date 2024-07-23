@@ -367,7 +367,7 @@ if __name__ == "__main__":
     NUM_HEADS = 4
     NUM_LAYERS = 12
     THETA =  0.7
-    assess_latency = True
+    assess_latency = False
 
     if torch.cuda.is_available():
         device = torch.device(0)

@@ -224,9 +224,8 @@ if __name__ == "__main__":
     width = 72
     num_of_gpu = 1
     base_len = num_of_gpu * frames
-    assess_latency = False
     debug = True
-    # assess_latency = True
+    assess_latency = False
 
     if torch.cuda.is_available():
         device = torch.device(0)
@@ -266,7 +265,7 @@ if __name__ == "__main__":
 
     # print("After: test_data.shape", test_data.shape)
     # exit()
-    net = EfficientPhys_FSAM(frame_depth=frames, img_size=height, batch_size=batch_size, debug=debug).to(device)
+    net = EfficientPhys_FSAM(frame_depth=frames, img_size=height, batch_size=batch_size, debug=debug, device=device).to(device)
     net.eval()
     
     if assess_latency:
