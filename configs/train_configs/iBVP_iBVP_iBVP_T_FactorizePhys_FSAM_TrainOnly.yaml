@@ -2,7 +2,7 @@ BASE: ['']
 TOOLBOX_MODE: "train_and_test"  # "train_and_test" or "only_train" or "only_test"
 TRAIN:
   BATCH_SIZE: 4
-  EPOCHS: 30
+  EPOCHS: 10
   LR: 1e-3
   MODEL_FILE_NAME: iBVP_iBVP_iBVP_T_FactorizePhys_FSAM_TrainOnly
   PLOT_LOSSES_AND_LR: True
@@ -15,7 +15,7 @@ TRAIN:
     CACHED_PATH: "/home/jitesh/data/iBVP_Dataset" # "/media/jitesh/Elements/rppg/iBVP_Dataset/" # "/home/jitesh/data/iBVP_Dataset"    # Processed dataset save path, need to be updated
     EXP_DATA_NAME: "iBVP_RGBT_160_72x72"
     BEGIN: 0.0
-    END: 0.5
+    END: 0.7
     PREPROCESS:
       DATA_TYPE: ['Raw']         #if use FactorizePhys, should be Raw
       DATA_AUG: ['None']    # 'None' or 'Motion' is supported, used if the data path points to an augmented dataset or requires augmentation
@@ -69,7 +69,7 @@ VALID:
         W: 72
 TEST:
   METRICS: ['MAE', 'RMSE', 'MAPE', 'Pearson', 'SNR', 'BA', 'MACC']
-  USE_LAST_EPOCH: False                   # to use provided validation dataset to find the best epoch, should be false
+  USE_LAST_EPOCH: True                   # to use provided validation dataset to find the best epoch, should be false
   DATA:
     FS: 30
     DATASET: iBVP
@@ -111,9 +111,9 @@ MODEL:
     FRAME_NUM: 160
     MD_FSAM: True
     MD_TYPE: "NMF"
-    MD_R: 1
-    MD_S: 4
-    MD_STEPS: 4
+    MD_R: 4
+    MD_S: 5
+    MD_STEPS: 5
     MD_INFERENCE: False
 INFERENCE:
   BATCH_SIZE: 4
