@@ -2,7 +2,7 @@ BASE: ['']
 TOOLBOX_MODE: "only_test"  # "train_and_test" or "only_train" or "only_test"
 TEST:
   METRICS: ['MAE', 'RMSE', 'MAPE', 'Pearson', 'SNR', 'BA', 'MACC']
-  USE_LAST_EPOCH: True                   # to use provided validation dataset to find the best epoch, should be false
+  USE_LAST_EPOCH: False                   # to use provided validation dataset to find the best epoch, should be false
   DATA:
     FS: 30
     DATASET: iBVP
@@ -42,13 +42,13 @@ MODEL:
   FactorizePhys:
     CHANNELS: 1
     FRAME_NUM: 160
-    MD_FSAM: True
+    MD_FSAM: False
     MD_TYPE: "NMF"
     MD_R: 1
     MD_S: 1
     MD_STEPS: 4
     MD_RESIDUAL: True
-    MD_INFERENCE: False
+    MD_INFERENCE: True
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
