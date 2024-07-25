@@ -13,8 +13,8 @@ model_config = {
     "MD_R": 1,
     "MD_S": 1,
     "MD_STEPS": 4,
-    "MD_INFERENCE": False,
-    "MD_RESIDUAL": False,
+    "MD_INFERENCE": True,
+    "MD_RESIDUAL": True,
     "in_channels": 3,
     "data_channels": 4,
     "height": 72,
@@ -59,10 +59,10 @@ if __name__ == "__main__":
     num_trials = model_config["num_trials"]
     visualize = model_config["visualize"]
 
-    # if torch.cuda.is_available():
-    #     device = torch.device(0)
-    # else:
-    device = torch.device("cpu")
+    if torch.cuda.is_available():
+        device = torch.device(0)
+    else:
+        device = torch.device("cpu")
 
     if visualize:
         np_data = np.load(data_path)
