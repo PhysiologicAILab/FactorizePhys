@@ -2,26 +2,26 @@ BASE: ['']
 TOOLBOX_MODE: "train_and_test"  # "train_and_test" or "only_train" or "only_test"
 TRAIN:
   BATCH_SIZE: 4
-  EPOCHS: 30
+  EPOCHS: 10
   LR: 1e-3
-  MODEL_FILE_NAME: iBVP_iBVP_iBVP_FactorizePhys_FactorizePhys_RGB
+  MODEL_FILE_NAME: PURE_FactorizePhys_FSAM_Res
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
-    DATASET: iBVP
-    DO_PREPROCESS: False                  # if first time, should be true
+    DATASET: PURE
+    DO_PREPROCESS: False            # if first time, should be true
     DATA_FORMAT: NCDHW
-    DATA_PATH: "/mnt/sda/data/jitesh/iBVP_Dataset/raw"   # Raw dataset path, need to be updated
-    CACHED_PATH: "/home/jitesh/data/iBVP_Dataset" # "/media/jitesh/Elements/rppg/iBVP_Dataset/" # "/home/jitesh/data/iBVP_Dataset"    # Processed dataset save path, need to be updated
-    EXP_DATA_NAME: "iBVP_RGBT_256_72x72"
+    DATA_PATH: "/mnt/sda/data/jitesh/PURE_Dataset/raw"                     # Raw dataset path, need to be updated
+    CACHED_PATH: "/home/jitesh/data/PURE_Dataset"    # Processed dataset save path, need to be updated
+    EXP_DATA_NAME: "PURE_Raw_160_72x72"
     BEGIN: 0.0
-    END: 0.5
+    END: 1.0
     PREPROCESS:
       DATA_TYPE: ['Raw']         #if use FactorizePhys, should be Raw
       DATA_AUG: ['None']    # 'None' or 'Motion' is supported, used if the data path points to an augmented dataset or requires augmentation
       LABEL_TYPE: Standardized
       DO_CHUNK: True
-      CHUNK_LENGTH: 256
+      CHUNK_LENGTH: 160
       CROP_FACE:
         DO_CROP_FACE: True
         BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face
@@ -31,28 +31,26 @@ TRAIN:
           DO_DYNAMIC_DETECTION: True
           DYNAMIC_DETECTION_FREQUENCY : 30
           USE_MEDIAN_FACE_BOX: False    # This should be used ONLY if dynamic detection is used
-      IBVP:
-        DATA_MODE: RGBT
       RESIZE:
         H: 72
         W: 72
 VALID:
   DATA:
     FS: 30
-    DATASET: iBVP
-    DO_PREPROCESS: False                  # if first time, should be true
+    DATASET: PURE
+    DO_PREPROCESS: False            # if first time, should be true
     DATA_FORMAT: NCDHW
-    DATA_PATH: "/mnt/sda/data/jitesh/iBVP_Dataset/raw"   # Raw dataset path, need to be updated
-    CACHED_PATH: "/home/jitesh/data/iBVP_Dataset" # "/media/jitesh/Elements/rppg/iBVP_Dataset/" # "/home/jitesh/data/iBVP_Dataset"    # Processed dataset save path, need to be updated
-    EXP_DATA_NAME: "iBVP_RGBT_256_72x72"
-    BEGIN: 0.5
-    END: 0.7
+    DATA_PATH: "/mnt/sda/data/jitesh/PURE_Dataset/raw"                     # Raw dataset path, need to be updated
+    CACHED_PATH: "/home/jitesh/data/PURE_Dataset"    # Processed dataset save path, need to be updated
+    EXP_DATA_NAME: "PURE_Raw_160_72x72"
+    BEGIN: 0.8
+    END: 1.0
     PREPROCESS:
       DATA_TYPE: ['Raw']         #if use FactorizePhys, should be Raw
       DATA_AUG: ['None']    # 'None' or 'Motion' is supported, used if the data path points to an augmented dataset or requires augmentation
       LABEL_TYPE: Standardized
       DO_CHUNK: True
-      CHUNK_LENGTH: 256
+      CHUNK_LENGTH: 160
       CROP_FACE:
         DO_CROP_FACE: True
         BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face
@@ -62,29 +60,27 @@ VALID:
           DO_DYNAMIC_DETECTION: True
           DYNAMIC_DETECTION_FREQUENCY : 30
           USE_MEDIAN_FACE_BOX: False    # This should be used ONLY if dynamic detection is used
-      IBVP:
-        DATA_MODE: RGBT
       RESIZE:
         H: 72
         W: 72
 TEST:
   METRICS: ['MAE', 'RMSE', 'MAPE', 'Pearson', 'SNR', 'BA', 'MACC']
-  USE_LAST_EPOCH: False                   # to use provided validation dataset to find the best epoch, should be false
+  USE_LAST_EPOCH: True                   # to use provided validation dataset to find the best epoch, should be false
   DATA:
     FS: 30
     DATASET: iBVP
     DO_PREPROCESS: False                  # if first time, should be true
     DATA_FORMAT: NCDHW
     DATA_PATH: "/mnt/sda/data/jitesh/iBVP_Dataset/raw"   # Raw dataset path, need to be updated
-    CACHED_PATH: "/home/jitesh/data/iBVP_Dataset" # "/media/jitesh/Elements/rppg/iBVP_Dataset/" # "/home/jitesh/data/iBVP_Dataset"    # Processed dataset save path, need to be updated
-    EXP_DATA_NAME: "iBVP_RGBT_256_72x72"
-    BEGIN: 0.7
+    CACHED_PATH: "/home/jitesh/data/iBVP_Dataset"    # Processed dataset save path, need to be updated
+    EXP_DATA_NAME: "iBVP_RGBT_160_72x72"
+    BEGIN: 0.0
     END: 1.0
     PREPROCESS:
       DATA_TYPE: ['Raw']         #if use FactorizePhys, should be Raw
       LABEL_TYPE: Standardized
       DO_CHUNK: True
-      CHUNK_LENGTH: 256
+      CHUNK_LENGTH: 160
       CROP_FACE:
         DO_CROP_FACE: True
         BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face
@@ -99,20 +95,27 @@ TEST:
       RESIZE:
         H: 72
         W: 72
-DEVICE: cuda:2
+DEVICE: cuda:1
 NUM_OF_GPU_TRAIN: 1
 LOG:
   PATH: runs/exp
 MODEL:
   DROP_RATE: 0.1
   NAME: FactorizePhys
-  iBVPNet:
+  FactorizePhys:
     CHANNELS: 3
-    FRAME_NUM: 256
+    FRAME_NUM: 160
+    MD_FSAM: True
+    MD_TYPE: "NMF"
+    MD_R: 1
+    MD_S: 1
+    MD_STEPS: 4
+    MD_RESIDUAL: True
+    MD_INFERENCE: True
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
     WINDOW_SIZE: 30        # In seconds
-  MODEL_PATH: "./final_model_release/iBVP_FactorizePhys_RGB.pth"
+  MODEL_PATH: ""
