@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 10
   LR: 1e-3
-  MODEL_FILE_NAME: iBVP_iBVP_T_FactorizePhys_FSAM_Res
+  MODEL_FILE_NAME: iBVP_T_FactorizePhys_FSAM_Res
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -80,9 +80,9 @@ MODEL:
     FRAME_NUM: 160
     MD_FSAM: True
     MD_TYPE: "NMF"
-    MD_R: 1
-    MD_S: 1
-    MD_STEPS: 4
+    MD_R: 2
+    MD_S: 4
+    MD_STEPS: 5
     MD_RESIDUAL: True
     MD_INFERENCE: True
 INFERENCE:
