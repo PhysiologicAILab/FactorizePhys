@@ -93,8 +93,9 @@ class FactorizePhysTrainer(BaseTrainer):
                 
                 data = batch[0].to(self.device)
                 labels = batch[1].to(self.device)
-
-                labels = labels[..., 0]     # Compatibility wigth multi-signal labelled data
+                
+                if len(labels.shape) > 2:
+                    labels = labels[..., 0]     # Compatibility wigth multi-signal labelled data
                 labels = (labels - torch.mean(labels)) / torch.std(labels)  # normalize
                 last_frame = torch.unsqueeze(data[:, :, -1, :, :], 2).repeat(1, 1, max(self.num_of_gpu, 1), 1, 1)
                 data = torch.cat((data, last_frame), 2)
@@ -178,8 +179,9 @@ class FactorizePhysTrainer(BaseTrainer):
                 vbar.set_description("Validation")
 
                 data, labels = valid_batch[0].to(self.device), valid_batch[1].to(self.device)
-                labels = labels[..., 0]     # Compatibility wigth multi-signal labelled data
-                # labels = (labels - torch.mean(labels)) / torch.std(labels)  # normalize
+                if len(labels.shape) > 2:
+                    labels = labels[..., 0]     # Compatibility wigth multi-signal labelled data
+                labels = (labels - torch.mean(labels)) / torch.std(labels)  # normalize
 
                 last_frame = torch.unsqueeze(data[:, :, -1, :, :], 2).repeat(1, 1, max(self.num_of_gpu, 1), 1, 1)
                 data = torch.cat((data, last_frame), 2)
@@ -244,7 +246,9 @@ class FactorizePhysTrainer(BaseTrainer):
             for _, test_batch in enumerate(tqdm(data_loader["test"], ncols=80)):
                 batch_size = test_batch[0].shape[0]
                 data, labels_test = test_batch[0].to(self.device), test_batch[1].to(self.device)
-                labels_test = labels_test[..., 0]     # Compatibility wigth multi-signal labelled data
+
+                if len(labels_test.shape) > 2:
+                    labels_test = labels_test[..., 0]     # Compatibility wigth multi-signal labelled data
                 labels_test = (labels_test - torch.mean(labels_test)) / torch.std(labels_test)  # normalize
 
                 last_frame = torch.unsqueeze(data[:, :, -1, :, :], 2).repeat(1, 1, max(self.num_of_gpu, 1), 1, 1)

@@ -123,7 +123,8 @@ class PhysFormerTrainer(BaseTrainer):
             for idx, batch in enumerate(tbar):
                 data, label = batch[0].float().to(self.device), batch[1].float().to(self.device)
 
-                label = label[..., 0]     # Compatibility wigth multi-signal labelled data
+                if len(label.shape) > 2:
+                    label = label[..., 0]     # Compatibility wigth multi-signal labelled data
                 label = (label - torch.mean(label)) / torch.std(label)  # normalize
                 hr = torch.tensor([self.get_hr(i.cpu().numpy()) for i in label]).float().to(self.device)
 
@@ -222,7 +223,8 @@ class PhysFormerTrainer(BaseTrainer):
                 data, label = val_batch[0].float().to(self.device), val_batch[1].float().to(self.device)
                 gra_sharp = 2.0
 
-                label = label[..., 0]     # Compatibility wigth multi-signal labelled data
+                if len(label.shape) > 2:
+                    label = label[..., 0]     # Compatibility wigth multi-signal labelled data
                 label = (label - torch.mean(label)) / torch.std(label)  # normalize
 
                 # Using data prepared with raw frames, but providing Diff Norm inputs uniformly to all models
@@ -273,11 +275,11 @@ class PhysFormerTrainer(BaseTrainer):
         with torch.no_grad():
             for _, test_batch in enumerate(tqdm(data_loader["test"], ncols=80)):
                 batch_size = test_batch[0].shape[0]
-                data, label = test_batch[0].to(
-                    self.config.DEVICE), test_batch[1].to(self.config.DEVICE)
+                data, label = test_batch[0].to(self.config.DEVICE), test_batch[1].to(self.config.DEVICE)
                 gra_sharp = 2.0
 
-                label = label[..., 0]     # Compatibility wigth multi-signal labelled data
+                if len(label.shape) > 2:
+                    label = label[..., 0]     # Compatibility wigth multi-signal labelled data
                 label = (label - torch.mean(label)) / torch.std(label)  # normalize
 
                 # Using data prepared with raw frames, but providing Diff Norm inputs uniformly to all models

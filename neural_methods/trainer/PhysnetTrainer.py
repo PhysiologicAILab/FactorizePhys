@@ -85,8 +85,9 @@ class PhysnetTrainer(BaseTrainer):
 
                 rPPG, x_visual, x_visual3232, x_visual1616 = self.model(data)
 
-                label = batch[1].to(torch.float32).to(self.device)
-                BVP_label = label[..., 0]     # Compatibility wigth multi-signal labelled data
+                BVP_label = batch[1].to(torch.float32).to(self.device)
+                if len(BVP_label.shape) > 2:
+                    BVP_label = BVP_label[..., 0]     # Compatibility wigth multi-signal labelled data
                 BVP_label = (BVP_label - torch.mean(BVP_label)) / torch.std(BVP_label)  # normalize
 
                 rPPG = (rPPG - torch.mean(rPPG)) / torch.std(rPPG)  # normalize
@@ -147,8 +148,9 @@ class PhysnetTrainer(BaseTrainer):
             for valid_idx, valid_batch in enumerate(vbar):
                 vbar.set_description("Validation")
 
-                label = valid_batch[1].to(torch.float32).to(self.device)
-                BVP_label = label[..., 0]     # Compatibility wigth multi-signal labelled data
+                BVP_label = valid_batch[1].to(torch.float32).to(self.device)
+                if len(BVP_label.shape) > 2:
+                    BVP_label = BVP_label[..., 0]     # Compatibility wigth multi-signal labelled data
                 BVP_label = (BVP_label - torch.mean(BVP_label)) / torch.std(BVP_label)  # normalize
 
                 data = valid_batch[0].to(torch.float32).to(self.device)
@@ -209,8 +211,9 @@ class PhysnetTrainer(BaseTrainer):
                 
                 data = test_batch[0].to(torch.float32).to(self.device)
 
-                label = test_batch[1].to(torch.float32).to(self.device)
-                BVP_label = label[..., 0]     # Compatibility wigth multi-signal labelled data
+                BVP_label = test_batch[1].to(torch.float32).to(self.device)
+                if len(BVP_label.shape) > 2:
+                    BVP_label = BVP_label[..., 0]     # Compatibility wigth multi-signal labelled data
                 BVP_label = (BVP_label - torch.mean(BVP_label)) / torch.std(BVP_label)  # normalize
 
                 # Using data prepared with raw frames, but providing Diff Norm inputs uniformly to all models
