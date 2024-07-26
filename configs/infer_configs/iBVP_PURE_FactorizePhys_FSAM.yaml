@@ -2,7 +2,7 @@ BASE: ['']
 TOOLBOX_MODE: "only_test"  # "train_and_test" or "only_train" or "only_test"
 TEST:
   METRICS: ['MAE', 'RMSE', 'MAPE', 'Pearson', 'SNR', 'BA', 'MACC']
-  USE_LAST_EPOCH: False                   # to use provided validation dataset to find the best epoch, should be false
+  USE_LAST_EPOCH: False
   DATA:
     FS: 30
     DATASET: PURE
@@ -40,16 +40,17 @@ MODEL:
   FactorizePhys:
     CHANNELS: 3
     FRAME_NUM: 160
-    MD_FSAM: True
+    MD_FSAM: False
     MD_TYPE: "NMF"
     MD_R: 1
-    MD_S: 4
+    MD_S: 1
     MD_STEPS: 4
-    MD_INFERENCE: False    
+    MD_RESIDUAL: False
+    MD_INFERENCE: True
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
     WINDOW_SIZE: 30        # In seconds
-  MODEL_PATH: "./runs/exp/iBVP_RGBT_160_72x72/PreTrainedModels/iBVP_iBVP_PURE_FactorizePhys_FSAM_TrainOnly_Epoch20.pth"
+  MODEL_PATH: "./final_model_release/iBVP_FactorizePhys_FSAM.pth"

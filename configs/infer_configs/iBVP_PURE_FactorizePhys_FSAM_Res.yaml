@@ -6,7 +6,7 @@ TEST:
   DATA:
     FS: 30
     DATASET: PURE
-    DO_PREPROCESS: False               # if first time, should be true
+    DO_PREPROCESS: False            # if first time, should be true
     DATA_FORMAT: NCDHW
     DATA_PATH: "/mnt/sda/data/jitesh/PURE_Dataset/raw"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/home/jitesh/data/PURE_Dataset"    # Processed dataset save path, need to be updated
@@ -40,17 +40,17 @@ MODEL:
   FactorizePhys:
     CHANNELS: 3
     FRAME_NUM: 160
-    MD_FSAM: True
+    MD_FSAM: False
     MD_TYPE: "NMF"
     MD_R: 1
-    MD_S: 4
+    MD_S: 1
     MD_STEPS: 4
     MD_RESIDUAL: True
-    MD_INFERENCE: False    
+    MD_INFERENCE: True
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
     WINDOW_SIZE: 30        # In seconds
-  MODEL_PATH: "./runs/exp/iBVP_RGBT_160_72x72/PreTrainedModels/iBVP_iBVP_PURE_FactorizePhys_FSAM_Res_TrainOnly_Epoch20.pth"
+  MODEL_PATH: "./final_model_release/iBVP_FactorizePhys_FSAM_Res.pth"
