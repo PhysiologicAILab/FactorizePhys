@@ -117,6 +117,7 @@ class EfficientPhysTrainer(BaseTrainer):
             for idx, batch in enumerate(tbar):
                 tbar.set_description("Train epoch %s" % epoch)
                 data, labels = batch[0].to(self.device), batch[1].to(self.device)
+                labels = labels[..., 0]     # Compatibility wigth multi-signal labelled data
 
                 N, D, C, H, W = data.shape
                 data = data.view(N * D, C, H, W)
@@ -199,6 +200,7 @@ class EfficientPhysTrainer(BaseTrainer):
                 N, D, C, H, W = data_valid.shape
                 data_valid = data_valid.view(N * D, C, H, W)
                 
+                labels_valid = labels_valid[..., 0]     # Compatibility wigth multi-signal labelled data
                 labels_valid = (labels_valid - torch.mean(labels_valid)) / torch.std(labels_valid)  # normalize
                 labels_valid = labels_valid.view(-1, 1)
                 data_valid = data_valid[:(N * D) // self.base_len * self.base_len]
@@ -263,6 +265,7 @@ class EfficientPhysTrainer(BaseTrainer):
                 N, D, C, H, W = data_test.shape
                 data_test = data_test.view(N * D, C, H, W)
                 
+                labels_test = labels_test[..., 0]     # Compatibility wigth multi-signal labelled data
                 labels_test = (labels_test - torch.mean(labels_test)) / torch.std(labels_test)  # normalize
 
                 labels_test = labels_test.view(-1, 1)

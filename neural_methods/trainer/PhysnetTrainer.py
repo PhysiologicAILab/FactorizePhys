@@ -85,8 +85,10 @@ class PhysnetTrainer(BaseTrainer):
 
                 rPPG, x_visual, x_visual3232, x_visual1616 = self.model(data)
 
-                BVP_label = batch[1].to(
-                    torch.float32).to(self.device)
+                label = batch[1].to(torch.float32).to(self.device)
+                BVP_label = label[..., 0]     # Compatibility wigth multi-signal labelled data
+                BVP_label = (BVP_label - torch.mean(BVP_label)) / torch.std(BVP_label)  # normalize
+
                 rPPG = (rPPG - torch.mean(rPPG)) / torch.std(rPPG)  # normalize
                 BVP_label = (BVP_label - torch.mean(BVP_label)) / \
                             torch.std(BVP_label)  # normalize
@@ -144,8 +146,10 @@ class PhysnetTrainer(BaseTrainer):
             vbar = tqdm(data_loader["valid"], ncols=80)
             for valid_idx, valid_batch in enumerate(vbar):
                 vbar.set_description("Validation")
-                BVP_label = valid_batch[1].to(
-                    torch.float32).to(self.device)
+
+                label = valid_batch[1].to(torch.float32).to(self.device)
+                BVP_label = label[..., 0]     # Compatibility wigth multi-signal labelled data
+                BVP_label = (BVP_label - torch.mean(BVP_label)) / torch.std(BVP_label)  # normalize
 
                 data = valid_batch[0].to(torch.float32).to(self.device)
 
@@ -204,7 +208,10 @@ class PhysnetTrainer(BaseTrainer):
                 batch_size = test_batch[0].shape[0]
                 
                 data = test_batch[0].to(torch.float32).to(self.device)
+
                 label = test_batch[1].to(torch.float32).to(self.device)
+                BVP_label = label[..., 0]     # Compatibility wigth multi-signal labelled data
+                BVP_label = (BVP_label - torch.mean(BVP_label)) / torch.std(BVP_label)  # normalize
 
                 # Using data prepared with raw frames, but providing Diff Norm inputs uniformly to all models
                 last_frame = torch.unsqueeze(
@@ -214,7 +221,7 @@ class PhysnetTrainer(BaseTrainer):
                 pred_ppg_test, _, _, _ = self.model(data)
 
                 if self.config.TEST.OUTPUT_SAVE_DIR:
-                    label = label.cpu()
+                    BVP_label = BVP_label.cpu()
                     pred_ppg_test = pred_ppg_test.cpu()
 
                 for idx in range(batch_size):
@@ -224,7 +231,7 @@ class PhysnetTrainer(BaseTrainer):
                         predictions[subj_index] = dict()
                         labels[subj_index] = dict()
                     predictions[subj_index][sort_index] = pred_ppg_test[idx]
-                    labels[subj_index][sort_index] = label[idx]
+                    labels[subj_index][sort_index] = BVP_label[idx]
 
         print('')
         calculate_metrics(predictions, labels, self.config)

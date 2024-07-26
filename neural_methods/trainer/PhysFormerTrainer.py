@@ -121,8 +121,11 @@ class PhysFormerTrainer(BaseTrainer):
             self.model.train()
             tbar = tqdm(data_loader["train"], ncols=80)
             for idx, batch in enumerate(tbar):
-                hr = torch.tensor([self.get_hr(i) for i in batch[1]]).float().to(self.device)
                 data, label = batch[0].float().to(self.device), batch[1].float().to(self.device)
+
+                label = label[..., 0]     # Compatibility wigth multi-signal labelled data
+                label = (label - torch.mean(label)) / torch.std(label)  # normalize
+                hr = torch.tensor([self.get_hr(i.cpu().numpy()) for i in label]).float().to(self.device)
 
                 # Using data prepared with raw frames, but providing Diff Norm inputs uniformly to all models
                 last_frame = torch.unsqueeze(
@@ -219,6 +222,9 @@ class PhysFormerTrainer(BaseTrainer):
                 data, label = val_batch[0].float().to(self.device), val_batch[1].float().to(self.device)
                 gra_sharp = 2.0
 
+                label = label[..., 0]     # Compatibility wigth multi-signal labelled data
+                label = (label - torch.mean(label)) / torch.std(label)  # normalize
+
                 # Using data prepared with raw frames, but providing Diff Norm inputs uniformly to all models
                 last_frame = torch.unsqueeze(
                     data[:, :, -1, :, :], 2).repeat(1, 1, max(self.num_of_gpu, 1), 1, 1)
@@ -270,6 +276,9 @@ class PhysFormerTrainer(BaseTrainer):
                 data, label = test_batch[0].to(
                     self.config.DEVICE), test_batch[1].to(self.config.DEVICE)
                 gra_sharp = 2.0
+
+                label = label[..., 0]     # Compatibility wigth multi-signal labelled data
+                label = (label - torch.mean(label)) / torch.std(label)  # normalize
 
                 # Using data prepared with raw frames, but providing Diff Norm inputs uniformly to all models
                 last_frame = torch.unsqueeze(
