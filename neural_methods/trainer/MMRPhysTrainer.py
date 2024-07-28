@@ -101,7 +101,11 @@ class MMRPhysTrainer(BaseTrainer):
                 data = batch[0].to(self.device)
                 labels = batch[1].to(self.device)
 
-                # labels = (labels - torch.mean(labels)) / torch.std(labels)  # normalize
+                label_bvp = labels[..., 0]
+                label_resp = labels[..., 1]
+                label_bvp = (label_bvp - torch.mean(label_bvp)) / torch.std(label_bvp)  # normalize
+                label_resp = (label_resp - torch.mean(label_resp)) / torch.std(label_resp)  # normalize
+                
                 last_frame = torch.unsqueeze(data[:, :, -1, :, :], 2).repeat(1, 1, max(self.num_of_gpu, 1), 1, 1)
                 data = torch.cat((data, last_frame), 2)
 
@@ -113,29 +117,29 @@ class MMRPhysTrainer(BaseTrainer):
 
                 self.optimizer.zero_grad()
                 if self.model.training and self.use_fsam:
-                    pred_ppg, pred_br, vox_embed, factorized_embed, \
+                    pred_bvp, pred_resp, vox_embed, factorized_embed, \
                         att_mask, appx_error, factorized_embed_br, \
                             att_mask_br, appx_error_br = self.model(data)
                 else:
-                    pred_ppg, pred_br, vox_embed = self.model(data)
+                    pred_bvp, pred_resp, vox_embed = self.model(data)
                 
-                pred_ppg = (pred_ppg - torch.mean(pred_ppg)) / torch.std(pred_ppg)  # normalize
-                pred_br = (pred_br - torch.mean(pred_br)) / torch.std(pred_br)  # normalize
+                pred_bvp = (pred_bvp - torch.mean(pred_bvp)) / torch.std(pred_bvp)  # normalize
+                pred_resp = (pred_resp - torch.mean(pred_resp)) / torch.std(pred_resp)  # normalize
 
-                loss1 = self.criterion1(pred_ppg, labels[..., 0])
-                loss2 = self.criterion2(pred_br, labels[..., 1])
-                loss = loss1 + 5*loss2
+                loss_bvp = self.criterion1(pred_bvp, label_bvp)
+                loss_resp = self.criterion2(pred_resp, label_resp)
+                loss = loss_bvp + 5*loss_resp
                 
                 loss.backward()
-                running_loss1 += loss1.item()
-                running_loss2 += loss2.item()
+                running_loss1 += loss_bvp.item()
+                running_loss2 += loss_resp.item()
                 if idx % 100 == 99:  # print every 100 mini-batches
-                    print(f'[{epoch}, {idx + 1:5d}] loss1: {running_loss1 / 100:.3f} loss2: {running_loss2 / 100:.3f}')
+                    print(f'[{epoch}, {idx + 1:5d}] loss_bvp: {running_loss1 / 100:.3f} loss_resp: {running_loss2 / 100:.3f}')
                     running_loss1 = 0.0
                     running_loss2 = 0.0
                 train_loss.append(loss.item())
-                train_loss1.append(loss1.item())
-                train_loss2.append(loss2.item())
+                train_loss1.append(loss_bvp.item())
+                train_loss2.append(loss_resp.item())
                 if self.use_fsam:
                     appx_error_list.append(appx_error.item())
 
@@ -146,9 +150,9 @@ class MMRPhysTrainer(BaseTrainer):
                 self.scheduler.step()
                 
                 if self.use_fsam:
-                    tbar.set_postfix({"appx_error": appx_error.item(), "loss_bvp":loss1.item(), "loss_resp": loss2.item()}, loss=loss.item())
+                    tbar.set_postfix({"appx_error": appx_error.item(), "loss_bvp":loss_bvp.item(), "loss_resp": loss_resp.item()}, loss=loss.item())
                 else:
-                    tbar.set_postfix({"loss_bvp":loss1.item(), "loss_resp": loss2.item()}, loss=loss.item())
+                    tbar.set_postfix({"loss_bvp":loss_bvp.item(), "loss_resp": loss_resp.item()}, loss=loss.item())
 
             # Append the mean training loss for the epoch
             mean_training_loss1.append(np.mean(train_loss1))
@@ -195,8 +199,10 @@ class MMRPhysTrainer(BaseTrainer):
                 vbar.set_description("Validation")
 
                 data, labels = valid_batch[0].to(self.device), valid_batch[1].to(self.device)
-                
-                # labels = (labels - torch.mean(labels)) / torch.std(labels)  # normalize
+                label_bvp = labels[..., 0]
+                label_resp = labels[..., 1]
+                label_bvp = (label_bvp - torch.mean(label_bvp)) / torch.std(label_bvp)  # normalize
+                label_resp = (label_resp - torch.mean(label_resp)) / torch.std(label_resp)  # normalize                
 
                 last_frame = torch.unsqueeze(data[:, :, -1, :, :], 2).repeat(1, 1, max(self.num_of_gpu, 1), 1, 1)
                 data = torch.cat((data, last_frame), 2)
@@ -208,25 +214,25 @@ class MMRPhysTrainer(BaseTrainer):
                 # labels[torch.isnan(labels)] = 0
 
                 if self.md_infer and self.use_fsam:
-                    pred_ppg, pred_br, vox_embed, factorized_embed, att_mask, appx_error, \
+                    pred_bvp, pred_resp, vox_embed, factorized_embed, att_mask, appx_error, \
                         factorized_embed_br, att_mask_br, appx_error_br = self.model(data)
                 else:
-                    pred_ppg, pred_br, vox_embed = self.model(data)
-                pred_ppg = (pred_ppg - torch.mean(pred_ppg)) / torch.std(pred_ppg)  # normalize
-                pred_br = (pred_br - torch.mean(pred_br)) / torch.std(pred_br)  # normalize
+                    pred_bvp, pred_resp, vox_embed = self.model(data)
+                pred_bvp = (pred_bvp - torch.mean(pred_bvp)) / torch.std(pred_bvp)  # normalize
+                pred_resp = (pred_resp - torch.mean(pred_resp)) / torch.std(pred_resp)  # normalize
                 
-                loss1 = self.criterion1(pred_ppg, labels[..., 0])
-                loss2 = self.criterion2(pred_br, labels[..., 1])
-                loss = loss1 + 5*loss2
+                loss_bvp = self.criterion1(pred_bvp, label_bvp)
+                loss_resp = self.criterion2(pred_resp, label_resp)
+                loss = loss_bvp + 5*loss_resp
 
-                valid_loss1.append(loss1.item())
-                valid_loss2.append(loss2.item())
+                valid_loss1.append(loss_bvp.item())
+                valid_loss2.append(loss_resp.item())
                 valid_step += 1
                 # vbar.set_postfix(loss=loss.item())
                 if self.md_infer and self.use_fsam:
-                    vbar.set_postfix({"appx_error": appx_error.item(), "loss_bvp":loss1.item(), "loss_resp": loss2.item()}, loss=loss.item())
+                    vbar.set_postfix({"appx_error": appx_error.item(), "loss_bvp":loss_bvp.item(), "loss_resp": loss_resp.item()}, loss=loss.item())
                 else:
-                    vbar.set_postfix({"loss_bvp":loss1.item(), "loss_resp": loss2.item()}, loss=loss.item())
+                    vbar.set_postfix({"loss_bvp":loss_bvp.item(), "loss_resp": loss_resp.item()}, loss=loss.item())
             valid_loss1 = np.asarray(valid_loss1)
             valid_loss2 = np.asarray(valid_loss2)
         return np.mean(valid_loss1), np.mean(valid_loss2)
@@ -238,10 +244,10 @@ class MMRPhysTrainer(BaseTrainer):
         
         print('')
         print("===Testing===")
-        predictions = dict()
-        labels = dict()
-        predictions_br = dict()
-        labels_br = dict()
+        predictions_bvp_dict = dict()
+        labels_bvp_dict = dict()
+        predictions_resp_dict = dict()
+        labels_resp_dict = dict()
 
         if self.config.TOOLBOX_MODE == "only_test":
             if not os.path.exists(self.config.INFERENCE.MODEL_PATH):
@@ -270,8 +276,10 @@ class MMRPhysTrainer(BaseTrainer):
             for _, test_batch in enumerate(tqdm(data_loader["test"], ncols=80)):
                 batch_size = test_batch[0].shape[0]
                 data, labels_test = test_batch[0].to(self.device), test_batch[1].to(self.device)
-                
-                # labels_test = (labels_test - torch.mean(labels_test)) / torch.std(labels_test)  # normalize
+                label_bvp = labels_test[..., 0]
+                label_resp = labels_test[..., 1]
+                label_bvp = (label_bvp - torch.mean(label_bvp)) / torch.std(label_bvp)  # normalize
+                label_resp = (label_resp - torch.mean(label_resp)) / torch.std(label_resp)  # normalize
 
                 last_frame = torch.unsqueeze(data[:, :, -1, :, :], 2).repeat(1, 1, max(self.num_of_gpu, 1), 1, 1)
                 data = torch.cat((data, last_frame), 2)
@@ -283,41 +291,40 @@ class MMRPhysTrainer(BaseTrainer):
                 # labels_test[torch.isnan(labels_test)] = 0
 
                 if self.md_infer and self.use_fsam:
-                    pred_ppg_test, pred_br_test, vox_embed, factorized_embed, att_mask, appx_error, \
+                    pred_bvp_test, pred_resp_test, vox_embed, factorized_embed, att_mask, appx_error, \
                         factorized_embed_br, att_mask_br, appx_error_br = self.model(data)
                 else:
-                    pred_ppg_test, pred_br_test, vox_embed = self.model(data)
+                    pred_bvp_test, pred_resp_test, vox_embed = self.model(data)
                 
-                pred_ppg_test = (pred_ppg_test - torch.mean(pred_ppg_test)) / torch.std(pred_ppg_test)  # normalize
-                pred_br_test = (pred_br_test - torch.mean(pred_br_test)) / torch.std(pred_br_test)  # normalize
+                pred_bvp_test = (pred_bvp_test - torch.mean(pred_bvp_test)) / torch.std(pred_bvp_test)  # normalize
+                pred_resp_test = (pred_resp_test - torch.mean(pred_resp_test)) / torch.std(pred_resp_test)  # normalize
 
                 if self.config.TEST.OUTPUT_SAVE_DIR:
-                    labels_test = labels_test.cpu()
-                    labels_ppg = labels_test[..., 0]
-                    labels_resp = labels_test[..., 1]
-                    pred_ppg_test = pred_ppg_test.cpu()
-                    pred_br_test = pred_br_test.cpu()
+                    label_bvp = label_bvp.cpu()
+                    label_resp = label_resp.cpu()
+                    pred_bvp_test = pred_bvp_test.cpu()
+                    pred_resp_test = pred_resp_test.cpu()
 
                 for idx in range(batch_size):
                     subj_index = test_batch[2][idx]
                     sort_index = int(test_batch[3][idx])
-                    if subj_index not in predictions.keys():
-                        predictions[subj_index] = dict()
-                        labels[subj_index] = dict()
-                        predictions_br[subj_index] = dict()
-                        labels_br[subj_index] = dict()
-                    predictions[subj_index][sort_index] = pred_ppg_test[idx]
-                    labels[subj_index][sort_index] = labels_ppg[idx]
-                    predictions_br[subj_index][sort_index] = pred_br_test[idx]
-                    labels_br[subj_index][sort_index] = labels_resp[idx]
+                    if subj_index not in predictions_bvp_dict.keys():
+                        predictions_bvp_dict[subj_index] = dict()
+                        labels_bvp_dict[subj_index] = dict()
+                        predictions_resp_dict[subj_index] = dict()
+                        labels_resp_dict[subj_index] = dict()
+                    predictions_bvp_dict[subj_index][sort_index] = pred_bvp_test[idx]
+                    labels_bvp_dict[subj_index][sort_index] = label_bvp[idx]
+                    predictions_resp_dict[subj_index][sort_index] = pred_resp_test[idx]
+                    labels_resp_dict[subj_index][sort_index] = label_resp[idx]
 
 
         print('')
-        calculate_metrics(predictions, labels, self.config)
-        calculate_metrics(predictions_br, labels_br, self.config)
+        calculate_metrics(predictions_bvp_dict, labels_bvp_dict, self.config)
+        calculate_metrics(predictions_resp_dict, labels_resp_dict, self.config)
         if self.config.TEST.OUTPUT_SAVE_DIR: # saving test outputs 
-            self.save_test_outputs(predictions, labels, self.config, suff="_bvp")
-            self.save_test_outputs(predictions_br, labels_br, self.config, suff="_resp")
+            self.save_test_outputs(predictions_bvp_dict, labels_bvp_dict, self.config, suff="_bvp")
+            self.save_test_outputs(predictions_resp_dict, labels_resp_dict, self.config, suff="_resp")
 
     def save_model(self, index):
         if not os.path.exists(self.model_dir):
