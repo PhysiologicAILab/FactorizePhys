@@ -38,20 +38,14 @@ LOG:
   PATH: runs/exp
 MODEL:
   DROP_RATE: 0.1
-  NAME: PhysFormer
-  PHYSFORMER:                     # Probably need to update these in some meaningful way
+  NAME: Physnet
+  PHYSNET:
     CHANNELS: 3
     FRAME_NUM: 160
-    PATCH_SIZE: 4
-    DIM: 96
-    FF_DIM: 144
-    NUM_HEADS: 4
-    NUM_LAYERS: 12
-    THETA: 0.7
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
     WINDOW_SIZE: 30        # In seconds
-  MODEL_PATH: "./final_model_release/UBFC-rPPG_PhysFormer.pth"
+  MODEL_PATH: "./final_model_release/UBFC-rPPG_PhysNet.pth"
