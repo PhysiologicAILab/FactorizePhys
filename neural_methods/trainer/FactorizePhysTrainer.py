@@ -41,6 +41,7 @@ class FactorizePhysTrainer(BaseTrainer):
         md_config["FRAME_NUM"] = self.config.MODEL.FactorizePhys.FRAME_NUM
         md_config["MD_TYPE"] = self.config.MODEL.FactorizePhys.MD_TYPE
         md_config["MD_FSAM"] = self.config.MODEL.FactorizePhys.MD_FSAM
+        md_config["MD_TRANSFORM"] = self.config.MODEL.FactorizePhys.MD_TRANSFORM
         md_config["MD_S"] = self.config.MODEL.FactorizePhys.MD_S
         md_config["MD_R"] = self.config.MODEL.FactorizePhys.MD_R
         md_config["MD_STEPS"] = self.config.MODEL.FactorizePhys.MD_STEPS

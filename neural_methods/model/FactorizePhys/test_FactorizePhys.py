@@ -10,6 +10,7 @@ from neural_methods.model.FactorizePhys.FactorizePhys import FactorizePhys
 model_config = {
     "MD_FSAM": True,
     "MD_TYPE": "NMF",
+    "MD_TRANSFORM": "T_KAB",
     "MD_R": 1,
     "MD_S": 1,
     "MD_STEPS": 4,
@@ -94,6 +95,7 @@ if __name__ == "__main__":
     md_config["MD_STEPS"] = model_config["MD_STEPS"]
     md_config["MD_FSAM"] = model_config["MD_FSAM"]
     md_config["MD_TYPE"] = model_config["MD_TYPE"]
+    md_config["MD_TRANSFORM"] = model_config["MD_TRANSFORM"]
     md_config["MD_INFERENCE"] = model_config["MD_INFERENCE"]
     md_config["MD_RESIDUAL"] = model_config["MD_RESIDUAL"]
 

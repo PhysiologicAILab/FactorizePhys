@@ -105,6 +105,7 @@ MODEL:
     FRAME_NUM: 160
     MD_FSAM: True
     MD_TYPE: "NMF"
+    MD_TRANSFORM: "T_KAB"     #Default, if not specified
     MD_R: 1
     MD_S: 1
     MD_STEPS: 4

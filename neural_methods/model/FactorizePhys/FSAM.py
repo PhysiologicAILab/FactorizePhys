@@ -16,6 +16,7 @@ class _MatrixDecompositionBase(nn.Module):
 
         self.dim = dim
         self.md_type = md_config["MD_TYPE"]
+        self.transform = md_config["MD_TRANSFORM"]
         self.S = md_config["MD_S"]
         self.R = md_config["MD_R"]
         self.debug = debug
@@ -68,10 +69,24 @@ class _MatrixDecompositionBase(nn.Module):
         if self.dim == "3D":        # (B, C, T, H, W) -> (B * S, D, N)
             B, C, T, H, W = x.shape
 
-            # # dimension of vector of our interest is T (rPPG signal as T dimension), so forming this as vector
-            # # From spatial and channel dimension, which are features, only 2-4 shall be enough to generate the approximated attention matrix
-            D = T // self.S
-            N = C * H * W 
+            # t = Time, k = Channels, a & B = height and width
+            if self.transform.lower() == "t_kab":
+                # # dimension of vector of our interest is T (rPPG signal as T dimension), so forming this as vector
+                # # From spatial and channel dimension, which are features, only 2-4 shall be enough to generate the approximated attention matrix
+                D = T // self.S
+                N = C * H * W
+
+            elif self.transform.lower() == "tk_ab":
+                D = T * C // self.S
+                N = H * W
+
+            elif self.transform.lower() == "k_tab":
+                D = C // self.S
+                N = T * H * W
+
+            else:
+                print("Invalid MD_TRANSFORM specified:", self.transform)
+                exit()
 
             # # smoothening the temporal dimension
             # x = x.view(B * self.S, N, D)

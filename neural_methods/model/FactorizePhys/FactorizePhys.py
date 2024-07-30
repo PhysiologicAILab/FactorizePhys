@@ -11,6 +11,7 @@ nf = [8, 12, 16]
 model_config = {
     "MD_FSAM": True,
     "MD_TYPE": "NMF",
+    "MD_TRANSFORM": "T_KAB",
     "MD_R": 1,
     "MD_S": 1,
     "MD_STEPS": 4,
