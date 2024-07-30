@@ -5,7 +5,7 @@ import torch
 import torch.optim as optim
 from evaluation.metrics import calculate_metrics
 from neural_methods.loss.NegPearsonLoss import Neg_Pearson
-from neural_methods.model.FactorizePhys.MMRPhys import MMRPhys
+from neural_methods.model.MMRPhys.MMRPhys import MMRPhys
 from neural_methods.trainer.BaseTrainer import BaseTrainer
 from tqdm import tqdm
 

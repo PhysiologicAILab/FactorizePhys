@@ -1,11 +1,11 @@
 """
-FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmography through Factorization of Voxel Embeddings
+MMRPhys: Remote Extraction of Multiple Physiological Signals using Label Guided Factorization.
 """
 
 import torch
 import torch.nn as nn
 import numpy as np
-from neural_methods.model.FactorizePhys.MMRPhys import MMRPhys
+from neural_methods.model.MMRPhys.MMRPhys import MMRPhys
 
 model_config = {
     "MD_FSAM": True,
@@ -13,8 +13,8 @@ model_config = {
     "MD_R": 1,
     "MD_S": 1,
     "MD_STEPS": 4,
-    "MD_INFERENCE": False,
-    "MD_RESIDUAL": False,
+    "MD_INFERENCE": True,
+    "MD_RESIDUAL": True,
     "in_channels": 3,
     "data_channels": 4,
     "height": 72,
@@ -38,14 +38,9 @@ if __name__ == "__main__":
     # from torch.utils.tensorboard import SummaryWriter
 
     # default `log_dir` is "runs" - we'll be more specific here
-    # writer = SummaryWriter('runs/FactorizePhys')
+    # writer = SummaryWriter('runs/MMRPhys')
 
-    # ckpt_path = "/Users/jiteshjoshi/Downloads/rPPG_Testing/models/PURE_PURE_iBVP_FactorizePhys_FactorizePhys_5_Epoch6.pth"
-    # ckpt_path = "/Users/jiteshjoshi/Downloads/rPPG_Testing/models/PURE_PURE_iBVP_FactorizePhys_FactorizePhys_5_Epoch12.pth"
-    # ckpt_path = "/Users/jiteshjoshi/Downloads/rPPG_Testing/models/PURE_PURE_iBVP_FactorizePhys_FactorizePhys_5_Epoch19.pth"
     ckpt_path = model_config["ckpt_path"]
-
-    # data_path = "/Users/jiteshjoshi/Downloads/rPPG_Testing/data/subject36_input9.npy"
     data_path = model_config["data_path"]
 
     label_path = model_config["label_path"]
