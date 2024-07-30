@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 10
   LR: 1e-3
-  MODEL_FILE_NAME: iBVP_RGBT_FactorizePhys_Base
+  MODEL_FILE_NAME: iBVP_RGBT_FactorizePhys_FSAM_Res
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -87,7 +87,7 @@ TEST:
       CHUNK_LENGTH: 160
       CROP_FACE:
         DO_CROP_FACE: True
-        BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face
+        BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face, Y5F_IR for running it on thermal frames
         USE_LARGE_FACE_BOX: True
         LARGE_BOX_COEF: 1.5
         DETECTION:
@@ -99,7 +99,7 @@ TEST:
       RESIZE:
         H: 72
         W: 72
-DEVICE: cuda:1
+DEVICE: cuda:3
 NUM_OF_GPU_TRAIN: 1
 LOG:
   PATH: runs/exp
@@ -109,6 +109,13 @@ MODEL:
   FactorizePhys:
     CHANNELS: 4
     FRAME_NUM: 160
+    MD_FSAM: True
+    MD_TYPE: "NMF"
+    MD_R: 1
+    MD_S: 1
+    MD_STEPS: 4
+    MD_RESIDUAL: True
+    MD_INFERENCE: True
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
