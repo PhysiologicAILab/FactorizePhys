@@ -16,7 +16,8 @@ class _MatrixDecompositionBase(nn.Module):
 
         self.dim = dim
         self.md_type = md_config["MD_TYPE"]
-        self.transform = md_config["MD_TRANSFORM"]
+        if dim == "3D":
+            self.transform = md_config["MD_TRANSFORM"]
         self.S = md_config["MD_S"]
         self.R = md_config["MD_R"]
         self.debug = debug
