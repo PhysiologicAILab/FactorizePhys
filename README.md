@@ -14,8 +14,8 @@ The repo currently supports the following algorithms:
 
 The repo supports four datasets, namely SCAMPS, UBFC-rPPG, PURE, and iBVP. **To use these datasets in a deep learning model, you should organize the files as follows.**
 
-* [SCAMPS](https://arxiv.org/abs/2206.04197)
-  * D. McDuff, M. Wander, X. Liu, B. Hill, J. Hernandez, J. Lester, T. Baltrusaitis, "SCAMPS: Synthetics for Camera Measurement of Physiological Signals", NeurIPS, 2022
+  * [SCAMPS](https://arxiv.org/abs/2206.04197)
+    * D. McDuff, M. Wander, X. Liu, B. Hill, J. Hernandez, J. Lester, T. Baltrusaitis, "SCAMPS: Synthetics for Camera Measurement of Physiological Signals", NeurIPS, 2022
     -----------------
          data/SCAMPS/Train/
             |-- P00001.mat
@@ -31,8 +31,8 @@ The repo supports four datasets, namely SCAMPS, UBFC-rPPG, PURE, and iBVP. **To 
          |...
     -----------------
 
-* [UBFC-rPPG](https://sites.google.com/view/ybenezeth/ubfcrppg)
-  * S. Bobbia, R. Macwan, Y. Benezeth, A. Mansouri, J. Dubois, "Unsupervised skin tissue segmentation for remote photoplethysmography", Pattern Recognition Letters, 2017.
+  * [UBFC-rPPG](https://sites.google.com/view/ybenezeth/ubfcrppg)
+    * S. Bobbia, R. Macwan, Y. Benezeth, A. Mansouri, J. Dubois, "Unsupervised skin tissue segmentation for remote photoplethysmography", Pattern Recognition Letters, 2017.
     -----------------
          data/UBFC-rPPG/
          |   |-- subject1/
@@ -47,9 +47,8 @@ The repo supports four datasets, namely SCAMPS, UBFC-rPPG, PURE, and iBVP. **To 
          |       |-- ground_truth.txt
     -----------------
 
-* [PURE](https://www.tu-ilmenau.de/universitaet/fakultaeten/fakultaet-informatik-und-automatisierung/profil/institute-und-fachgebiete/institut-fuer-technische-informatik-und-ingenieurinformatik/fachgebiet-neuroinformatik-und-kognitive-robotik/data-sets-code/pulse-rate-detection-dataset-pure)
-  * Stricker, R., Müller, S., Gross, H.-M.Non-contact "Video-based Pulse Rate Measurement on a Mobile Service Robot"
-in: Proc. 23st IEEE Int. Symposium on Robot and Human Interactive Communication (Ro-Man 2014), Edinburgh, Scotland, UK, pp. 1056 - 1062, IEEE 2014
+  * [PURE](https://www.tu-ilmenau.de/universitaet/fakultaeten/fakultaet-informatik-und-automatisierung/profil/institute-und-fachgebiete/institut-fuer-technische-informatik-und-ingenieurinformatik/fachgebiet-neuroinformatik-und-kognitive-robotik/data-sets-code/pulse-rate-detection-dataset-pure)
+    * Stricker, R., Müller, S., Gross, H.-M.Non-contact "Video-based Pulse Rate Measurement on a Mobile Service Robot" in: Proc. 23st IEEE Int. Symposium on Robot and Human Interactive Communication (Ro-Man 2014), Edinburgh, Scotland, UK, pp. 1056 - 1062, IEEE 2014
     -----------------
          data/PURE/
          |   |-- 01-01/
@@ -64,8 +63,8 @@ in: Proc. 23st IEEE Int. Symposium on Robot and Human Interactive Communication 
          |      |-- ii-jj.json
     -----------------
 
-* [iBVP](https://github.com/PhysiologicAILab/iBVP-Dataset)
-  * Joshi, J.; Cho, Y. iBVP Dataset: RGB-Thermal rPPG Dataset with High Resolution Signal Quality Labels. Electronics 2024, 13, 1334.
+  * [iBVP](https://github.com/PhysiologicAILab/iBVP-Dataset)
+    * Joshi, J.; Cho, Y. iBVP Dataset: RGB-Thermal rPPG Dataset with High Resolution Signal Quality Labels. Electronics 2024, 13, 1334.
     -----------------
           iBVP_Dataset/
           |   |-- p01_a/
