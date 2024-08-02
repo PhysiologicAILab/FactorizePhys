@@ -6,6 +6,7 @@ import torch.optim as optim
 from evaluation.metrics import calculate_metrics
 from neural_methods.loss.NegPearsonLoss import Neg_Pearson
 from neural_methods.model.FactorizePhys.FactorizePhys import FactorizePhys
+from neural_methods.model.FactorizePhys.FactorizePhysBig import FactorizePhysBig
 from neural_methods.trainer.BaseTrainer import BaseTrainer
 from tqdm import tqdm
 
@@ -36,6 +37,8 @@ class FactorizePhysTrainer(BaseTrainer):
 
         frames = self.config.MODEL.FactorizePhys.FRAME_NUM
         in_channels = self.config.MODEL.FactorizePhys.CHANNELS
+        model_type = self.config.MODEL.FactorizePhys.TYPE
+        model_type = model_type.lower()
 
         md_config = {}
         md_config["FRAME_NUM"] = self.config.MODEL.FactorizePhys.FRAME_NUM
@@ -51,8 +54,15 @@ class FactorizePhysTrainer(BaseTrainer):
         self.md_infer = self.config.MODEL.FactorizePhys.MD_INFERENCE
         self.use_fsam = self.config.MODEL.FactorizePhys.MD_FSAM
 
-        self.model = FactorizePhys(frames=frames, md_config=md_config, in_channels=in_channels,
-                                dropout=self.dropout_rate, device=self.device)  # [3, T, 128,128]
+        if model_type == "standard":
+            self.model = FactorizePhys(frames=frames, md_config=md_config, in_channels=in_channels,
+                                    dropout=self.dropout_rate, device=self.device)  # [3, T, 72,72]
+        elif model_type == "big":
+            self.model = FactorizePhysBig(frames=frames, md_config=md_config, in_channels=in_channels,
+                                       dropout=self.dropout_rate, device=self.device)  # [3, T, 144,144]
+        else:
+            print("Unexpected model type specified. Should be standard or big, but specified:", model_type)
+            exit()
 
         if torch.cuda.device_count() > 0 and self.num_of_gpu > 0:  # distribute model across GPUs
             self.model = torch.nn.DataParallel(self.model, device_ids=[self.device])  # data parallel model

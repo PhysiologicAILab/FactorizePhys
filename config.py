@@ -316,6 +316,7 @@ _C.MODEL.PHYSNET.CHANNELS = 3
 _C.MODEL.FactorizePhys = CN()
 _C.MODEL.FactorizePhys.FRAME_NUM = 160
 _C.MODEL.FactorizePhys.CHANNELS = 3
+_C.MODEL.FactorizePhys.TYPE = "Standard"
 _C.MODEL.FactorizePhys.MD_FSAM = False
 _C.MODEL.FactorizePhys.MD_TYPE = 'NMF'
 _C.MODEL.FactorizePhys.MD_TRANSFORM = 'T_KAB'

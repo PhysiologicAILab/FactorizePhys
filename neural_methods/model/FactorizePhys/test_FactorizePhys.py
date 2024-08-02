@@ -4,6 +4,7 @@ FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmogra
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 from neural_methods.model.FactorizePhys.FactorizePhys import FactorizePhys
 
@@ -25,15 +26,16 @@ model_config = {
     "debug": True,
     "assess_latency": False,
     "num_trials": 20,
-    "visualize": False,
-    "ckpt_path": "",
-    "data_path": "",
-    "label_path": ""
+    "visualize": True,
+    "ckpt_path": "./final_model_release/iBVP_FactorizePhys_FSAM_Res.pth",
+    "data_path": "/home/jitesh/data/iBVP_Dataset/iBVP_RGB_160_72x72/p07a_input1.npy",
+    "label_path": "/home/jitesh/data/iBVP_Dataset/iBVP_RGB_160_72x72/p07a_label1.npy"
 }
 
 if __name__ == "__main__":
     import time
     import matplotlib.pyplot as plt
+    import matplotlib.cm as cm
     import numpy as np
     from scipy.signal import resample
     # from torch.utils.tensorboard import SummaryWriter
@@ -69,6 +71,7 @@ if __name__ == "__main__":
         np_data = np.load(data_path)
         np_label = np.load(label_path)
         np_label = np.expand_dims(np_label, 0)
+        np_label = torch.tensor(np_label)
 
         print("Chunk data shape", np_data.shape)
         print("Chunk label shape", np_label.shape)
@@ -99,9 +102,11 @@ if __name__ == "__main__":
     md_config["MD_INFERENCE"] = model_config["MD_INFERENCE"]
     md_config["MD_RESIDUAL"] = model_config["MD_RESIDUAL"]
 
-    # net = nn.DataParallel(FactorizePhys(frames=frames, md_config=md_config, device=device, in_channels=in_channels, debug=debug)).to(device)
-    net = FactorizePhys(frames=frames, md_config=md_config, device=device, in_channels=in_channels, debug=debug).to(device)
-    # net.load_state_dict(torch.load(ckpt_path, map_location=device))
+    if visualize:
+        net = nn.DataParallel(FactorizePhys(frames=frames, md_config=md_config, device=device, in_channels=in_channels, debug=debug)).to(device)
+        net.load_state_dict(torch.load(ckpt_path, map_location=device))
+    else:
+        net = FactorizePhys(frames=frames, md_config=md_config, device=device, in_channels=in_channels, debug=debug).to(device)
     net.eval()
 
     if assess_latency:
@@ -136,122 +141,89 @@ if __name__ == "__main__":
     # print("-"*100)
 
     if visualize:
-        test_data = test_data.detach().numpy()
-        vox_embed = vox_embed.detach().numpy()
-        if (md_infer or net.training or debug) and use_fsam:
-            factorized_embed = factorized_embed.detach().numpy()
-            att_mask = att_mask.detach().numpy()
+        
+        # b, channels, enc_frames, enc_height, enc_width = vox_embed.shape
+        # label_matrix = np_label.unsqueeze(0).repeat(1, channels, 1).unsqueeze(
+        #     2).unsqueeze(2).permute(0, 1, 4, 3, 2).repeat(1, 1, 1, enc_height, enc_width)
+        # label_matrix = label_matrix.to(device=device)
 
-        # print(test_data.shape, vox_embed.shape, factorized_embed.shape)
-        b, ch, enc_frames, enc_height, enc_width = vox_embed.shape
+        # corr_matrix = F.cosine_similarity(vox_embed, label_matrix, dim=2)
+
+        avg_emb = torch.mean(vox_embed, dim=1)
+        b, enc_frames, enc_height, enc_width = avg_emb.shape
+
+        label_matrix = np_label.unsqueeze(0).unsqueeze(2).permute(0, 3, 2, 1).repeat(1, 1, enc_height, enc_width)
+        label_matrix = label_matrix.to(device=device)
+        corr_matrix = F.cosine_similarity(avg_emb, label_matrix, dim=1)
+
+        print("corr_matrix.shape", corr_matrix.shape)
         # exit()
-        for ch in range(vox_embed.shape[1]):
-            if (md_infer or net.training or debug) and use_fsam:
-                fig, ax = plt.subplots(9, 4, layout="tight")
-            else:
-                fig, ax = plt.subplots(9, 2, layout="tight")
 
-            frame = 0
-            ax[0, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[0, 0].axis('off')
-            ax[0, 1].imshow(vox_embed[0, ch, frame, :, :])
-            ax[0, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[0, 2].imshow(factorized_embed[0, ch, frame, :, :])
-                ax[0, 2].axis('off')
-                ax[0, 3].imshow(att_mask[0, ch, frame, :, :])
-                ax[0, 3].axis('off')
+        test_data = test_data.detach().cpu().numpy()
+        vox_embed = vox_embed.detach().cpu().numpy()
+        corr_matrix = corr_matrix.detach().cpu().numpy()
+        
+        if (md_infer or net.training or debug) and use_fsam:
+            att_mask = torch.mean(att_mask, dim=1)
+            factorized_embed = factorized_embed.detach().cpu().numpy()
+            # att_mask = att_mask.detach().cpu().numpy()
 
-            frame = 20
-            ax[1, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[1, 0].axis('off')
-            ax[1, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[1, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[1, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[1, 2].axis('off')
-                ax[1, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[1, 3].axis('off')
+            b, enc_frames, att_height, att_width = att_mask.shape
 
-            frame = 40
-            ax[2, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[2, 0].axis('off')
-            ax[2, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[2, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[2, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[2, 2].axis('off')
-                ax[2, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[2, 3].axis('off')
+            label_matrix_att = np_label.unsqueeze(0).unsqueeze(2).permute(0, 3, 2, 1).repeat(1, 1, att_height, att_width)
+            label_matrix_att = label_matrix_att.to(device=device)
+            corr_matrix_att = F.cosine_similarity(att_mask, label_matrix_att, dim=1)
 
-            frame = 60
-            ax[3, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[3, 0].axis('off')
-            ax[3, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[3, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[3, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[3, 2].axis('off')
-                ax[3, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[3, 3].axis('off')
+            corr_matrix_att = corr_matrix_att.detach().cpu().numpy()
+            att_mask = att_mask.detach().cpu().numpy()
 
-            frame = 80
-            ax[4, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[4, 0].axis('off')
-            ax[4, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[4, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[4, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[4, 2].axis('off')
-                ax[4, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[4, 3].axis('off')
+        print("corr_matrix_att.shape", corr_matrix_att.shape)
 
-            frame = 100
-            ax[5, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[5, 0].axis('off')
-            ax[5, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[5, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[5, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[5, 2].axis('off')
-                ax[5, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[5, 3].axis('off')
+        print("test_data.shape:", test_data.shape)
+        print("vox_embed.shape:", vox_embed.shape)
+        print("factorized_embed.shape:", factorized_embed.shape)
+        
+        # exit()
+        # for ch in range(vox_embed.shape[1]):
 
-            frame = 120
-            ax[6, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[6, 0].axis('off')
-            ax[6, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[6, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[6, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[6, 2].axis('off')
-                ax[6, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[6, 3].axis('off')
+        # if (md_infer or net.training or debug) and use_fsam:
+        #     fig, ax = plt.subplots(3, 3, layout="tight")
+        # else:
 
-            frame = 140
-            ax[7, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[7, 0].axis('off')
-            ax[7, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[7, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[7, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[7, 2].axis('off')
-                ax[7, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[7, 3].axis('off')
+        fig, ax = plt.subplots(1, 3, layout="tight")
 
-            frame = 159
-            ax[8, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[8, 0].axis('off')
-            ax[8, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[8, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[8, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[8, 2].axis('off')
-                ax[8, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[8, 3].axis('off')
+        ch = 0
+        ax[0].imshow(np_data[ch, ...].astype(np.uint8))
+        ax[0].axis('off')
+        ax[1].imshow(corr_matrix[ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[1].axis('off')
+        if (md_infer or net.training or debug) and use_fsam:
+            ax[2].imshow(corr_matrix_att[ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+            ax[2].axis('off')
 
-            plt.show()
-            plt.close(fig)
+        # ch = 5
+        # ax[1, 0].imshow(np_data[ch, ...].astype(np.uint8))
+        # ax[1, 0].axis('off')
+        # ax[1, 1].imshow(corr_matrix[0, ch, :, :])
+        # ax[1, 1].axis('off')
+        # # if (md_infer or net.training or debug) and use_fsam:
+        # #     ax[1, 2].imshow(factorized_embed[0, ch, :, :])
+        # #     ax[1, 2].axis('off')
+
+        # ch = 12
+        # ax[2, 0].imshow(np_data[ch, ...].astype(np.uint8))
+        # ax[2, 0].axis('off')
+        # ax[2, 1].imshow(corr_matrix[0, ch, :, :])
+        # ax[2, 1].axis('off')
+        # # if (md_infer or net.training or debug) and use_fsam:
+        # #     ax[2, 2].imshow(factorized_embed[0, ch, :, :])
+        # #     ax[2, 2].axis('off')
+
+        fig.colorbar(mappable=cm.ScalarMappable(cmap='nipy_spectral'), ax=ax[0])
+
+        # plt.show()
+        plt.savefig("AttentionMap.jpg")
+        plt.close(fig)
     print("pred.shape", pred.shape)
 
     pytorch_total_params = sum(p.numel() for p in net.parameters())
