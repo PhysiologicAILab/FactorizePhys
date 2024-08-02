@@ -1,6 +1,9 @@
 # FactorizePhys
 Imaging based contactless physiological signal extraction.
 
+# :notebook: Algorithms
+The repo currently supports the following algorithms:
+
 * Supervised Neural Algorithms
   * FactorizePhys - proposed method
   * [Remote Photoplethysmograph Signal Measurement from Facial Videos Using Spatio-Temporal Networks (PhysNet)](https://bmvc2019.org/wp-content/uploads/papers/0186-paper.pdf), by Yu *et al.*, 2019
