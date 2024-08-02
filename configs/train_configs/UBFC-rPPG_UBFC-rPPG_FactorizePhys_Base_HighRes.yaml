@@ -32,8 +32,8 @@ TRAIN:
           DYNAMIC_DETECTION_FREQUENCY : 30
           USE_MEDIAN_FACE_BOX: False    # This should be used ONLY if dynamic detection is used
       RESIZE:
-        H: 72
-        W: 72
+        H: 144
+        W: 144
 VALID:
   DATA:
     FS: 30
@@ -61,8 +61,8 @@ VALID:
           DYNAMIC_DETECTION_FREQUENCY : 30
           USE_MEDIAN_FACE_BOX: False    # This should be used ONLY if dynamic detection is used
       RESIZE:
-        H: 72
-        W: 72
+        H: 144
+        W: 144
 TEST:
   METRICS: ['MAE', 'RMSE', 'MAPE', 'Pearson', 'SNR', 'BA', 'MACC']
   USE_LAST_EPOCH: True                   # to use provided validation dataset to find the best epoch, should be false
@@ -92,8 +92,8 @@ TEST:
           DYNAMIC_DETECTION_FREQUENCY : 30
           USE_MEDIAN_FACE_BOX: False    # This should be used ONLY if dynamic detection is used
       RESIZE:
-        H: 72
-        W: 72
+        H: 144
+        W: 144
 DEVICE: cuda:1
 NUM_OF_GPU_TRAIN: 1
 LOG:
