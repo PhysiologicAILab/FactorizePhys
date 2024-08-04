@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 10
   LR: 1e-3
-  MODEL_FILE_NAME: UBFC-rPPG_Intra_FactorizePhys_FSAM_Res
+  MODEL_FILE_NAME: UBFC-rPPG_Intra_FactorizePhys_FSAM_Res_HighRes
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -13,7 +13,7 @@ TRAIN:
     DATA_FORMAT: NCDHW
     DATA_PATH: "/mnt/sda/data/jitesh/UBFC-rPPG/data/"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/home/jitesh/data/UBFC-rPPG/"    # Processed dataset save path, need to be updated
-    EXP_DATA_NAME: "UBFC-rPPG_Raw_240_144x144"
+    EXP_DATA_NAME: "UBFC-rPPG_Raw_240_128x128"
     BEGIN: 0.0
     END: 0.7
     PREPROCESS:
@@ -32,8 +32,8 @@ TRAIN:
           DYNAMIC_DETECTION_FREQUENCY : 30
           USE_MEDIAN_FACE_BOX: False    # This should be used ONLY if dynamic detection is used
       RESIZE:
-        H: 144
-        W: 144
+        H: 128
+        W: 128
 VALID:
   DATA:
     FS: 30
@@ -42,7 +42,7 @@ VALID:
     DATA_FORMAT: NCDHW
     DATA_PATH: "/mnt/sda/data/jitesh/UBFC-rPPG/data/"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/home/jitesh/data/UBFC-rPPG/"    # Processed dataset save path, need to be updated
-    EXP_DATA_NAME: "UBFC-rPPG_Raw_240_144x144"
+    EXP_DATA_NAME: "UBFC-rPPG_Raw_240_128x128"
     BEGIN: 0.5
     END: 0.7
     PREPROCESS:
@@ -61,8 +61,8 @@ VALID:
           DYNAMIC_DETECTION_FREQUENCY : 30
           USE_MEDIAN_FACE_BOX: False    # This should be used ONLY if dynamic detection is used
       RESIZE:
-        H: 144
-        W: 144
+        H: 128
+        W: 128
 TEST:
   METRICS: ['MAE', 'RMSE', 'MAPE', 'Pearson', 'SNR', 'BA', 'MACC']
   USE_LAST_EPOCH: True                   # to use provided validation dataset to find the best epoch, should be false
@@ -73,7 +73,7 @@ TEST:
     DATA_FORMAT: NCDHW
     DATA_PATH: "/mnt/sda/data/jitesh/UBFC-rPPG/data/"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/home/jitesh/data/UBFC-rPPG/"    # Processed dataset save path, need to be updated
-    EXP_DATA_NAME: "UBFC-rPPG_Raw_240_144x144"
+    EXP_DATA_NAME: "UBFC-rPPG_Raw_240_128x128"
     BEGIN: 0.7
     END: 1.0
     PREPROCESS:
@@ -92,8 +92,8 @@ TEST:
           DYNAMIC_DETECTION_FREQUENCY : 30
           USE_MEDIAN_FACE_BOX: False    # This should be used ONLY if dynamic detection is used
       RESIZE:
-        H: 144
-        W: 144
+        H: 128
+        W: 128
 DEVICE: cuda:2
 NUM_OF_GPU_TRAIN: 1
 LOG:
@@ -109,7 +109,7 @@ MODEL:
     MD_TYPE: "NMF"
     MD_R: 1
     MD_S: 1
-    MD_STEPS: 5
+    MD_STEPS: 4
     MD_RESIDUAL: True
     MD_INFERENCE: True
 INFERENCE:

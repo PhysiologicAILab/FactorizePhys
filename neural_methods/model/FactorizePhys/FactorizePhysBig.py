@@ -23,8 +23,8 @@ model_config = {
     "in_channels": 3,
     "data_channels": 4,
     "align_channels": nf[2] // 2,
-    "height": 144,
-    "weight": 144,
+    "height": 128,
+    "weight": 128,
     "batch_size": 4,
     "frames": 240,
     "debug": False,
@@ -56,16 +56,16 @@ class rPPG_FeatureExtractor(nn.Module):
         # inCh, out_channel, kernel_size, stride, padding
 
         self.debug = debug
-        #                                                        Input: #B, inCh, 240, 144, 144
+        #                                                        Input: #B, inCh, 240, 128, 128
         self.FeatureExtractor = nn.Sequential(
-            ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 1, 1]),  #B, nf[0], 240, 144, 144
-            ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 240, 71, 71
-            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 240, 69, 69
+            ConvBlock3D(inCh, nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),  #B, nf[0], 240, 126, 126
+            ConvBlock3D(nf[0], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 240, 62, 62
+            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 240, 60, 60
             nn.Dropout3d(p=dropout_rate),
 
-            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[1], 240, 67, 67
-            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 240, 33, 33
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 240, 31, 31
+            ConvBlock3D(nf[1], nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[1], 240, 29, 29
+            ConvBlock3D(nf[1], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 240, 27, 27
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 240, 25, 25
             nn.Dropout3d(p=dropout_rate),
         )
 
@@ -88,9 +88,9 @@ class BVP_Head(nn.Module):
         self.md_res = md_config["MD_RESIDUAL"]
 
         self.conv_block = nn.Sequential(
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 240, 29, 29
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 240, 14, 14
-            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 240, 12, 12
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 2, 2], [1, 0, 0]), #B, nf[2], 240, 12, 12
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 240, 10, 10
+            ConvBlock3D(nf[2], nf[2], [3, 3, 3], [1, 1, 1], [1, 0, 0]), #B, nf[2], 240, 8, 8
             nn.Dropout3d(p=dropout_rate),
         )
 
@@ -103,7 +103,7 @@ class BVP_Head(nn.Module):
             inC = nf[2]
 
         self.final_layer = nn.Sequential(
-            ConvBlock3D(inC, nf[1], [3, 3, 3], [1, 2, 2], [1, 0, 0]),                         #B, nf[1], 240, 5, 5
+            ConvBlock3D(inC, nf[1], [3, 4, 4], [1, 1, 1], [1, 0, 0]),                         #B, nf[1], 240, 5, 5
             ConvBlock3D(nf[1], nf[0], [3, 3, 3], [1, 1, 1], [1, 0, 0]),                       #B, nf[0], 240, 3, 3
             nn.Conv3d(nf[0], 1, (3, 3, 3), stride=(1, 1, 1), padding=(1, 0, 0), bias=False),  #B, 1, 240, 1, 1
         )
@@ -114,8 +114,6 @@ class BVP_Head(nn.Module):
         if self.debug:
             print("BVP Head")
             print("     voxel_embeddings.shape", voxel_embeddings.shape)
-
-        voxel_embeddings = self.conv_block(voxel_embeddings)
 
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
             if "NMF" in self.md_type:
@@ -145,10 +143,12 @@ class BVP_Head(nn.Module):
             # # Concatenate
             # factorized_embeddings = torch.cat([voxel_embeddings, self.fsam_norm(x)], dim=1)
 
-            x = self.final_layer(factorized_embeddings)
+            x = self.conv_block(factorized_embeddings)
+            x = self.final_layer(x)
         
         else:
-            x = self.final_layer(voxel_embeddings)
+            x = self.conv_block(voxel_embeddings)
+            x = self.final_layer(x)
 
         rPPG = x.view(-1, length)
 
@@ -156,7 +156,7 @@ class BVP_Head(nn.Module):
             print("     rPPG.shape", rPPG.shape)
         
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
-            return rPPG, factorized_embeddings, att_mask, appx_error
+            return rPPG, factorized_embeddings, appx_error
         else:
             return rPPG
 
@@ -231,7 +231,7 @@ class FactorizePhysBig(nn.Module):
         voxel_embeddings = self.rppg_feature_extractor(x)
         
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
-            rPPG, factorized_embeddings, att_mask, appx_error = self.rppg_head(voxel_embeddings, batch, length-1)
+            rPPG, factorized_embeddings, appx_error = self.rppg_head(voxel_embeddings, batch, length-1)
         else:
             rPPG = self.rppg_head(voxel_embeddings, batch, length-1)
 
@@ -244,6 +244,6 @@ class FactorizePhysBig(nn.Module):
             print("rPPG.shape", rPPG.shape)
 
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
-            return rPPG, voxel_embeddings, factorized_embeddings, att_mask, appx_error
+            return rPPG, voxel_embeddings, factorized_embeddings, appx_error
         else:
             return rPPG, voxel_embeddings

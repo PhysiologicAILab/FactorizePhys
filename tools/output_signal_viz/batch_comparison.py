@@ -8,6 +8,19 @@ from pathlib import Path
 import io
 import matplotlib.pyplot as plt
 
+SMALL_SIZE = 8
+MEDIUM_SIZE = 10
+BIGGER_SIZE = 12
+
+plt.rc('font', size=BIGGER_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=BIGGER_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=BIGGER_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=BIGGER_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=BIGGER_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 # device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
@@ -18,40 +31,32 @@ class CPU_Unpickler(pickle.Unpickler):
         else:
             return super().find_class(module, name)
 
-
-# path_dict = {
-#     "root": "/Users/jiteshjoshi/Downloads/rPPG_Testing/FactorizePhys/",
-#     "test_datasets": {
-#         "PURE": {
-#             "iBVP_EfficientPhys_SASN": "iBVP_iBVP_EfficientPhys_outputs.pickle",
-#             "iBVP_EfficientPhys_FSAM": "iBVP_iBVP_EfficientPhys_FSAM_V12_FD40_outputs.pickle",
-#             "iBVP_FactorizePhys": "iBVP_iBVP_FactorizePhys_FactorizePhys_v63_No_FSAM_outputs.pickle",
-#             "iBVP_FactorizePhys_FSAM": "iBVP_iBVP_FactorizePhys_FactorizePhys_v63_R8_S8_ST6_LR1e-3_NoRes_outputs.pickle",
-#             "iBVP_PhysFormer": "iBVP_iBVP_PHYSFORMER_outputs.pickle",
-#             "iBVP_PhysNet": "iBVP_iBVP_PHYSNET_outputs.pickle",
-#             "UBFC_EfficientPhys_FSAM": "UBFC_UBFC_PURE_EfficientPhys_FM_v12_outputs.pickle",
-#             "UBFC_EfficientPhys_SASN": "UBFC_UBFC_PURE_EfficientPhys_outputs.pickle",
-#             "UBFC_FactorizePhys": "UBFC_UBFC_PURE_FactorizePhys_v63_No_FSAM_outputs.pickle",
-#             "UBFC_FactorizePhys_FSAM": "UBFC_UBFC_PURE_FactorizePhys_v63_R8_S8_ST6_LR1e-3_NoRes_outputs.pickle",
-#             "UBFC_PhysNet": "UBFC_UBFC_PURE_PhysNet_outputs.pickle",
-#             "UBFC_PhysFormer": "UBFC-rPPG_UBFC-rPPG_PURE_PhysFormer_outputs.pickle"
-#         }
-#     }
-# }
-
 path_dict = {
-    "root": "/Users/jiteshjoshi/Downloads/rPPG_Testing/FactorizePhys/",
     "test_datasets": {
         "PURE": {
-            "iBVP_EfficientPhys_SASN": "iBVP_iBVP_EfficientPhys_outputs.pickle",
-            "iBVP_FactorizePhys_FSAM": "iBVP_iBVP_FactorizePhys_FactorizePhys_v63_R8_S8_ST6_LR1e-3_NoRes_outputs.pickle",
-            "UBFC_EfficientPhys_SASN": "UBFC_UBFC_PURE_EfficientPhys_outputs.pickle",
-            "UBFC_FactorizePhys_FSAM": "UBFC_UBFC_PURE_FactorizePhys_v63_R8_S8_ST6_LR1e-3_NoRes_outputs.pickle",
+            "root": "runs/exp/PURE_Raw_160_72x72/saved_test_outputs/",
+            "exp": {
+                "iBVP_EfficientPhys_SASN": "iBVP_EfficientPhys_outputs.pickle",
+                "SCAMPS_EfficientPhys_SASN": "SCAMPS_EfficientPhys_PURE_outputs.pickle",
+                "UBFC_EfficientPhys_SASN": "UBFC-rPPG_EfficientPhys_outputs.pickle",
+                "iBVP_FactorizePhys_FSAM": "iBVP_FactorizePhys_FSAM_Res_PURE_outputs.pickle",
+                "SCAMPS_FactorizePhys_FSAM": "SCAMPS_FactorizePhys_FSAM_Res_PURE_outputs.pickle",
+                "UBFC_FactorizePhys_FSAM": "UBFC-rPPG_FactorizePhys_FSAM_Res_outputs.pickle"
+            }
+        },
+        "iBVP": {
+            "root": "runs/exp/iBVP_RGBT_160_72x72/saved_test_outputs/",
+            "exp": {
+                "PURE_EfficientPhys_SASN": "PURE_PURE_EfficientPhys_outputs.pickle",
+                "PURE_FactorizePhys_FSAM": "PURE_FactorizePhys_FSAM_Res_outputs.pickle",
+                "SCAMPS_EfficientPhys_SASN": "SCAMPS_EfficientPhys_outputs.pickle",
+                "SCAMPS_FactorizePhys_FSAM": "SCAMPS_FactorizePhys_FSAM_Res_outputs.pickle",
+                "UBFC_EfficientPhys_SASN": "UBFC-rPPG_EfficientPhys_iBVP_outputs.pickle",
+                "UBFC_FactorizePhys_FSAM": "UBFC-rPPG_FactorizePhys_FSAM_Res_iBVP_outputs.pickle" 
+            }
         }
     }
 }
-
-
 
 # HELPER FUNCTIONS
 
@@ -72,9 +77,9 @@ def _process_signal(signal, fs=30, diff_flag=True):
     # Detrend and filter
     use_bandpass = True
     if diff_flag:  # if the predictions and labels are 1st derivative of PPG signal.
-        gt_bvp = _detrend(np.cumsum(signal), 100)
+        signal = _detrend(np.cumsum(signal), 100)
     else:
-        gt_bvp = _detrend(signal, 100)
+        signal = _detrend(signal, 100)
     if use_bandpass:
         # bandpass filter between [0.75, 2.5] Hz
         # equals [45, 150] beats per min
@@ -101,12 +106,7 @@ def _detrend(input_signal, lambda_value):
 
 def compare_estimated_bvps():
 
-    root_dir = Path(path_dict["root"])
-    if not root_dir.exists():
-        print("Data path does not exists:", str(root_dir))
-        exit()
-    
-    plot_dir = root_dir.joinpath("plots")
+    plot_dir = Path.cwd().joinpath("plots")
     plot_dir.mkdir(parents=True, exist_ok=True)
 
     for test_dataset in path_dict["test_datasets"]:
@@ -115,10 +115,15 @@ def compare_estimated_bvps():
         print("*"*50)
         data_dict = {}
 
+        root_dir = Path(path_dict["test_datasets"][test_dataset]["root"])
+        if not root_dir.exists():
+            print("Data path does not exists:", str(root_dir))
+            exit()
+
         plot_test_dir = plot_dir.joinpath(test_dataset)
         plot_test_dir.mkdir(parents=True, exist_ok=True)
 
-        for train_model in path_dict["test_datasets"][test_dataset]:
+        for train_model in path_dict["test_datasets"][test_dataset]["exp"]:
             train_data = train_model.split("_")[0]
             model_name = "_".join(train_model.split("_")[1:])
             print("Train Data, Model:", [train_data, model_name])
@@ -126,7 +131,7 @@ def compare_estimated_bvps():
             if train_data not in data_dict:
                 data_dict[train_data] = {}
             
-            fn = root_dir.joinpath(path_dict["test_datasets"][test_dataset][train_model])
+            fn = root_dir.joinpath(path_dict["test_datasets"][test_dataset]["exp"][train_model])
             data_dict[train_data][model_name] = CPU_Unpickler(open(fn, "rb")).load()
         
         print("-"*50)
@@ -155,7 +160,6 @@ def compare_estimated_bvps():
         print('Chunk size', chunk_size)
         print('Total chunks', total_chunks)
 
-
         for trial_ind in range(len(trial_list)):
             
             # Read in meta-data from pickle file
@@ -165,49 +169,53 @@ def compare_estimated_bvps():
 
             trial_dict = {}
 
-            gt_bvp = np.array(_reform_data_from_dict(
+            bvp_label = np.array(_reform_data_from_dict(
                 data_dict[train_datasets[0]][model_names[0]]['labels'][trial_list[trial_ind]]))
-            gt_bvp = _process_signal(gt_bvp, fs, diff_flag=diff_flag)
+            bvp_label = _process_signal(bvp_label, fs, diff_flag=diff_flag)
 
             for c_ind in range(total_chunks):
+                try:
+                    fig, ax = plt.subplots(total_train_datasets, 1, figsize=(20, 12), sharex=True)
+                    fig.tight_layout()
+                    plt.suptitle('Testing on ' + test_dataset + ' Dataset; Trial: ' +
+                                trial_list[trial_ind] + '; Chunk: ' + str(c_ind), fontsize=14)
 
-                fig, ax = plt.subplots(total_train_datasets, 1, figsize=(25, 9))
-                plt.suptitle('Testing on PURE Dataset; Trial: ' + trial_list[trial_ind] + "; Chunk: " + str(c_ind))
+                    start = (c_ind)*chunk_size
+                    stop = (c_ind+1)*chunk_size
+                    samples = stop - start
+                    x_time = np.linspace(0, samples/fs, num=samples)
 
-                start = (c_ind)*chunk_size
-                stop = (c_ind+1)*chunk_size
-                samples = stop - start
-                x_time = np.linspace(0, samples/fs, num=samples)
+                    for d_ind in range(total_train_datasets):
+                        if train_datasets[d_ind] not in trial_dict:
+                            trial_dict[train_datasets[d_ind]] = {}
 
-                for d_ind in range(total_train_datasets):
-                    if train_datasets[d_ind] not in trial_dict:
-                        trial_dict[train_datasets[d_ind]] = {}
+                        for m_ind in range(len(model_names)):
+                                
+                            if model_names[m_ind] not in trial_dict[train_datasets[d_ind]]:
+                                trial_dict[train_datasets[d_ind]][model_names[m_ind]] = {}
 
-                    for m_ind in range(len(model_names)):
-                            
-                        if model_names[m_ind] not in trial_dict[train_datasets[d_ind]]:
-                            trial_dict[train_datasets[d_ind]][model_names[m_ind]] = {}
+                                # Reform label and prediction vectors from multiple trial chunks
+                                trial_dict[train_datasets[d_ind]][model_names[m_ind]]["prediction"] = np.array(_reform_data_from_dict(
+                                    data_dict[train_datasets[d_ind]][model_names[m_ind]]['predictions'][trial_list[trial_ind]]))
 
-                            # Reform label and prediction vectors from multiple trial chunks
-                            trial_dict[train_datasets[d_ind]][model_names[m_ind]]["prediction"] = np.array(_reform_data_from_dict(
-                                data_dict[train_datasets[d_ind]][model_names[m_ind]]['predictions'][trial_list[trial_ind]]))
+                                # Process label and prediction signals
+                                trial_dict[train_datasets[d_ind]][model_names[m_ind]]["prediction"] = _process_signal(
+                                    trial_dict[train_datasets[d_ind]][model_names[m_ind]]["prediction"], fs, diff_flag=diff_flag)
 
-                            # Process label and prediction signals
-                            trial_dict[train_datasets[d_ind]][model_names[m_ind]]["prediction"] = _process_signal(
-                                trial_dict[train_datasets[d_ind]][model_names[m_ind]]["prediction"], fs, diff_flag=diff_flag)
+                            ax[d_ind].plot(x_time, trial_dict[train_datasets[d_ind]][model_names[m_ind]]
+                                        ["prediction"][start: stop], label=model_names[m_ind])
 
-                        ax[d_ind].plot(x_time, trial_dict[train_datasets[d_ind]][model_names[m_ind]]
-                                       ["prediction"][start: stop], label=model_names[m_ind])
+                        ax[d_ind].plot(x_time, bvp_label[start: stop], label="GT", color='black')
+                        ax[d_ind].legend(loc = "upper right")
+                        ax[d_ind].set_title("Training Dataset: " + train_datasets[d_ind])
 
-                    ax[d_ind].plot(x_time, gt_bvp[start: stop], label="GT", color='black')
-                    ax[d_ind].legend(loc = "upper right")
-                    ax[d_ind].set_xlabel('Time (s)')
-                    ax[d_ind].set_title("Training Dataset: " + train_datasets[d_ind])
+                    # plt.show()
+                    save_fn = plot_test_dir.joinpath(str(trial_list[trial_ind]) + "_" + str(c_ind) + ".jpg")
+                    plt.xlabel('Time (s)')
+                    plt.savefig(save_fn)
+                    plt.close(fig)
+                except Exception as e:
+                    print("Encoutered error:", e)
 
-                # plt.show()
-                save_fn = plot_test_dir.joinpath(str(trial_list[trial_ind]) + "_" + str(c_ind) + ".jpg")
-                plt.savefig(save_fn)
-                plt.close(fig)
-        
 if __name__ == "__main__":
     compare_estimated_bvps()

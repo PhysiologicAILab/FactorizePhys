@@ -1,5 +1,5 @@
 # FactorizePhys
-Imaging based contactless physiological signal extraction.
+FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmography through Factorization of Voxel Embeddings.
 
 # :notebook: Algorithms
 The repo currently supports the following algorithms:

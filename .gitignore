@@ -1,6 +1,7 @@
 # Project files and directories
 runs/
 test.ipynb*
+plots**/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

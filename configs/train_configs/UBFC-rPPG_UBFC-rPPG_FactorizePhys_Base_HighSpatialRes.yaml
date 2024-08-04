@@ -4,7 +4,7 @@ TRAIN:
   BATCH_SIZE: 4
   EPOCHS: 10
   LR: 1e-3
-  MODEL_FILE_NAME: UBFC-rPPG_Intra_FactorizePhys_Base_HighRes
+  MODEL_FILE_NAME: UBFC-rPPG_Intra_FactorizePhys_Base_HighSpatialRes
   PLOT_LOSSES_AND_LR: True
   DATA:
     FS: 30
@@ -13,7 +13,7 @@ TRAIN:
     DATA_FORMAT: NCDHW
     DATA_PATH: "/mnt/sda/data/jitesh/UBFC-rPPG/data/"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/home/jitesh/data/UBFC-rPPG/"    # Processed dataset save path, need to be updated
-    EXP_DATA_NAME: "UBFC-rPPG_Raw_240_128x128"
+    EXP_DATA_NAME: "UBFC-rPPG_Raw_160_128x128"
     BEGIN: 0.0
     END: 0.7
     PREPROCESS:
@@ -21,7 +21,7 @@ TRAIN:
       DATA_AUG: ['None']    # 'None' or 'Motion' is supported, used if the data path points to an augmented dataset or requires augmentation
       LABEL_TYPE: Standardized
       DO_CHUNK: True
-      CHUNK_LENGTH: 240
+      CHUNK_LENGTH: 160
       CROP_FACE:
         DO_CROP_FACE: True
         BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face
@@ -42,7 +42,7 @@ VALID:
     DATA_FORMAT: NCDHW
     DATA_PATH: "/mnt/sda/data/jitesh/UBFC-rPPG/data/"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/home/jitesh/data/UBFC-rPPG/"    # Processed dataset save path, need to be updated
-    EXP_DATA_NAME: "UBFC-rPPG_Raw_240_128x128"
+    EXP_DATA_NAME: "UBFC-rPPG_Raw_160_128x128"
     BEGIN: 0.5
     END: 0.7
     PREPROCESS:
@@ -50,7 +50,7 @@ VALID:
       DATA_AUG: ['None']    # 'None' or 'Motion' is supported, used if the data path points to an augmented dataset or requires augmentation
       LABEL_TYPE: Standardized
       DO_CHUNK: True
-      CHUNK_LENGTH: 240
+      CHUNK_LENGTH: 160
       CROP_FACE:
         DO_CROP_FACE: True
         BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face
@@ -73,7 +73,7 @@ TEST:
     DATA_FORMAT: NCDHW
     DATA_PATH: "/mnt/sda/data/jitesh/UBFC-rPPG/data/"                     # Raw dataset path, need to be updated
     CACHED_PATH: "/home/jitesh/data/UBFC-rPPG/"    # Processed dataset save path, need to be updated
-    EXP_DATA_NAME: "UBFC-rPPG_Raw_240_128x128"
+    EXP_DATA_NAME: "UBFC-rPPG_Raw_160_128x128"
     BEGIN: 0.7
     END: 1.0
     PREPROCESS:
@@ -81,7 +81,7 @@ TEST:
       DATA_AUG: ['None']    # 'None' or 'Motion' is supported, used if the data path points to an augmented dataset or requires augmentation
       LABEL_TYPE: Standardized
       DO_CHUNK: True
-      CHUNK_LENGTH: 240
+      CHUNK_LENGTH: 160
       CROP_FACE:
         DO_CROP_FACE: True
         BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face
@@ -103,7 +103,7 @@ MODEL:
   NAME: FactorizePhys
   FactorizePhys:
     CHANNELS: 3
-    FRAME_NUM: 240
+    FRAME_NUM: 160
     TYPE: "Big"
     MD_FSAM: False
     MD_TYPE: "NMF"

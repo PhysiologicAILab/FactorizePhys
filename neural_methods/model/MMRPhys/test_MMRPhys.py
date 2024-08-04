@@ -2,9 +2,15 @@
 MMRPhys: Remote Extraction of Multiple Physiological Signals using Label Guided Factorization.
 """
 
+import time
+import numpy as np
+from pathlib import Path
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+from scipy.signal import resample
 import torch
 import torch.nn as nn
-import numpy as np
+import torch.nn.functional as F
 from neural_methods.model.MMRPhys.MMRPhys import MMRPhys
 
 model_config = {
@@ -30,236 +36,244 @@ model_config = {
     "label_path": ""
 }
 
-if __name__ == "__main__":
-    import time
-    import matplotlib.pyplot as plt
-    import numpy as np
-    from scipy.signal import resample
-    # from torch.utils.tensorboard import SummaryWriter
 
-    # default `log_dir` is "runs" - we'll be more specific here
-    # writer = SummaryWriter('runs/MMRPhys')
+class TestMMRPhys(object):
+    def __init__(self) -> None:
+        self.ckpt_path = Path(model_config["ckpt_path"])
+        self.data_path = Path(model_config["data_path"])
+        self.label_path = Path(model_config["label_path"])
 
-    ckpt_path = model_config["ckpt_path"]
-    data_path = model_config["data_path"]
+        self.use_fsam = model_config["MD_FSAM"]
+        self.md_infer = model_config["MD_INFERENCE"]
 
-    label_path = model_config["label_path"]
+        self.batch_size = model_config["batch_size"]
+        self.frames = model_config["frames"]
+        self.in_channels = model_config["in_channels"]
+        self.data_channels = model_config["data_channels"]
+        self.height = model_config["height"]
+        self.width = model_config["weight"]
+        self.debug = bool(model_config["debug"])
+        self.assess_latency = bool(model_config["assess_latency"])
+        self.visualize = model_config["visualize"]
 
-    use_fsam = model_config["MD_FSAM"]
-    md_infer = model_config["MD_INFERENCE"]
+        if self.visualize:
+            self.data_files = list(sorted(self.data_path.rglob("*input*.npy")))
+            self.label_files = list(sorted(self.data_path.rglob("*label*.npy")))
+            self.num_trials = len(self.data_files)
 
-    batch_size = model_config["batch_size"]
-    frames = model_config["frames"]
-    in_channels = model_config["in_channels"]
-    data_channels = model_config["data_channels"]
-    height = model_config["height"]
-    width = model_config["weight"]
-    debug = bool(model_config["debug"])
-    assess_latency = bool(model_config["assess_latency"])
-    num_trials = model_config["num_trials"]
-    visualize = model_config["visualize"]
+            self.plot_dir = Path.cwd().joinpath("plots").joinpath("inference")
+            self.plot_dir.mkdir(parents=True, exist_ok=True)
 
-    if torch.cuda.is_available():
-        device = torch.device(0)
-    else:
-        device = torch.device("cpu")
+            self.attention_map_dir = self.plot_dir.joinpath("attention_maps").joinpath(self.data_path.name).joinpath(self.ckpt_path.name)
+            self.attention_map_dir.mkdir(parents=True, exist_ok=True)
 
-    if visualize:
-        np_data = np.load(data_path)
-        np_label = np.load(label_path)
-        np_label = np.expand_dims(np_label, 0)
-
-        print("Chunk data shape", np_data.shape)
-        print("Chunk label shape", np_label.shape)
-        print("Min Max of input data:", np.min(np_data), np.max(np_data))
-        # exit()
-
-        test_data = np.transpose(np_data, (3, 0, 1, 2))
-        test_data = torch.from_numpy(test_data)
-        test_data = test_data.unsqueeze(0)
-
-        last_frame = torch.unsqueeze(test_data[:, :, -1, :, :], 2).repeat(1, 1, 1, 1, 1)
-        test_data = torch.cat((test_data, last_frame), 2)
-    else:
-        # test_data = torch.rand(batch_size, in_channels, frames, height, width).to(device)
-        test_data = torch.rand(batch_size, data_channels, frames + 1, height, width)
-
-    test_data = test_data.to(torch.float32).to(device)
-    # print(test_data.shape)
-    # exit()
-    md_config = {}
-    md_config["FRAME_NUM"] = frames
-    md_config["MD_S"] = model_config["MD_S"]
-    md_config["MD_R"] = model_config["MD_R"]
-    md_config["MD_STEPS"] = model_config["MD_STEPS"]
-    md_config["MD_FSAM"] = model_config["MD_FSAM"]
-    md_config["MD_TYPE"] = model_config["MD_TYPE"]
-    md_config["MD_INFERENCE"] = model_config["MD_INFERENCE"]
-    md_config["MD_RESIDUAL"] = model_config["MD_RESIDUAL"]
-
-    # net = nn.DataParallel(MMRPhys(frames=frames, md_config=md_config, device=device, in_channels=in_channels, debug=debug)).to(device)
-    net = MMRPhys(frames=frames, md_config=md_config, device=device, in_channels=in_channels, debug=debug).to(device)
-    # net.load_state_dict(torch.load(ckpt_path, map_location=device))
-    net.eval()
-
-    if assess_latency:
-        time_vec = []
-        if debug:
-            appx_error_list = []
-        for passes in range(num_trials):
-            t0 = time.time()
-            if (md_infer or net.training or debug) and use_fsam:
-                pred_rPPG, pred_rBr, vox_embed, factorized_embed, att_mask, appx_error, factorized_embed_br, att_mask_br, appx_error_br = net(
-                    test_data)
-            else:
-                pred_rPPG, pred_rBr, vox_embed = net(test_data)
-            t1 = time.time()
-            time_vec.append(t1-t0)
-            if debug:
-                appx_error_list.append(appx_error.item())
-
-        print("Median time: ", np.median(time_vec))
-        if debug:
-            print("Median error:", np.median(appx_error_list))
-        plt.plot(time_vec)
-        plt.show()
-    else:
-        if (md_infer or net.training or debug) and use_fsam:
-            pred_rPPG, pred_rBr, vox_embed, factorized_embed, att_mask, appx_error, factorized_embed_br, att_mask_br, appx_error_br = net(
-                test_data)
-            print("Appx error: ", appx_error.item())  # .detach().numpy())
         else:
-            pred_rPPG, pred_rBr, vox_embed = net(test_data)
-
-    # print("-"*100)
-    # print(net)
-    # print("-"*100)
-
-    if visualize:
-        test_data = test_data.detach().numpy()
-        vox_embed = vox_embed.detach().numpy()
-        if (md_infer or net.training or debug) and use_fsam:
-            factorized_embed = factorized_embed.detach().numpy()
-            att_mask = att_mask.detach().numpy()
-
-        # print(test_data.shape, vox_embed.shape, factorized_embed.shape)
-        b, ch, enc_frames, enc_height, enc_width = vox_embed.shape
-        # exit()
-        for ch in range(vox_embed.shape[1]):
-            if (md_infer or net.training or debug) and use_fsam:
-                fig, ax = plt.subplots(9, 4, layout="tight")
+            if self.assess_latency:
+                self.num_trials = model_config["num_trials"]
             else:
-                fig, ax = plt.subplots(9, 2, layout="tight")
+                self.num_trials = 1
 
-            frame = 0
-            ax[0, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[0, 0].axis('off')
-            ax[0, 1].imshow(vox_embed[0, ch, frame, :, :])
-            ax[0, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[0, 2].imshow(factorized_embed[0, ch, frame, :, :])
-                ax[0, 2].axis('off')
-                ax[0, 3].imshow(att_mask[0, ch, frame, :, :])
-                ax[0, 3].axis('off')
+        if torch.cuda.is_available():
+            self.device = torch.device(0)
+        else:
+            self.device = torch.device("cpu")
 
-            frame = 20
-            ax[1, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[1, 0].axis('off')
-            ax[1, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[1, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[1, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[1, 2].axis('off')
-                ax[1, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[1, 3].axis('off')
+        md_config = {}
+        md_config["FRAME_NUM"] = model_config["frames"]
+        md_config["MD_S"] = model_config["MD_S"]
+        md_config["MD_R"] = model_config["MD_R"]
+        md_config["MD_STEPS"] = model_config["MD_STEPS"]
+        md_config["MD_FSAM"] = model_config["MD_FSAM"]
+        md_config["MD_TYPE"] = model_config["MD_TYPE"]
+        md_config["MD_INFERENCE"] = model_config["MD_INFERENCE"]
+        md_config["MD_RESIDUAL"] = model_config["MD_RESIDUAL"]
 
-            frame = 40
-            ax[2, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[2, 0].axis('off')
-            ax[2, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[2, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[2, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[2, 2].axis('off')
-                ax[2, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[2, 3].axis('off')
+        if self.visualize:
+            self.net = nn.DataParallel(MMRPhys(frames=self.frames, md_config=md_config,
+                                device=self.device, in_channels=self.in_channels, debug=self.debug), device_ids=[0]).to(self.device)
+            self.net.load_state_dict(torch.load(str(self.ckpt_path), map_location=self.device))
+        else:
+            self.net = MMRPhys(frames=self.frames, md_config=md_config,
+                                device=self.device, in_channels=self.in_channels, debug=self.debug).to(self.device)
 
-            frame = 60
-            ax[3, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[3, 0].axis('off')
-            ax[3, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[3, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[3, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[3, 2].axis('off')
-                ax[3, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[3, 3].axis('off')
+        self.net.eval()
+        if self.assess_latency:
+            self.time_vec = []
 
-            frame = 80
-            ax[4, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[4, 0].axis('off')
-            ax[4, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[4, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[4, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[4, 2].axis('off')
-                ax[4, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[4, 3].axis('off')
+        if self.debug:
+            self.appx_error_list = []
 
-            frame = 100
-            ax[5, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[5, 0].axis('off')
-            ax[5, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[5, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[5, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[5, 2].axis('off')
-                ax[5, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[5, 3].axis('off')
 
-            frame = 120
-            ax[6, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[6, 0].axis('off')
-            ax[6, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[6, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[6, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[6, 2].axis('off')
-                ax[6, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[6, 3].axis('off')
+    def load_data(self, num_trial):
 
-            frame = 140
-            ax[7, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[7, 0].axis('off')
-            ax[7, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[7, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[7, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[7, 2].axis('off')
-                ax[7, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[7, 3].axis('off')
+        if self.visualize:
+            self.np_data = np.load(str(self.data_files[num_trial]))
+            self.np_label = np.load(str(self.label_files[num_trial]))
+            self.np_label = np.expand_dims(self.np_label, 0)
+            self.np_label = torch.tensor(self.np_label)
 
-            frame = 159
-            ax[8, 0].imshow(np_data[frame, ...].astype(np.uint8))
-            ax[8, 0].axis('off')
-            ax[8, 1].imshow(vox_embed[0, ch, frame//4, :, :])
-            ax[8, 1].axis('off')
-            if (md_infer or net.training or debug) and use_fsam:
-                ax[8, 2].imshow(factorized_embed[0, ch, frame//4, :, :])
-                ax[8, 2].axis('off')
-                ax[8, 3].imshow(att_mask[0, ch, frame//4, :, :])
-                ax[8, 3].axis('off')
+            # print("Chunk data shape", self.np_data.shape)
+            # print("Chunk label shape", self.np_label.shape)
+            # print("Min Max of input data:", np.min(self.np_data), np.max(self.np_data))
+            # exit()
 
-            plt.show()
-            plt.close(fig)
-    print("pred_rPPG.shape", pred_rPPG.shape)
-    print("pred_rBr.shape", pred_rBr.shape)
+            self.test_data = np.transpose(self.np_data, (3, 0, 1, 2))
+            self.test_data = torch.from_numpy(self.test_data)
+            self.test_data = self.test_data.unsqueeze(0)
 
-    pytorch_total_params = sum(p.numel() for p in net.parameters())
-    print("Total parameters = ", pytorch_total_params)
+            last_frame = torch.unsqueeze(self.test_data[:, :, -1, :, :], 2).repeat(1, 1, 1, 1, 1)
+            self.test_data = torch.cat((self.test_data, last_frame), 2)
+            self.test_data = self.test_data.to(torch.float32).to(self.device)
+        else:
+            self.test_data = torch.rand(self.batch_size, self.data_channels, self.frames + 1, self.height, self.width)
+            self.test_data = self.test_data.to(torch.float32).to(self.device)
 
-    pytorch_trainable_params = sum(p.numel() for p in net.parameters() if p.requires_grad)
-    print("Trainable parameters = ", pytorch_trainable_params)
+
+    def run_inference(self, num_trial):
+
+        print("Processing:", self.data_files[num_trial].name)
+        if self.assess_latency:
+            t0 = time.time()
+
+        if (self.md_infer or self.net.training or self.debug) and self.use_fsam:
+            self.pred, self.pred_rBr, self.vox_embed, self.factorized_embed, self.appx_error, self.factorized_embed_br, self.appx_error_br = self.net(self.test_data)
+        else:
+            self.pred, self.pred_rBr, self.vox_embed = self.net(self.test_data)
+
+        if self.assess_latency:
+            t1 = time.time()
+            self.time_vec.append(t1-t0)
+
+        if self.debug:
+            print("pred.shape", self.pred.shape)
+            if (self.md_infer or self.net.training or self.debug) and self.use_fsam:
+                self.appx_error_list.append(self.appx_error.item())
+
+        if self.visualize:
+            self.save_attention_maps(num_trial)
+
+
+    def save_attention_maps(self, num_trial):
+        b, channels, enc_frames, enc_height, enc_width = self.vox_embed.shape
+        label_matrix = self.np_label.unsqueeze(0).repeat(1, channels, 1).unsqueeze(
+            2).unsqueeze(2).permute(0, 1, 4, 3, 2).repeat(1, 1, 1, enc_height, enc_width)
+        label_matrix = label_matrix.to(device=self.device)
+        corr_matrix = F.cosine_similarity(self.vox_embed, label_matrix, dim=2)
+
+        # avg_emb = torch.mean(self.vox_embed, dim=1)
+        # b, enc_frames, enc_height, enc_width = avg_emb.shape
+        # label_matrix = np_label.unsqueeze(0).unsqueeze(2).permute(0, 3, 2, 1).repeat(1, 1, enc_height, enc_width)
+        # label_matrix = label_matrix.to(device=device)
+        # corr_matrix = F.cosine_similarity(avg_emb, label_matrix, dim=1)
+
+        if self.debug:
+            print("corr_matrix.shape", corr_matrix.shape)
+            print("self.test_data.shape:", self.test_data.shape)
+            print("self.vox_embed.shape:", self.vox_embed.shape)
+
+        self.test_data = self.test_data.detach().cpu().numpy()
+        self.vox_embed = self.vox_embed.detach().cpu().numpy()
+        corr_matrix = corr_matrix.detach().cpu().numpy()
+
+        fig, ax = plt.subplots(4, 4, figsize=[16, 16])
+        fig.tight_layout()
+
+        ax[0, 0].imshow(self.np_data[enc_frames//2, ...].astype(np.uint8))
+        ax[0, 0].axis('off')
+
+        ch = 0
+        ax[0, 1].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[0, 1].axis('off')
+
+        ch = 1
+        ax[0, 2].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[0, 2].axis('off')
+
+        ch = 2
+        ax[0, 3].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[0, 3].axis('off')     
+
+        ch = 3
+        ax[1, 0].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[1, 0].axis('off')
+
+        ch = 4
+        ax[1, 1].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[1, 1].axis('off')
+
+        ch = 5
+        ax[1, 2].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[1, 2].axis('off')
+
+        ch = 6
+        ax[1, 3].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[1, 3].axis('off')
+
+        ch = 7
+        ax[2, 0].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[2, 0].axis('off')
+
+        ch = 8
+        ax[2, 1].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[2, 1].axis('off')
+
+        ch = 9
+        ax[2, 2].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[2, 2].axis('off')
+
+        ch = 10
+        ax[2, 3].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[2, 3].axis('off')
+
+        ch = 11
+        ax[3, 0].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[3, 0].axis('off')
+
+        ch = 12
+        ax[3, 1].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[3, 1].axis('off')
+
+        ch = 13
+        ax[3, 2].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[3, 2].axis('off')
+
+        ch = 14
+        ax[3, 3].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[3, 3].axis('off')
+
+        # plt.show()
+        plt.savefig(str(self.attention_map_dir.joinpath(str(self.data_files[num_trial].name.replace(".npy", "_attention_map.jpg")))))
+        plt.close(fig)
+
+
+    def output_summary_results(self):
+        if self.assess_latency:
+            print("Median time: ", np.median(self.time_vec))
+            plt.plot(self.time_vec)
+            plt.savefig(str(self.plot_dir.joinpath("Latency.jpg")))
+
+        if self.debug:
+            if (self.md_infer or self.net.training or self.debug) and self.use_fsam:
+                print("Median error:", np.median(self.appx_error_list))
+
+        pytorch_total_params = sum(p.numel() for p in self.net.parameters())
+        print("Total parameters = ", pytorch_total_params)
+
+        pytorch_trainable_params = sum(p.numel()
+                                    for p in self.net.parameters() if p.requires_grad)
+        print("Trainable parameters = ", pytorch_trainable_params)
+
+
+if __name__ == "__main__":
+
+    testObj = TestMMRPhys()
+
+    print("testObj.num_trials:", testObj.num_trials)
+    for trial_num in range(testObj.num_trials):
+        testObj.load_data(trial_num)
+        testObj.run_inference(trial_num)
+
+    testObj.output_summary_results()
 
     # writer.add_graph(net, test_data)
     # writer.close()

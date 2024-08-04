@@ -156,7 +156,7 @@ class BVP_Head(nn.Module):
             print("     rPPG.shape", rPPG.shape)
         
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
-            return rPPG, factorized_embeddings, att_mask, appx_error
+            return rPPG, factorized_embeddings, appx_error
         else:
             return rPPG
 
@@ -269,7 +269,7 @@ class Resp_Head(nn.Module):
             print("     rBr.shape", rBr.shape)
         
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
-            return rBr, factorized_embeddings, att_mask, appx_error
+            return rBr, factorized_embeddings, appx_error
         else:
             return rBr
 
@@ -303,7 +303,6 @@ class MMRPhys(nn.Module):
         self.rbr_feature_extractor = rBr_FeatureExtractor(self.in_channels, dropout_rate=dropout, debug=debug)
         self.rppg_head = BVP_Head(md_config, device=device, dropout_rate=dropout, debug=debug)
         self.rBr_head = Resp_Head(md_config, device=device, dropout_rate=dropout, debug=debug)
-
 
         
     def forward(self, x): # [batch, Features=3, Temp=frames, Width=32, Height=32]
@@ -347,8 +346,8 @@ class MMRPhys(nn.Module):
         rbr_voxel_embeddings = self.rbr_feature_extractor(x)
         
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
-            rPPG, factorized_embeddings, att_mask, appx_error = self.rppg_head(rppg_voxel_embeddings, batch, length-1)
-            rBr, factorized_embeddings_br, att_mask_br, appx_error_br = self.rBr_head(rbr_voxel_embeddings, batch, length-1)
+            rPPG, factorized_embeddings, appx_error = self.rppg_head(rppg_voxel_embeddings, batch, length-1)
+            rBr, factorized_embeddings_br, appx_error_br = self.rBr_head(rbr_voxel_embeddings, batch, length-1)
         else:
             rPPG = self.rppg_head(rppg_voxel_embeddings, batch, length-1)
             rBr = self.rBr_head(rbr_voxel_embeddings, batch, length-1)
@@ -363,6 +362,6 @@ class MMRPhys(nn.Module):
             print("rBr.shape", rBr.shape)
 
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
-            return rPPG, rBr, rppg_voxel_embeddings, factorized_embeddings, att_mask, appx_error, factorized_embeddings_br, att_mask_br, appx_error_br
+            return rPPG, rBr, rppg_voxel_embeddings, factorized_embeddings, appx_error, factorized_embeddings_br, appx_error_br
         else:
             return rPPG, rBr, rppg_voxel_embeddings

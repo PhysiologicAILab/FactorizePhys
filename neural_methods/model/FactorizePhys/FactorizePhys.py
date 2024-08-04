@@ -156,7 +156,7 @@ class BVP_Head(nn.Module):
             print("     rPPG.shape", rPPG.shape)
         
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
-            return rPPG, factorized_embeddings, att_mask, appx_error
+            return rPPG, factorized_embeddings, appx_error
         else:
             return rPPG
 
@@ -231,7 +231,7 @@ class FactorizePhys(nn.Module):
         voxel_embeddings = self.rppg_feature_extractor(x)
         
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
-            rPPG, factorized_embeddings, att_mask, appx_error = self.rppg_head(voxel_embeddings, batch, length-1)
+            rPPG, factorized_embeddings, appx_error = self.rppg_head(voxel_embeddings, batch, length-1)
         else:
             rPPG = self.rppg_head(voxel_embeddings, batch, length-1)
 
@@ -244,6 +244,6 @@ class FactorizePhys(nn.Module):
             print("rPPG.shape", rPPG.shape)
 
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
-            return rPPG, voxel_embeddings, factorized_embeddings, att_mask, appx_error
+            return rPPG, voxel_embeddings, factorized_embeddings, appx_error
         else:
             return rPPG, voxel_embeddings
