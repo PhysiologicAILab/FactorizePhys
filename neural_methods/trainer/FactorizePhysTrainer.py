@@ -119,7 +119,7 @@ class FactorizePhysTrainer(BaseTrainer):
 
                 self.optimizer.zero_grad()
                 if self.model.training and self.use_fsam:
-                    pred_ppg, vox_embed, factorized_embed, att_mask, appx_error = self.model(data)
+                    pred_ppg, vox_embed, factorized_embed, appx_error = self.model(data)
                 else:
                     pred_ppg, vox_embed = self.model(data)
                 
@@ -204,7 +204,7 @@ class FactorizePhysTrainer(BaseTrainer):
                 # labels[torch.isnan(labels)] = 0
 
                 if self.md_infer and self.use_fsam:
-                    pred_ppg, vox_embed, factorized_embed, att_mask, appx_error = self.model(data)
+                    pred_ppg, vox_embed, factorized_embed, appx_error = self.model(data)
                 else:
                     pred_ppg, vox_embed = self.model(data)
                 pred_ppg = (pred_ppg - torch.mean(pred_ppg)) / torch.std(pred_ppg)  # normalize
@@ -272,7 +272,7 @@ class FactorizePhysTrainer(BaseTrainer):
                 # labels_test[torch.isnan(labels_test)] = 0
 
                 if self.md_infer and self.use_fsam:
-                    pred_ppg_test, vox_embed, factorized_embed, att_mask, appx_error = self.model(data)
+                    pred_ppg_test, vox_embed, factorized_embed, appx_error = self.model(data)
                 else:
                     pred_ppg_test, vox_embed = self.model(data)
                 pred_ppg_test = (pred_ppg_test - torch.mean(pred_ppg_test)) / torch.std(pred_ppg_test)  # normalize

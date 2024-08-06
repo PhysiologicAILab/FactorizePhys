@@ -118,8 +118,8 @@ class MMRPhysTrainer(BaseTrainer):
                 self.optimizer.zero_grad()
                 if self.model.training and self.use_fsam:
                     pred_bvp, pred_resp, vox_embed, factorized_embed, \
-                        att_mask, appx_error, factorized_embed_br, \
-                            att_mask_br, appx_error_br = self.model(data)
+                        appx_error, factorized_embed_br, \
+                            appx_error_br = self.model(data)
                 else:
                     pred_bvp, pred_resp, vox_embed = self.model(data)
                 
@@ -214,8 +214,8 @@ class MMRPhysTrainer(BaseTrainer):
                 # labels[torch.isnan(labels)] = 0
 
                 if self.md_infer and self.use_fsam:
-                    pred_bvp, pred_resp, vox_embed, factorized_embed, att_mask, appx_error, \
-                        factorized_embed_br, att_mask_br, appx_error_br = self.model(data)
+                    pred_bvp, pred_resp, vox_embed, factorized_embed, appx_error, \
+                        factorized_embed_br, appx_error_br = self.model(data)
                 else:
                     pred_bvp, pred_resp, vox_embed = self.model(data)
                 pred_bvp = (pred_bvp - torch.mean(pred_bvp)) / torch.std(pred_bvp)  # normalize
@@ -291,8 +291,8 @@ class MMRPhysTrainer(BaseTrainer):
                 # labels_test[torch.isnan(labels_test)] = 0
 
                 if self.md_infer and self.use_fsam:
-                    pred_bvp_test, pred_resp_test, vox_embed, factorized_embed, att_mask, appx_error, \
-                        factorized_embed_br, att_mask_br, appx_error_br = self.model(data)
+                    pred_bvp_test, pred_resp_test, vox_embed, factorized_embed, appx_error, \
+                        factorized_embed_br, appx_error_br = self.model(data)
                 else:
                     pred_bvp_test, pred_resp_test, vox_embed = self.model(data)
                 
