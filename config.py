@@ -332,6 +332,8 @@ _C.MODEL.MMRPhys.MD_S = 1
 _C.MODEL.MMRPhys.MD_STEPS = 4
 _C.MODEL.MMRPhys.MD_INFERENCE = False
 _C.MODEL.MMRPhys.MD_RESIDUAL = False
+_C.MODEL.MMRPhys.LGAM = False
+_C.MODEL.MMRPhys.MODALITY = ["BVP", "Resp"]
 
 # -----------------------------------------------------------------------------
 # Model Settings for TS-CAN

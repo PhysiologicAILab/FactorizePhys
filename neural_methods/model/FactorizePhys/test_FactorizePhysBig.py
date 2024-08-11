@@ -30,10 +30,10 @@ model_config = {
     "weight": 128,
     "batch_size": 1,
     "frames": 240,
-    "debug": False,
+    "debug": True,
     "assess_latency": False,
     "num_trials": 20,
-    "visualize": True,
+    "visualize": False,
     # "ckpt_path": "./final_model_release/UBFC-rPPG_Intra_FactorizePhys_Base_HighRes.pth",
     "ckpt_path": "./final_model_release/UBFC-rPPG_Intra_FactorizePhys_FSAM_Res_HighRes.pth",
     "data_path": "/home/jitesh/data/UBFC-rPPG/UBFC-rPPG_Raw_240_128x128",
@@ -138,7 +138,8 @@ class TestFactorizePhysBig(object):
 
     def run_inference(self, num_trial):
 
-        print("Processing:", self.data_files[num_trial].name)
+        if self.visualize:
+            print("Processing:", self.data_files[num_trial].name)
         if self.assess_latency:
             t0 = time.time()
 

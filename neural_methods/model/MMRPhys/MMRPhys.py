@@ -5,12 +5,15 @@ MMRPhys: Remote Extraction of Multiple Physiological Signals using Label Guided 
 import torch
 import torch.nn as nn
 from neural_methods.model.MMRPhys.FSAM import FeaturesFactorizationModule
+from neural_methods.model.MMRPhys.LGAM import LGAM
 # from copy import deepcopy
 
 nf = [8, 12, 16]
 
 model_config = {
-    "MD_FSAM": True,
+    "MODALITY": ["BVP"],
+    "LGAM": True,
+    "MD_FSAM": False,
     "MD_TYPE": "NMF",
     "MD_R": 1,
     "MD_S": 1,
@@ -83,6 +86,7 @@ class BVP_Head(nn.Module):
         self.debug = debug
 
         self.use_fsam = md_config["MD_FSAM"]
+        self.use_lgam = md_config["LGAM"]
         self.md_type = md_config["MD_TYPE"]
         self.md_infer = md_config["MD_INFERENCE"]
         self.md_res = md_config["MD_RESIDUAL"]
@@ -99,6 +103,11 @@ class BVP_Head(nn.Module):
             self.fsam = FeaturesFactorizationModule(inC, device, md_config, dim="3D", debug=debug)
             self.fsam_norm = nn.InstanceNorm3d(inC)
             self.bias1 = nn.Parameter(torch.tensor(1.0), requires_grad=True).to(device)
+        elif self.use_lgam:
+            inC = nf[2]
+            self.lgam = LGAM(device, debug=debug)
+            self.lgam_norm = nn.InstanceNorm3d(inC)
+            self.bias1 = nn.Parameter(torch.tensor(1.0), requires_grad=True).to(device)
         else:
             inC = nf[2]
 
@@ -109,7 +118,7 @@ class BVP_Head(nn.Module):
         )
 
 
-    def forward(self, voxel_embeddings, batch, length):
+    def forward(self, voxel_embeddings, batch, length, label_bvp=None):
 
         if self.debug:
             print("BVP Head")
@@ -126,12 +135,6 @@ class BVP_Head(nn.Module):
             if self.debug:
                 print("att_mask.shape", att_mask.shape)
 
-            # # directly use att_mask   ---> difficult to converge without Residual connection. Needs high rank
-            # factorized_embeddings = self.fsam_norm(att_mask)
-
-            # # Residual connection: 
-            # factorized_embeddings = voxel_embeddings + self.fsam_norm(att_mask)
-
             if self.md_res:
                 # Multiplication with Residual connection
                 x = torch.mul(voxel_embeddings - voxel_embeddings.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
@@ -142,11 +145,14 @@ class BVP_Head(nn.Module):
                 x = torch.mul(voxel_embeddings - voxel_embeddings.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
                 factorized_embeddings = self.fsam_norm(x)            
 
-            # # Concatenate
-            # factorized_embeddings = torch.cat([voxel_embeddings, self.fsam_norm(x)], dim=1)
-
             x = self.final_layer(factorized_embeddings)
         
+        elif (self.training or self.debug) and self.use_lgam:
+            att_mask = self.lgam(voxel_embeddings, label_bvp)
+            x = torch.mul(voxel_embeddings - voxel_embeddings.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
+            lg_embeddings = self.lgam_norm(x)
+            lg_embeddings = voxel_embeddings + lg_embeddings
+            x = self.final_layer(lg_embeddings)
         else:
             x = self.final_layer(voxel_embeddings)
 
@@ -288,24 +294,39 @@ class MMRPhys(nn.Module):
             self.thermal_norm = nn.InstanceNorm3d(1)
         else:
             print("Unsupported input channels")
-        
-        self.use_fsam = md_config["MD_FSAM"]
-        self.md_infer = md_config["MD_INFERENCE"]
 
         for key in model_config:
             if key not in md_config:
                 md_config[key] = model_config[key]
 
+        self.use_fsam = False
+        self.md_infer = False
+
+        if md_config["MD_FSAM"]:
+            self.use_fsam = True
+            self.md_infer = md_config["MD_INFERENCE"]
+
+        elif md_config["LGAM"]:
+            self.use_lgam = True
+            
+        else:
+            pass
+        
+        self.modality = md_config["MODALITY"]
+
         if self.debug:
             print("nf:", nf)
 
-        self.rppg_feature_extractor = rPPG_FeatureExtractor(self.in_channels, dropout_rate=dropout, debug=debug)
-        self.rbr_feature_extractor = rBr_FeatureExtractor(self.in_channels, dropout_rate=dropout, debug=debug)
-        self.rppg_head = BVP_Head(md_config, device=device, dropout_rate=dropout, debug=debug)
-        self.rBr_head = Resp_Head(md_config, device=device, dropout_rate=dropout, debug=debug)
+        if "BVP" in self.modality:
+            self.rppg_feature_extractor = rPPG_FeatureExtractor(self.in_channels, dropout_rate=dropout, debug=debug)
+            self.rppg_head = BVP_Head(md_config, device=device, dropout_rate=dropout, debug=debug)
+
+        if "Resp" in self.modality:
+            self.rbr_feature_extractor = rBr_FeatureExtractor(self.in_channels, dropout_rate=dropout, debug=debug)        
+            self.rBr_head = Resp_Head(md_config, device=device, dropout_rate=dropout, debug=debug)
 
         
-    def forward(self, x): # [batch, Features=3, Temp=frames, Width=32, Height=32]
+    def forward(self, x, label_bvp=None, label_resp=None): # [batch, Features=3, Temp=frames, Width=32, Height=32]
         
         [batch, channel, length, width, height] = x.shape
         
@@ -342,15 +363,27 @@ class MMRPhys(nn.Module):
         if self.debug:
             print("Diff Normalized shape", x.shape)
 
-        rppg_voxel_embeddings = self.rppg_feature_extractor(x)
-        rbr_voxel_embeddings = self.rbr_feature_extractor(x)
+        if "BVP" in self.modality:
+            rppg_voxel_embeddings = self.rppg_feature_extractor(x)
+    
+        if "Resp" in self.modality:
+            rbr_voxel_embeddings = self.rbr_feature_extractor(x)
         
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
-            rPPG, factorized_embeddings, appx_error = self.rppg_head(rppg_voxel_embeddings, batch, length-1)
-            rBr, factorized_embeddings_br, appx_error_br = self.rBr_head(rbr_voxel_embeddings, batch, length-1)
+            if "BVP" in self.modality:
+                rPPG, factorized_embeddings, appx_error = self.rppg_head(rppg_voxel_embeddings, batch, length-1)
+            if "Resp" in self.modality:
+                rBr, factorized_embeddings_br, appx_error_br = self.rBr_head(rbr_voxel_embeddings, batch, length-1)
+        elif (self.training or self.debug) and self.use_lgam:
+            if "BVP" in self.modality:
+                rPPG = self.rppg_head(rppg_voxel_embeddings, batch, length-1, label_bvp)
+            if "Resp" in self.modality:
+                rBr = self.rBr_head(rbr_voxel_embeddings, batch, length-1, label_resp)
         else:
-            rPPG = self.rppg_head(rppg_voxel_embeddings, batch, length-1)
-            rBr = self.rBr_head(rbr_voxel_embeddings, batch, length-1)
+            if "BVP" in self.modality:
+                rPPG = self.rppg_head(rppg_voxel_embeddings, batch, length-1)
+            if "Resp" in self.modality:
+                rBr = self.rBr_head(rbr_voxel_embeddings, batch, length-1)
 
         # if self.debug:
         #     print("rppg_feats.shape", rppg_feats.shape)
@@ -358,10 +391,22 @@ class MMRPhys(nn.Module):
         # rPPG = rppg_feats.view(-1, length-1)
 
         if self.debug:
-            print("rPPG.shape", rPPG.shape)
-            print("rBr.shape", rBr.shape)
+            if "BVP" in self.modality:
+                print("rPPG.shape", rPPG.shape)
+            if "Resp" in self.modality:
+                print("rBr.shape", rBr.shape)
 
         if (self.md_infer or self.training or self.debug) and self.use_fsam:
-            return rPPG, rBr, rppg_voxel_embeddings, factorized_embeddings, appx_error, factorized_embeddings_br, appx_error_br
+            if "BVP" in self.modality and "Resp" in self.modality:
+                return rPPG, rBr, rppg_voxel_embeddings, factorized_embeddings, appx_error, factorized_embeddings_br, appx_error_br
+            elif "BVP" in self.modality:
+                return rPPG, rppg_voxel_embeddings, factorized_embeddings, appx_error
+            elif "Resp" in self.modality:
+                return rBr, rbr_voxel_embeddings, factorized_embeddings_br, appx_error_br
         else:
-            return rPPG, rBr, rppg_voxel_embeddings
+            if "BVP" in self.modality and "Resp" in self.modality:
+                return rPPG, rBr, rppg_voxel_embeddings
+            elif "BVP" in self.modality:
+                return rPPG, rppg_voxel_embeddings
+            elif "Resp" in self.modality:
+                return rBr, rbr_voxel_embeddings

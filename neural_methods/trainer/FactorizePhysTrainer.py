@@ -154,6 +154,8 @@ class FactorizePhysTrainer(BaseTrainer):
                 mean_appx_error.append(np.mean(appx_error_list))
                 print("Mean train loss: {}, Mean appx error: {}".format(
                     np.mean(train_loss), np.mean(appx_error_list)))
+            else:
+                print("Mean train loss: {}".format(np.mean(train_loss)))
 
             self.save_model(epoch)
             if not self.config.TEST.USE_LAST_EPOCH: 

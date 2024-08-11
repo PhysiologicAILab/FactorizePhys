@@ -32,7 +32,7 @@ model_config = {
     "debug": True,
     "assess_latency": False,
     "num_trials": 20,
-    "visualize": True,
+    "visualize": False,
     "ckpt_path": "./final_model_release/iBVP_FactorizePhys_FSAM_Res.pth",
     "data_path": "/home/jitesh/data/iBVP_Dataset/iBVP_RGB_160_72x72",
     "label_path": "/home/jitesh/data/iBVP_Dataset/iBVP_RGB_160_72x72"
@@ -134,7 +134,8 @@ class TestFactorizePhysBig(object):
 
     def run_inference(self, num_trial):
 
-        print("Processing:", self.data_files[num_trial].name)
+        if self.visualize:
+            print("Processing:", self.data_files[num_trial].name)
         if self.assess_latency:
             t0 = time.time()
 

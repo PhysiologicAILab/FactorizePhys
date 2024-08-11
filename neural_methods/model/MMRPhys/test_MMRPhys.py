@@ -14,7 +14,9 @@ import torch.nn.functional as F
 from neural_methods.model.MMRPhys.MMRPhys import MMRPhys
 
 model_config = {
-    "MD_FSAM": True,
+    "MODALITY": ["BVP"],
+    "LGAM": True,
+    "MD_FSAM": False,
     "MD_TYPE": "NMF",
     "MD_R": 1,
     "MD_S": 1,
@@ -43,6 +45,8 @@ class TestMMRPhys(object):
         self.data_path = Path(model_config["data_path"])
         self.label_path = Path(model_config["label_path"])
 
+        self.modality = model_config["MODALITY"]
+        self.use_lgam = model_config["LGAM"]
         self.use_fsam = model_config["MD_FSAM"]
         self.md_infer = model_config["MD_INFERENCE"]
 
@@ -88,6 +92,8 @@ class TestMMRPhys(object):
         md_config["MD_INFERENCE"] = model_config["MD_INFERENCE"]
         md_config["MD_RESIDUAL"] = model_config["MD_RESIDUAL"]
 
+        md_config["LGAM"] = model_config["LGAM"]
+
         if self.visualize:
             self.net = nn.DataParallel(MMRPhys(frames=self.frames, md_config=md_config,
                                 device=self.device, in_channels=self.in_channels, debug=self.debug), device_ids=[0]).to(self.device)
@@ -112,6 +118,10 @@ class TestMMRPhys(object):
             self.np_label = np.expand_dims(self.np_label, 0)
             self.np_label = torch.tensor(self.np_label)
 
+
+            # bvp_label
+            # resp_label
+
             # print("Chunk data shape", self.np_data.shape)
             # print("Chunk label shape", self.np_label.shape)
             # print("Min Max of input data:", np.min(self.np_data), np.max(self.np_data))
@@ -127,18 +137,46 @@ class TestMMRPhys(object):
         else:
             self.test_data = torch.rand(self.batch_size, self.data_channels, self.frames + 1, self.height, self.width)
             self.test_data = self.test_data.to(torch.float32).to(self.device)
-
+            self.bvp_label = torch.rand(self.batch_size, self.frames).to(torch.float32).to(self.device)
+            self.resp_label = torch.rand(self.batch_size, self.frames).to(torch.float32).to(self.device)
 
     def run_inference(self, num_trial):
 
-        print("Processing:", self.data_files[num_trial].name)
+        if self.visualize:
+            print("Processing:", self.data_files[num_trial].name)
         if self.assess_latency:
             t0 = time.time()
 
         if (self.md_infer or self.net.training or self.debug) and self.use_fsam:
-            self.pred, self.pred_rBr, self.vox_embed, self.factorized_embed, self.appx_error, self.factorized_embed_br, self.appx_error_br = self.net(self.test_data)
+            if "BVP" in self.modality and "Resp" in self.modality:
+                self.pred, self.pred_rBr, self.vox_embed, self.factorized_embed, self.appx_error, self.factorized_embed_br, self.appx_error_br = self.net(self.test_data)
+            elif "BVP" in self.modality:
+                self.pred, self.vox_embed, self.factorized_embed, self.appx_error = self.net(self.test_data)
+            elif "Resp" in self.modality:
+                self.pred_rBr, self.vox_embed, self.factorized_embed_br, self.appx_error_br = self.net(self.test_data)
+            else:
+                print("Unknown modality... Only BVP and Resp are supported. Exiting the code...")
+                exit()
+        elif (self.net.training or self.debug) and self.use_lgam:
+            if "BVP" in self.modality and "Resp" in self.modality:
+                self.pred, self.pred_rBr, self.vox_embed = self.net(self.test_data, self.bvp_label, self.resp_label)
+            elif "BVP" in self.modality:
+                self.pred, self.vox_embed = self.net(self.test_data, self.bvp_label)
+            elif "Resp" in self.modality:
+                self.pred_rBr, self.vox_embed = self.net(self.test_data, self.resp_label)
+            else:
+                print("Unknown modality... Only BVP and Resp are supported. Exiting the code...")
+                exit()
         else:
-            self.pred, self.pred_rBr, self.vox_embed = self.net(self.test_data)
+            if "BVP" in self.modality and "Resp" in self.modality:
+                self.pred, self.pred_rBr, self.vox_embed = self.net(self.test_data)
+            elif "BVP" in self.modality:
+                self.pred, self.vox_embed = self.net(self.test_data)
+            elif "Resp" in self.modality:
+                self.pred_rBr, self.vox_embed = self.net(self.test_data)
+            else:
+                print("Unknown modality... Only BVP and Resp are supported. Exiting the code...")
+                exit()
 
         if self.assess_latency:
             t1 = time.time()

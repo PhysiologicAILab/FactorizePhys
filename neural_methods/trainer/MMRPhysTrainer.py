@@ -46,9 +46,19 @@ class MMRPhysTrainer(BaseTrainer):
         md_config["MD_STEPS"] = self.config.MODEL.MMRPhys.MD_STEPS
         md_config["MD_INFERENCE"] = self.config.MODEL.MMRPhys.MD_INFERENCE
         md_config["MD_RESIDUAL"] = self.config.MODEL.MMRPhys.MD_RESIDUAL
+        
+        md_config["LGAM"] = self.config.MODEL.MMRPhys.LGAM
+        md_config["MODALITY"] = self.config.MODEL.MMRPhys.MODALITY
 
         self.md_infer = self.config.MODEL.MMRPhys.MD_INFERENCE
         self.use_fsam = self.config.MODEL.MMRPhys.MD_FSAM
+        self.modality = self.config.MODEL.MMRPhys.MODALITY
+        self.use_lgam = self.config.MODEL.MMRPhys.LGAM
+        if "BVP" in self.modality or "Resp" in self.modality:
+            pass
+        else:
+            print("Unknown modality... Only BVP and Resp are supported. Exiting the code...")
+            exit()
 
         self.model = MMRPhys(frames=frames, md_config=md_config, in_channels=in_channels,
                                 dropout=self.dropout_rate, device=self.device)  # [3, T, 128,128]
@@ -77,10 +87,10 @@ class MMRPhysTrainer(BaseTrainer):
         if data_loader["train"] is None:
             raise ValueError("No data for train")
 
-        mean_training_loss1 = []
-        mean_training_loss2 = []
-        mean_valid_loss1 = []
-        mean_valid_loss2 = []
+        mean_training_loss_bvp = []
+        mean_training_loss_resp = []
+        mean_valid_loss_bvp = []
+        mean_valid_loss_resp = []
         mean_appx_error = []
         lrs = []
         for epoch in range(self.max_epoch_num):
@@ -90,8 +100,8 @@ class MMRPhysTrainer(BaseTrainer):
             running_loss2 = 0.0
 
             train_loss = []
-            train_loss1 = []
-            train_loss2 = []
+            train_loss_bvp = []
+            train_loss_resp = []
             appx_error_list = []
             self.model.train()
             tbar = tqdm(data_loader["train"], ncols=120)
@@ -101,10 +111,18 @@ class MMRPhysTrainer(BaseTrainer):
                 data = batch[0].to(self.device)
                 labels = batch[1].to(self.device)
 
-                label_bvp = labels[..., 0]
-                label_resp = labels[..., 1]
-                label_bvp = (label_bvp - torch.mean(label_bvp)) / torch.std(label_bvp)  # normalize
-                label_resp = (label_resp - torch.mean(label_resp)) / torch.std(label_resp)  # normalize
+                if len(labels.shape) == 3:
+                    label_bvp = labels[..., 0]
+                    label_resp = labels[..., 1]
+                elif "BVP" in self.modality:
+                    label_bvp = labels
+                elif "Resp" in self.modality:
+                    label_resp = labels
+
+                if "BVP" in self.modality:
+                    label_bvp = (label_bvp - torch.mean(label_bvp)) / torch.std(label_bvp)  # normalize
+                if "Resp" in self.modality:
+                    label_resp = (label_resp - torch.mean(label_resp)) / torch.std(label_resp)  # normalize
                 
                 last_frame = torch.unsqueeze(data[:, :, -1, :, :], 2).repeat(1, 1, max(self.num_of_gpu, 1), 1, 1)
                 data = torch.cat((data, last_frame), 2)
@@ -117,29 +135,64 @@ class MMRPhysTrainer(BaseTrainer):
 
                 self.optimizer.zero_grad()
                 if self.model.training and self.use_fsam:
-                    pred_bvp, pred_resp, vox_embed, factorized_embed, \
-                        appx_error, factorized_embed_br, \
-                            appx_error_br = self.model(data)
+                    if "BVP" in self.modality and "Resp" in self.modality:
+                        pred_bvp, pred_resp, vox_embed, factorized_embed, appx_error, factorized_embed_br, appx_error_br = self.model(data)
+                    elif "BVP" in self.modality:
+                        pred_bvp, vox_embed, factorized_embed, appx_error = self.model(data)
+                    else:
+                        pred_resp, vox_embed, factorized_embed_br, appx_error_br = self.model(data)
+                elif self.model.training and self.use_lgam:
+                    if "BVP" in self.modality and "Resp" in self.modality:
+                        pred_bvp, pred_resp, vox_embed = self.model(data, label_bvp, label_resp)
+                    elif "BVP" in self.modality:
+                        pred_bvp, vox_embed = self.model(data, label_bvp)
+                    else:
+                        pred_resp, vox_embed = self.model(data, label_resp)
                 else:
-                    pred_bvp, pred_resp, vox_embed = self.model(data)
+                    if "BVP" in self.modality and "Resp" in self.modality:
+                        pred_bvp, pred_resp, vox_embed = self.model(data)
+                    elif "BVP" in self.modality:
+                        pred_bvp, vox_embed = self.model(data)
+                    else:
+                        pred_resp, vox_embed = self.model(data)
                 
-                pred_bvp = (pred_bvp - torch.mean(pred_bvp)) / torch.std(pred_bvp)  # normalize
-                pred_resp = (pred_resp - torch.mean(pred_resp)) / torch.std(pred_resp)  # normalize
+                if "BVP" in self.modality:
+                    pred_bvp = (pred_bvp - torch.mean(pred_bvp)) / torch.std(pred_bvp)  # normalize
+                    loss_bvp = self.criterion1(pred_bvp, label_bvp)
 
-                loss_bvp = self.criterion1(pred_bvp, label_bvp)
-                loss_resp = self.criterion2(pred_resp, label_resp)
-                loss = loss_bvp + 5*loss_resp
+                if "Resp" in self.modality:
+                    pred_resp = (pred_resp - torch.mean(pred_resp)) / torch.std(pred_resp)  # normalize
+                    loss_resp = self.criterion2(pred_resp, label_resp)
+                
+                if "BVP" in self.modality and "Resp" in self.modality:
+                    loss = loss_bvp + loss_resp
+                elif "BVP" in self.modality:
+                    loss = loss_bvp
+                else:
+                    loss = loss_resp
                 
                 loss.backward()
-                running_loss1 += loss_bvp.item()
-                running_loss2 += loss_resp.item()
+                if "BVP" in self.modality:
+                    running_loss1 += loss_bvp.item()
+                if "Resp" in self.modality:
+                    running_loss2 += loss_resp.item()
                 if idx % 100 == 99:  # print every 100 mini-batches
-                    print(f'[{epoch}, {idx + 1:5d}] loss_bvp: {running_loss1 / 100:.3f} loss_resp: {running_loss2 / 100:.3f}')
-                    running_loss1 = 0.0
-                    running_loss2 = 0.0
+                    if "BVP" in self.modality and "Resp" in self.modality:
+                        print(f'[{epoch}, {idx + 1:5d}] loss_bvp: {running_loss1 / 100:.3f} loss_resp: {running_loss2 / 100:.3f}')    
+                        running_loss1 = 0.0
+                        running_loss2 = 0.0
+                    elif "BVP" in self.modality:
+                        print(f'[{epoch}, {idx + 1:5d}] loss_bvp: {running_loss1 / 100:.3f}')    
+                        running_loss1 = 0.0
+                    elif "Resp" in self.modality:
+                        print(f'[{epoch}, {idx + 1:5d}] loss_resp: {running_loss2 / 100:.3f}')    
+                        running_loss2 = 0.0
+
                 train_loss.append(loss.item())
-                train_loss1.append(loss_bvp.item())
-                train_loss2.append(loss_resp.item())
+                if "BVP" in self.modality:
+                    train_loss_bvp.append(loss_bvp.item())
+                if "Resp" in self.modality:
+                    train_loss_resp.append(loss_resp.item())
                 if self.use_fsam:
                     appx_error_list.append(appx_error.item())
 
@@ -150,37 +203,67 @@ class MMRPhysTrainer(BaseTrainer):
                 self.scheduler.step()
                 
                 if self.use_fsam:
-                    tbar.set_postfix({"appx_error": appx_error.item(), "loss_bvp":loss_bvp.item(), "loss_resp": loss_resp.item()}, loss=loss.item())
+                    if "BVP" in self.modality and "Resp" in self.modality:
+                        tbar.set_postfix({"appx_error": appx_error.item(), "loss_bvp":loss_bvp.item(), "loss_resp": loss_resp.item()}, loss=loss.item())
+                    elif "BVP" in self.modality:
+                        tbar.set_postfix({"appx_error": appx_error.item()}, loss=loss.item())
+                    elif "Resp" in self.modality:
+                        tbar.set_postfix({"appx_error": appx_error.item()}, loss=loss.item())
                 else:
-                    tbar.set_postfix({"loss_bvp":loss_bvp.item(), "loss_resp": loss_resp.item()}, loss=loss.item())
+                    if "BVP" in self.modality and "Resp" in self.modality:
+                        tbar.set_postfix({"loss_bvp":loss_bvp.item(), "loss_resp": loss_resp.item()}, loss=loss.item())
+                    else:
+                        tbar.set_postfix(loss=loss.item())
 
             # Append the mean training loss for the epoch
-            mean_training_loss1.append(np.mean(train_loss1))
-            mean_training_loss2.append(np.mean(train_loss2))
+            if "BVP" in self.modality:
+                mean_training_loss_bvp.append(np.mean(train_loss_bvp))
+            if "Resp" in self.modality:
+                mean_training_loss_resp.append(np.mean(train_loss_resp))
             if self.use_fsam:
                 mean_appx_error.append(np.mean(appx_error_list))
-                print("Mean train loss: {}, Mean appx error: {}".format(
-                    np.round(np.mean(train_loss), 3), np.round(np.mean(appx_error_list), 3)))
+                print("Mean train loss: {}, Mean appx error: {}".format(np.round(np.mean(train_loss), 3), np.round(np.mean(appx_error_list), 3)))
+            else:
+                print("Mean train loss: {}".format(np.round(np.mean(train_loss), 3)))
 
             self.save_model(epoch)
-            if not self.config.TEST.USE_LAST_EPOCH: 
-                valid_loss1, valid_loss2 = self.valid(data_loader)
-                mean_valid_loss1.append(valid_loss1)
-                mean_valid_loss2.append(valid_loss2)
-                print('validation losses: ', valid_loss1, valid_loss2)
+            if not self.config.TEST.USE_LAST_EPOCH:
+                if "BVP" in self.modality and "Resp" in self.modality:
+                    valid_loss_bvp, valid_loss_resp = self.valid(data_loader)
+                    print('validation losses: ', valid_loss_bvp, valid_loss_resp)
+                    total_valid_loss = valid_loss_bvp + valid_loss_resp
+                elif "BVP" in self.modality:
+                    valid_loss_bvp = self.valid(data_loader)
+                    print('validation loss: ', valid_loss_bvp)
+                    total_valid_loss = valid_loss_bvp
+                elif "Resp" in self.modality:
+                    valid_loss_resp = self.valid(data_loader)
+                    print('validation loss: ', valid_loss_resp)
+                    total_valid_loss = valid_loss_resp
+
+                if "BVP" in self.modality:
+                    mean_valid_loss_bvp.append(valid_loss_bvp)
+                if "Resp" in self.modality:
+                    mean_valid_loss_resp.append(valid_loss_resp)
+
                 if self.min_valid_loss is None:
-                    self.min_valid_loss = valid_loss1 + valid_loss2
+                    self.min_valid_loss = total_valid_loss
                     self.best_epoch = epoch
                     print("Update best model! Best epoch: {}".format(self.best_epoch))
-                elif ((valid_loss1 + valid_loss2) < self.min_valid_loss):
-                    self.min_valid_loss = valid_loss1 + valid_loss2
+                elif (total_valid_loss < self.min_valid_loss):
+                    self.min_valid_loss = total_valid_loss
                     self.best_epoch = epoch
                     print("Update best model! Best epoch: {}".format(self.best_epoch))
         if not self.config.TEST.USE_LAST_EPOCH: 
             print("best trained epoch: {}, min_val_loss: {}".format(
                 self.best_epoch, self.min_valid_loss))
         if self.config.TRAIN.PLOT_LOSSES_AND_LR:
-            self.plot_losses_and_lrs(mean_training_loss1, mean_valid_loss1, lrs, self.config, mean_training_loss2, mean_valid_loss2)
+            if "BVP" in self.modality and "Resp" in self.modality:
+                self.plot_losses_and_lrs(mean_training_loss_bvp, mean_valid_loss_bvp, lrs, self.config, mean_training_loss_resp, mean_valid_loss_resp)
+            elif "BVP" in self.modality:
+                self.plot_losses_and_lrs(mean_training_loss_bvp, mean_valid_loss_bvp, lrs, self.config)
+            elif "Resp" in self.modality:
+                self.plot_losses_and_lrs(mean_training_loss_resp, mean_valid_loss_resp, lrs, self.config)
 
     def valid(self, data_loader):
         """ Runs the model on valid sets."""
@@ -189,8 +272,8 @@ class MMRPhysTrainer(BaseTrainer):
 
         print('')
         print(" ====Validing===")
-        valid_loss1 = []
-        valid_loss2 = []
+        valid_loss_bvp = []
+        valid_loss_resp = []
         self.model.eval()
         valid_step = 0
         with torch.no_grad():
@@ -199,10 +282,18 @@ class MMRPhysTrainer(BaseTrainer):
                 vbar.set_description("Validation")
 
                 data, labels = valid_batch[0].to(self.device), valid_batch[1].to(self.device)
-                label_bvp = labels[..., 0]
-                label_resp = labels[..., 1]
-                label_bvp = (label_bvp - torch.mean(label_bvp)) / torch.std(label_bvp)  # normalize
-                label_resp = (label_resp - torch.mean(label_resp)) / torch.std(label_resp)  # normalize                
+                if len(labels.shape) == 3:
+                    label_bvp = labels[..., 0]
+                    label_resp = labels[..., 1]
+                elif "BVP" in self.modality:
+                    label_bvp = labels
+                elif "Resp" in self.modality:
+                    label_resp = labels
+
+                if "BVP" in self.modality:
+                    label_bvp = (label_bvp - torch.mean(label_bvp)) / torch.std(label_bvp)  # normalize
+                if "Resp" in self.modality:
+                    label_resp = (label_resp - torch.mean(label_resp)) / torch.std(label_resp)  # normalize                
 
                 last_frame = torch.unsqueeze(data[:, :, -1, :, :], 2).repeat(1, 1, max(self.num_of_gpu, 1), 1, 1)
                 data = torch.cat((data, last_frame), 2)
@@ -214,28 +305,60 @@ class MMRPhysTrainer(BaseTrainer):
                 # labels[torch.isnan(labels)] = 0
 
                 if self.md_infer and self.use_fsam:
-                    pred_bvp, pred_resp, vox_embed, factorized_embed, appx_error, \
-                        factorized_embed_br, appx_error_br = self.model(data)
+                    if "BVP" in self.modality and "Resp" in self.modality:
+                        pred_bvp, pred_resp, vox_embed, factorized_embed, appx_error, factorized_embed_br, appx_error_br = self.model(data)
+                    elif "BVP" in self.modality:
+                        pred_bvp, vox_embed, factorized_embed, appx_error = self.model(data)
+                    else:
+                        pred_resp, vox_embed, factorized_embed_br, appx_error_br = self.model(data)
                 else:
-                    pred_bvp, pred_resp, vox_embed = self.model(data)
-                pred_bvp = (pred_bvp - torch.mean(pred_bvp)) / torch.std(pred_bvp)  # normalize
-                pred_resp = (pred_resp - torch.mean(pred_resp)) / torch.std(pred_resp)  # normalize
-                
-                loss_bvp = self.criterion1(pred_bvp, label_bvp)
-                loss_resp = self.criterion2(pred_resp, label_resp)
-                loss = loss_bvp + 5*loss_resp
+                    if "BVP" in self.modality and "Resp" in self.modality:
+                        pred_bvp, pred_resp, vox_embed = self.model(data)
+                    elif "BVP" in self.modality:
+                        pred_bvp, vox_embed = self.model(data)
+                    else:
+                        pred_resp, vox_embed = self.model(data)
 
-                valid_loss1.append(loss_bvp.item())
-                valid_loss2.append(loss_resp.item())
+                if "BVP" in self.modality:
+                    pred_bvp = (pred_bvp - torch.mean(pred_bvp)) / torch.std(pred_bvp)  # normalize
+                    loss_bvp = self.criterion1(pred_bvp, label_bvp)
+                    valid_loss_bvp.append(loss_bvp.item())
+                if "Resp" in self.modality:
+                    pred_resp = (pred_resp - torch.mean(pred_resp)) / torch.std(pred_resp)  # normalize
+                    loss_resp = self.criterion2(pred_resp, label_resp)
+                    valid_loss_resp.append(loss_resp.item())
+                
+                if "BVP" in self.modality and "Resp" in self.modality:
+                    loss = loss_bvp + loss_resp
+                elif "BVP" in self.modality:
+                    loss = loss_bvp
+                elif "Resp" in self.modality:
+                    loss = loss_resp
+
                 valid_step += 1
                 # vbar.set_postfix(loss=loss.item())
                 if self.md_infer and self.use_fsam:
-                    vbar.set_postfix({"appx_error": appx_error.item(), "loss_bvp":loss_bvp.item(), "loss_resp": loss_resp.item()}, loss=loss.item())
+                    if "BVP" in self.modality and "Resp" in self.modality:
+                        vbar.set_postfix({"appx_error": appx_error.item(), "loss_bvp":loss_bvp.item(), "loss_resp": loss_resp.item()}, loss=loss.item())
+                    else:
+                        vbar.set_postfix(loss=loss.item())
                 else:
-                    vbar.set_postfix({"loss_bvp":loss_bvp.item(), "loss_resp": loss_resp.item()}, loss=loss.item())
-            valid_loss1 = np.asarray(valid_loss1)
-            valid_loss2 = np.asarray(valid_loss2)
-        return np.mean(valid_loss1), np.mean(valid_loss2)
+                    if "BVP" in self.modality and "Resp" in self.modality:
+                        vbar.set_postfix({"loss_bvp":loss_bvp.item(), "loss_resp": loss_resp.item()}, loss=loss.item())
+                    else:
+                        vbar.set_postfix(loss=loss.item())
+
+            if "BVP" in self.modality:
+                valid_loss_bvp = np.asarray(valid_loss_bvp)
+            if "Resp" in self.modality:
+                valid_loss_resp = np.asarray(valid_loss_resp)
+        
+        if "BVP" in self.modality and "Resp" in self.modality:
+            return np.mean(valid_loss_bvp), np.mean(valid_loss_resp)
+        elif "BVP" in self.modality:
+            return np.mean(valid_loss_bvp)
+        elif "Resp" in self.modality:
+            return np.mean(valid_loss_resp)
 
     def test(self, data_loader):
         """ Runs the model on test sets."""
@@ -276,10 +399,19 @@ class MMRPhysTrainer(BaseTrainer):
             for _, test_batch in enumerate(tqdm(data_loader["test"], ncols=80)):
                 batch_size = test_batch[0].shape[0]
                 data, labels_test = test_batch[0].to(self.device), test_batch[1].to(self.device)
-                label_bvp = labels_test[..., 0]
-                label_resp = labels_test[..., 1]
-                label_bvp = (label_bvp - torch.mean(label_bvp)) / torch.std(label_bvp)  # normalize
-                label_resp = (label_resp - torch.mean(label_resp)) / torch.std(label_resp)  # normalize
+
+                if len(labels_test.shape) == 3:
+                    label_bvp = labels_test[..., 0]
+                    label_resp = labels_test[..., 1]
+                elif "BVP" in self.modality:
+                    label_bvp = labels_test
+                elif "Resp" in self.modality:
+                    label_resp = labels_test
+
+                if "BVP" in self.modality:
+                    label_bvp = (label_bvp - torch.mean(label_bvp)) / torch.std(label_bvp)  # normalize
+                if "Resp" in self.modality:
+                    label_resp = (label_resp - torch.mean(label_resp)) / torch.std(label_resp)  # normalize
 
                 last_frame = torch.unsqueeze(data[:, :, -1, :, :], 2).repeat(1, 1, max(self.num_of_gpu, 1), 1, 1)
                 data = torch.cat((data, last_frame), 2)
@@ -291,19 +423,32 @@ class MMRPhysTrainer(BaseTrainer):
                 # labels_test[torch.isnan(labels_test)] = 0
 
                 if self.md_infer and self.use_fsam:
-                    pred_bvp_test, pred_resp_test, vox_embed, factorized_embed, appx_error, \
-                        factorized_embed_br, appx_error_br = self.model(data)
+                    if "BVP" in self.modality and "Resp" in self.modality:
+                        pred_bvp_test, pred_resp_test, vox_embed, factorized_embed, appx_error, factorized_embed_br, appx_error_br = self.model(data)
+                    elif "BVP" in self.modality:
+                        pred_bvp_test, vox_embed, factorized_embed, appx_error = self.model(data)
+                    else:
+                        pred_resp_test, vox_embed, factorized_embed_br, appx_error_br = self.model(data)
                 else:
-                    pred_bvp_test, pred_resp_test, vox_embed = self.model(data)
-                
-                pred_bvp_test = (pred_bvp_test - torch.mean(pred_bvp_test)) / torch.std(pred_bvp_test)  # normalize
-                pred_resp_test = (pred_resp_test - torch.mean(pred_resp_test)) / torch.std(pred_resp_test)  # normalize
+                    if "BVP" in self.modality and "Resp" in self.modality:
+                        pred_bvp_test, pred_resp_test, vox_embed = self.model(data)
+                    elif "BVP" in self.modality:
+                        pred_bvp_test, vox_embed = self.model(data)
+                    else:
+                        pred_resp_test, vox_embed = self.model(data)
+
+                if "BVP" in self.modality:
+                    pred_bvp_test = (pred_bvp_test - torch.mean(pred_bvp_test)) / torch.std(pred_bvp_test)  # normalize
+                if "Resp" in self.modality:
+                    pred_resp_test = (pred_resp_test - torch.mean(pred_resp_test)) / torch.std(pred_resp_test)  # normalize
 
                 if self.config.TEST.OUTPUT_SAVE_DIR:
-                    label_bvp = label_bvp.cpu()
-                    label_resp = label_resp.cpu()
-                    pred_bvp_test = pred_bvp_test.cpu()
-                    pred_resp_test = pred_resp_test.cpu()
+                    if "BVP" in self.modality:
+                        label_bvp = label_bvp.cpu()
+                        pred_bvp_test = pred_bvp_test.cpu()
+                    if "Resp" in self.modality:
+                        label_resp = label_resp.cpu()
+                        pred_resp_test = pred_resp_test.cpu()
 
                 for idx in range(batch_size):
                     subj_index = test_batch[2][idx]
@@ -313,18 +458,25 @@ class MMRPhysTrainer(BaseTrainer):
                         labels_bvp_dict[subj_index] = dict()
                         predictions_resp_dict[subj_index] = dict()
                         labels_resp_dict[subj_index] = dict()
-                    predictions_bvp_dict[subj_index][sort_index] = pred_bvp_test[idx]
-                    labels_bvp_dict[subj_index][sort_index] = label_bvp[idx]
-                    predictions_resp_dict[subj_index][sort_index] = pred_resp_test[idx]
-                    labels_resp_dict[subj_index][sort_index] = label_resp[idx]
+
+                    if "BVP" in self.modality:
+                        predictions_bvp_dict[subj_index][sort_index] = pred_bvp_test[idx]
+                        labels_bvp_dict[subj_index][sort_index] = label_bvp[idx]
+                    if "Resp" in self.modality:
+                        predictions_resp_dict[subj_index][sort_index] = pred_resp_test[idx]
+                        labels_resp_dict[subj_index][sort_index] = label_resp[idx]
 
 
         print('')
-        calculate_metrics(predictions_bvp_dict, labels_bvp_dict, self.config)
-        calculate_metrics(predictions_resp_dict, labels_resp_dict, self.config)
+        if "BVP" in self.modality:
+            calculate_metrics(predictions_bvp_dict, labels_bvp_dict, self.config)
+        if "Resp" in self.modality:
+            calculate_metrics(predictions_resp_dict, labels_resp_dict, self.config)
         if self.config.TEST.OUTPUT_SAVE_DIR: # saving test outputs 
-            self.save_test_outputs(predictions_bvp_dict, labels_bvp_dict, self.config, suff="_bvp")
-            self.save_test_outputs(predictions_resp_dict, labels_resp_dict, self.config, suff="_resp")
+            if "BVP" in self.modality:
+                self.save_test_outputs(predictions_bvp_dict, labels_bvp_dict, self.config, suff="_bvp")
+            if "Resp" in self.modality:
+                self.save_test_outputs(predictions_resp_dict, labels_resp_dict, self.config, suff="_resp")
 
     def save_model(self, index):
         if not os.path.exists(self.model_dir):
