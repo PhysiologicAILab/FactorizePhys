@@ -12,8 +12,8 @@ class LGAM_org(nn.Module):
     def forward(self, voxel_embeddings, label):
         with torch.no_grad():
             if self.debug:
-                print("voxel_embeddings.shape", voxel_embeddings.shape) #[2, 16, 160, 7, 7])
-            b, channels, enc_frames, enc_height, enc_width = voxel_embeddings.shape
+                print("voxel_embeddings.shape", voxel_embeddings.shape) #[B, 16, 160, 7, 7])
+            batch, channels, enc_frames, enc_height, enc_width = voxel_embeddings.shape
             if self.debug:
                 print("label.shape", label.shape)
             
@@ -51,25 +51,23 @@ class LGAM(nn.Module):
         self.debug = debug
         super().__init__()
 
-    def forward(self, voxel_embeddings, label):
+    def forward(self, voxel_embeddings, label=None):
         with torch.no_grad():
             if self.debug:
-                print("voxel_embeddings.shape", voxel_embeddings.shape) #[2, 16, 160, 7, 7])
-            b, channels, enc_frames, enc_height, enc_width = voxel_embeddings.shape
+                print("voxel_embeddings.shape", voxel_embeddings.shape) #[B, 16, 160, 7, 7])
+            batch, channels, enc_frames, enc_height, enc_width = voxel_embeddings.shape
             
-            vec_embeddings = voxel_embeddings.view(b, -1, enc_frames)
+            vec_embeddings = voxel_embeddings.view(batch, -1, enc_frames)
             mean_vec = torch.mean(vec_embeddings, dim=1)
             vec_embeddings = mean_vec.unsqueeze(
                 1).unsqueeze(-1).unsqueeze(-1).repeat(1, channels, 1, enc_height, enc_width)
-
             if self.debug:
                 print("vec_embeddings.shape", vec_embeddings.shape)
-                # exit()
-            # Generate cosine similarity map
 
+            # Generate cosine similarity map
             corr_matrix = F.cosine_similarity(voxel_embeddings, vec_embeddings, dim=2).abs()
             
-            # Generate attention mask by picking the voxels highly correlating with with the ground-truth.
+            # Generate attention mask by picking the voxels highly correlating with with the mean-vector.
             # threshold = torch.mean(corr_matrix).item()  #dynamic threshold
             threshold = self.cs_threshold
             # corr_matrix[corr_matrix >= threshold] = 1
@@ -78,7 +76,5 @@ class LGAM(nn.Module):
             
             if self.debug:
                 print("att_mask.shape", att_mask.shape)
-            # att_mask = voxel_embeddings * att_mask
-            # if self.debug:
-            #     print("att_mask.shape", att_mask.shape)
+
             return att_mask
