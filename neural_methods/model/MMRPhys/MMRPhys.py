@@ -147,7 +147,8 @@ class BVP_Head(nn.Module):
 
             x = self.final_layer(factorized_embeddings)
         
-        elif (self.training or self.debug) and self.use_lgam:
+        # elif (self.training or self.debug) and self.use_lgam:
+        elif self.use_lgam:
             att_mask = self.lgam(voxel_embeddings, label_bvp)
             x = torch.mul(voxel_embeddings - voxel_embeddings.min() + self.bias1, att_mask - att_mask.min() + self.bias1)
             lg_embeddings = self.lgam_norm(x)
