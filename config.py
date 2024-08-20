@@ -320,22 +320,6 @@ _C.MODEL.FactorizePhys.MD_INFERENCE = True
 _C.MODEL.FactorizePhys.MD_RESIDUAL = True
 
 # -----------------------------------------------------------------------------
-# Specific parameters for MMRPhys parameters
-# -----------------------------------------------------------------------------
-_C.MODEL.MMRPhys = CN()
-_C.MODEL.MMRPhys.FRAME_NUM = 160
-_C.MODEL.MMRPhys.CHANNELS = 3
-_C.MODEL.MMRPhys.MD_FSAM = False
-_C.MODEL.MMRPhys.MD_TYPE = 'NMF'
-_C.MODEL.MMRPhys.MD_R = 1
-_C.MODEL.MMRPhys.MD_S = 1
-_C.MODEL.MMRPhys.MD_STEPS = 4
-_C.MODEL.MMRPhys.MD_INFERENCE = False
-_C.MODEL.MMRPhys.MD_RESIDUAL = False
-_C.MODEL.MMRPhys.LGAM = False
-_C.MODEL.MMRPhys.MODALITY = ["BVP", "Resp"]
-
-# -----------------------------------------------------------------------------
 # Model Settings for TS-CAN
 # -----------------------------------------------------------------------------
 _C.MODEL.TSCAN = CN()
