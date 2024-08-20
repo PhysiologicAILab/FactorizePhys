@@ -266,10 +266,14 @@ class BaseLoader(Dataset):
             pass
         elif config_preprocess.LABEL_TYPE == "DiffNormalized":
             bvps = BaseLoader.diff_normalize_label(bvps)
-            ss = BaseLoader.diff_normalize_label(resps)
+            if np.all(resps) != None:
+                resps = BaseLoader.diff_normalize_label(resps)
 
         elif config_preprocess.LABEL_TYPE == "Standardized":
             bvps = BaseLoader.standardized_label(bvps)
+            if np.all(resps) != None:
+                resps = BaseLoader.standardized_label(resps)
+
         else:
             raise ValueError("Unsupported label type!")
 

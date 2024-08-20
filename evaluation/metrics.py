@@ -118,7 +118,7 @@ def calculate_metrics(predictions, labels, config):
                 print("FFT MAE (FFT Label): {0} +/- {1}".format(MAE_FFT, standard_error))
             elif metric == "RMSE":
                 RMSE_FFT = np.sqrt(np.mean(np.square(predict_hr_fft_all - gt_hr_fft_all)))
-                standard_error = np.std(np.square(predict_hr_fft_all - gt_hr_fft_all)) / np.sqrt(num_test_samples)
+                standard_error = np.sqrt(np.std(np.square(predict_hr_fft_all - gt_hr_fft_all))) / np.sqrt(num_test_samples)
                 print("FFT RMSE (FFT Label): {0} +/- {1}".format(RMSE_FFT, standard_error))
             elif metric == "MAPE":
                 MAPE_FFT = np.mean(np.abs((predict_hr_fft_all - gt_hr_fft_all) / gt_hr_fft_all)) * 100
