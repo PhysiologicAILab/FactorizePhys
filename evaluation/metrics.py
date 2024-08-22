@@ -168,7 +168,7 @@ def calculate_metrics(predictions, labels, config):
                 print("Peak MAE (Peak Label): {0} +/- {1}".format(MAE_PEAK, standard_error))
             elif metric == "RMSE":
                 RMSE_PEAK = np.sqrt(np.mean(np.square(predict_hr_peak_all - gt_hr_peak_all)))
-                standard_error = np.std(np.square(predict_hr_peak_all - gt_hr_peak_all)) / np.sqrt(num_test_samples)
+                standard_error = np.sqrt(np.std(np.square(predict_hr_peak_all - gt_hr_peak_all))) / np.sqrt(num_test_samples)
                 print("PEAK RMSE (Peak Label): {0} +/- {1}".format(RMSE_PEAK, standard_error))
             elif metric == "MAPE":
                 MAPE_PEAK = np.mean(np.abs((predict_hr_peak_all - gt_hr_peak_all) / gt_hr_peak_all)) * 100
