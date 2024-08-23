@@ -1,8 +1,8 @@
 BASE: ['']
-TOOLBOX_MODE: "only_test"  # "train_and_test"  or "only_test"
+TOOLBOX_MODE: "only_test"  # "train_and_test" or "only_train" or "only_test"
 TEST:
   METRICS: ['MAE', 'RMSE', 'MAPE', 'Pearson', 'SNR', 'BA', 'MACC']
-  USE_LAST_EPOCH: False
+  USE_LAST_EPOCH: True                   # to use provided validation dataset to find the best epoch, should be false
   DATA:
     FS: 30
     DATASET: iBVP
@@ -10,17 +10,17 @@ TEST:
     DATA_FORMAT: NDCHW
     DATA_PATH: "/mnt/sda/data/jitesh/iBVP_Dataset/raw"   # Raw dataset path, need to be updated
     CACHED_PATH: "/home/jitesh/data/iBVP_Dataset"    # Processed dataset save path, need to be updated
-    EXP_DATA_NAME: "iBVP_RGB_160_72x72"
+    EXP_DATA_NAME: "iBVP_RGBT_160_72x72"
     BEGIN: 0.0
     END: 1.0
     PREPROCESS:
-      DATA_TYPE: ['Raw']         #if using EfficientPhys, should be Raw
+      DATA_TYPE: ['Raw']         #if use EfficientPhys, Data_Type should be Raw and Label_Type should be Raw
       LABEL_TYPE: Standardized
       DO_CHUNK: True
       CHUNK_LENGTH: 160
       CROP_FACE:
         DO_CROP_FACE: True
-        BACKEND: 'HC'    # HC for Haar Cascade, RF for RetinaFace
+        BACKEND: 'Y5F'    # HC for Haar Cascade, RF for RetinaFace, Y5F for YOLO5Face
         USE_LARGE_FACE_BOX: True
         LARGE_BOX_COEF: 1.5
         DETECTION:
@@ -28,7 +28,7 @@ TEST:
           DYNAMIC_DETECTION_FREQUENCY : 30
           USE_MEDIAN_FACE_BOX: False    # This should be used ONLY if dynamic detection is used
       IBVP:
-        DATA_MODE: RGB    #"RGBT": for combined RGB and thermal frames; "RGB": for only RGB frames; "T": for only thermal frames
+        DATA_MODE: RGBT
       RESIZE:
         H: 72
         W: 72
@@ -40,11 +40,12 @@ MODEL:
   DROP_RATE: 0.2
   NAME: EfficientPhys
   EFFICIENTPHYS:
-    FRAME_DEPTH: 10
+    CHANNELS: 3
+    FRAME_DEPTH: 20
 INFERENCE:
   BATCH_SIZE: 4
-  EVALUATION_METHOD: 'FFT'        # "FFT" or "peak detection"
+  EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
     WINDOW_SIZE: 30        # In seconds
-  MODEL_PATH:   "./final_model_release/PURE_EfficientPhys.pth"
+  MODEL_PATH: "./final_model_release/SCAMPS_EfficientPhys.pth"
