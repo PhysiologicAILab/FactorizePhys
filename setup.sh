@@ -1,2 +1,2 @@
 conda remove --name fsam --all -y
-conda create -n fsam python=3.8 pytorch=1.12.1 torchvision=0.13.1 torchaudio=0.12.1 cudatoolkit=10.2 -c pytorch -q -y
+conda create -n fsam python=3.11.2 pytorch=2.0.0 torchvision=0.15.1 torchaudio=2.0.1 cudatoolkit=11.7 -c pytorch -q -y
