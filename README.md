@@ -118,107 +118,107 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 
 **Performance Evaluation on PURE Dataset, for Models Trained with iBVP Dataset:**
 
-|         Model        | Attention      Module |    MAE (HR) ↓   |    RMSE (HR) ↓   |    MAPE (HR)↓    |   Corr (HR) ↑   |  SNR (dB, BVP) ↑ |   MACC (BVP) ↑  |
-|:--------------------:|:---------------------:|:---------------:|:----------------:|:----------------:|:---------------:|:----------------:|:---------------:|
-| PhysNet              | -                     |   7.78   |   19.12   |    8.94   |   0.59   |    9.90   |   0.70   |
-| PhysFormer           | TD-MHSA*              |   6.58   |   16.55   |    6.93   |   0.76   |    9.75   |   0.71   |
-| EfficientPhys        | SASN                  |   0.56   |    1.40   |    0.87   | **1.00** |   11.96   |   0.73   |
-| EfficientPhys        | FSAM (Ours)           | **0.44** |  **1.19** |  **0.64** | **1.00** |   12.64   |   0.75   |
-| FactorizePhys (Ours) | FSAM (Ours)           |   0.60   |    1.70   |    0.87   | **1.00** | **15.19** | **0.77** |
-|                      |                       |                 |                  |                  |                 |                  |                 |
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
+| PhysNet              | -                |   7.78   |   19.12   |    8.94   |   0.59   |    9.90   |   0.70   |
+| PhysFormer           | TD-MHSA*         |   6.58   |   16.55   |    6.93   |   0.76   |    9.75   |   0.71   |
+| EfficientPhys        | SASN             |   0.56   |    1.40   |    0.87   | **1.00** |   11.96   |   0.73   |
+| EfficientPhys        | FSAM (Ours)      | **0.44** |  **1.19** |  **0.64** | **1.00** |   12.64   |   0.75   |
+| FactorizePhys (Ours) | FSAM (Ours)      |   0.60   |    1.70   |    0.87   | **1.00** | **15.19** | **0.77** |
+|                      |                  |          |           |           |          |           |          |
 
 
 **Performance Evaluation on PURE Dataset, for Models Trained with SCAMPS Dataset:**
 
-|         Model        | Attention      Module |    MAE (HR) ↓   |    RMSE (HR) ↓   |    MAPE (HR)↓    |   Corr (HR) ↑   |  SNR (dB, BVP) ↑ |   MACC (BVP) ↑  |
-|:--------------------:|:---------------------:|:---------------:|:----------------:|:----------------:|:---------------:|:----------------:|:---------------:|
-| PhysNet              | -                     |   26.74  |   36.19   |   46.73   |   0.45   |   -2.21   |   0.31   |
-| PhysFormer           | TD-MHSA*              |   16.64  |   28.13   |   30.58   |   0.51   |    0.84   |   0.42   |
-| EfficientPhys        | SASN                  |   6.21   |   18.45   |   12.16   |   0.74   |    4.39   |   0.51   |
-| EfficientPhys        | FSAM (Ours)           |   8.03   |   19.09   |   15.12   |   0.73   |    3.81   |   0.48   |
-| FactorizePhys (Ours) | FSAM (Ours)           | **5.43** | **15.80** | **11.10** | **0.80** | **11.40** | **0.67** |
-|                      |                       |                 |                  |                  |                 |                  |                 |
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
+| PhysNet              | -                |   26.74  |   36.19   |   46.73   |   0.45   |   -2.21   |   0.31   |
+| PhysFormer           | TD-MHSA*         |   16.64  |   28.13   |   30.58   |   0.51   |    0.84   |   0.42   |
+| EfficientPhys        | SASN             |   6.21   |   18.45   |   12.16   |   0.74   |    4.39   |   0.51   |
+| EfficientPhys        | FSAM (Ours)      |   8.03   |   19.09   |   15.12   |   0.73   |    3.81   |   0.48   |
+| FactorizePhys (Ours) | FSAM (Ours)      | **5.43** | **15.80** | **11.10** | **0.80** | **11.40** | **0.67** |
+|                      |                  |          |           |           |          |           |          |
 
 
 **Performance Evaluation on PURE Dataset, for Models Trained with UBFC-rPPG Dataset:**
 
-|         Model        | Attention      Module |    MAE (HR) ↓   |    RMSE (HR) ↓   |    MAPE (HR)↓    |   Corr (HR) ↑   |  SNR (dB, BVP) ↑ |   MACC (BVP) ↑  |
-|:--------------------:|:---------------------:|:---------------:|:----------------:|:----------------:|:---------------:|:----------------:|:---------------:|
-| PhysNet              | -                     |   10.38  |   21.14   |   20.91   |   0.66   |   11.01   |   0.72   |
-| PhysFormer           | TD-MHSA*              |   8.90   |   18.77   |   17.68   |   0.71   |    8.73   |   0.66   |
-| EfficientPhys        | SASN                  |   4.71   |   14.52   |    7.63   |   0.80   |    8.77   |   0.66   |
-| EfficientPhys        | FSAM (Ours)           |   3.69   |   13.27   |    5.85   |   0.83   |    9.65   |   0.68   |
-| FactorizePhys (Ours) | FSAM (Ours)           | **0.48** |  **1.39** |  **0.72** | **1.00** | **14.16** | **0.78** |
-|                      |                       |                 |                  |                  |                 |                  |                 |
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
+| PhysNet              | -                |   10.38  |   21.14   |   20.91   |   0.66   |   11.01   |   0.72   |
+| PhysFormer           | TD-MHSA*         |   8.90   |   18.77   |   17.68   |   0.71   |    8.73   |   0.66   |
+| EfficientPhys        | SASN             |   4.71   |   14.52   |    7.63   |   0.80   |    8.77   |   0.66   |
+| EfficientPhys        | FSAM (Ours)      |   3.69   |   13.27   |    5.85   |   0.83   |    9.65   |   0.68   |
+| FactorizePhys (Ours) | FSAM (Ours)      | **0.48** |  **1.39** |  **0.72** | **1.00** | **14.16** | **0.78** |
+|                      |                  |          |           |           |          |           |          |
 
 
 **Performance Evaluation on UBFC-rPPG Dataset, for Models Trained with iBVP Dataset:**
 
-|         Model        | Attention      Module |    MAE (HR) ↓   |    RMSE (HR) ↓   |    MAPE (HR)↓    |   Corr (HR) ↑   |  SNR (dB, BVP) ↑ |   MACC (BVP) ↑  |
-|:--------------------:|:---------------------:|:---------------:|:----------------:|:----------------:|:---------------:|:----------------:|:---------------:|
-| PhysNet              | -                     |   3.09   |   10.72   |    2.83   |   0.81   |    7.13   |   0.81   |
-| PhysFormer           | TD-MHSA*              |   9.88   |   19.59   |    8.72   |   0.44   |    2.80   |   0.70   |
-| EfficientPhys        | SASN                  |   1.14   |    2.85   |    1.42   | **0.99** |    8.71   |   0.84   |
-| EfficientPhys        | FSAM (Ours)           |   1.17   |    2.87   |    1.31   | **0.99** |    8.54   |   0.85   |
-| FactorizePhys (Ours) | FSAM (Ours)           | **1.04** |  **2.40** |  **1.23** | **0.99** |  **8.84** | **0.86** |
-|                      |                       |                 |                  |                  |                 |                  |                 |
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
+| PhysNet              | -                |   3.09   |   10.72   |    2.83   |   0.81   |    7.13   |   0.81   |
+| PhysFormer           | TD-MHSA*         |   9.88   |   19.59   |    8.72   |   0.44   |    2.80   |   0.70   |
+| EfficientPhys        | SASN             |   1.14   |    2.85   |    1.42   | **0.99** |    8.71   |   0.84   |
+| EfficientPhys        | FSAM (Ours)      |   1.17   |    2.87   |    1.31   | **0.99** |    8.54   |   0.85   |
+| FactorizePhys (Ours) | FSAM (Ours)      | **1.04** |  **2.40** |  **1.23** | **0.99** |  **8.84** | **0.86** |
+|                      |                  |          |           |           |          |           |          |
 
 
 **Performance Evaluation on UBFC-rPPG Dataset, for Models Trained with PURE Dataset:**
-|         Model        | Attention      Module |    MAE (HR) ↓   |    RMSE (HR) ↓   |    MAPE (HR)↓    |   Corr (HR) ↑   |  SNR (dB, BVP) ↑ |   MACC (BVP) ↑  |
-|:--------------------:|:---------------------:|:---------------:|:----------------:|:----------------:|:---------------:|:----------------:|:---------------:|
-| PhysNet              | -                     |   1.23   |    2.65   |    1.42   | **0.99** |    8.34   |   0.85   |
-| PhysFormer           | TD-MHSA*              | **1.01** |  **2.40** |  **1.21** | **0.99** |    8.42   |   0.85   |
-| EfficientPhys        | SASN                  |   1.41   |    3.16   |    1.68   |   0.98   |    6.87   |   0.79   |
-| EfficientPhys        | FSAM (Ours)           |   1.20   |    2.92   |    1.50   | **0.99** |    7.37   |   0.79   |
-| FactorizePhys (Ours) | FSAM (Ours)           |   1.04   |    2.44   |    1.23   | **0.99** |  **8.88** | **0.87** |
-|                      |                       |                 |                  |                  |                 |                  |                 |
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
+| PhysNet              | -                |   1.23   |    2.65   |    1.42   | **0.99** |    8.34   |   0.85   |
+| PhysFormer           | TD-MHSA*         | **1.01** |  **2.40** |  **1.21** | **0.99** |    8.42   |   0.85   |
+| EfficientPhys        | SASN             |   1.41   |    3.16   |    1.68   |   0.98   |    6.87   |   0.79   |
+| EfficientPhys        | FSAM (Ours)      |   1.20   |    2.92   |    1.50   | **0.99** |    7.37   |   0.79   |
+| FactorizePhys (Ours) | FSAM (Ours)      |   1.04   |    2.44   |    1.23   | **0.99** |  **8.88** | **0.87** |
+|                      |                  |          |           |           |          |           |          |
 
 
 **Performance Evaluation on UBFC-rPPG Dataset, for Models Trained with SCAMPS Dataset:**
-|         Model        | Attention      Module |    MAE (HR) ↓   |    RMSE (HR) ↓   |    MAPE (HR)↓    |   Corr (HR) ↑   |  SNR (dB, BVP) ↑ |   MACC (BVP) ↑  |
-|:--------------------:|:---------------------:|:---------------:|:----------------:|:----------------:|:---------------:|:----------------:|:---------------:|
-| PhysNet              | -                     |   11.24  |   18.81   |   13.55   |   0.38   |   -0.09   |   0.48   |
-| PhysFormer           | TD-MHSA*              |   8.42   |   17.73   |   11.27   |   0.49   |    2.29   |   0.61   |
-| EfficientPhys        | SASN                  |   2.18   |    4.82   |    2.35   |   0.96   |    4.40   |   0.67   |
-| EfficientPhys        | FSAM (Ours)           |   2.69   |    5.20   |    3.16   |   0.95   |    3.74   |   0.63   |
-| FactorizePhys (Ours) | FSAM (Ours)           | **1.17** |  **2.56** |  **1.35** | **0.99** |  **8.41** | **0.82** |
-|                      |                       |                 |                  |                  |                 |                  |                 |
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
+| PhysNet              | -                |   11.24  |   18.81   |   13.55   |   0.38   |   -0.09   |   0.48   |
+| PhysFormer           | TD-MHSA*         |   8.42   |   17.73   |   11.27   |   0.49   |    2.29   |   0.61   |
+| EfficientPhys        | SASN             |   2.18   |    4.82   |    2.35   |   0.96   |    4.40   |   0.67   |
+| EfficientPhys        | FSAM (Ours)      |   2.69   |    5.20   |    3.16   |   0.95   |    3.74   |   0.63   |
+| FactorizePhys (Ours) | FSAM (Ours)      | **1.17** |  **2.56** |  **1.35** | **0.99** |  **8.41** | **0.82** |
+|                      |                  |          |           |           |          |           |          |
 
 
 **Performance Evaluation on iBVP Dataset, for Models Trained with PURE Dataset:**
 
-|         Model        | Attention      Module |    MAE (HR) ↓   |    RMSE (HR) ↓   |    MAPE (HR)↓    |   Corr (HR) ↑   |  SNR (dB, BVP) ↑ |   MACC (BVP) ↑  |
-|:--------------------:|:---------------------:|:---------------:|:----------------:|:----------------:|:---------------:|:----------------:|:---------------:|
-| PhysNet              | -                     | **1.63** |    3.77   |  **2.17** |   0.92   |    6.08   |   0.55   |
-| PhysFormer           | TD-MHSA*              |   2.50   |    7.09   |    3.39   |   0.79   |    5.21   |   0.52   |
-| EfficientPhys        | SASN                  |   3.80   |   14.82   |    5.15   |   0.56   |    2.93   |   0.45   |
-| EfficientPhys        | FSAM (Ours)           |   2.10   |    4.00   |    2.94   |   0.91   |    4.19   |   0.49   |
-| FactorizePhys (Ours) | FSAM (Ours)           |   1.66   |  **3.55** |    2.31   | **0.93** |  **6.78** | **0.58** |
-|                      |                       |                 |                  |                  |                 |                  |                 |
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
+| PhysNet              | -                | **1.63** |    3.77   |  **2.17** |   0.92   |    6.08   |   0.55   |
+| PhysFormer           | TD-MHSA*         |   2.50   |    7.09   |    3.39   |   0.79   |    5.21   |   0.52   |
+| EfficientPhys        | SASN             |   3.80   |   14.82   |    5.15   |   0.56   |    2.93   |   0.45   |
+| EfficientPhys        | FSAM (Ours)      |   2.10   |    4.00   |    2.94   |   0.91   |    4.19   |   0.49   |
+| FactorizePhys (Ours) | FSAM (Ours)      |   1.66   |  **3.55** |    2.31   | **0.93** |  **6.78** | **0.58** |
+|                      |                  |          |           |           |          |           |          |
 
 **Performance Evaluation on iBVP Dataset, for Models Trained with SCAMPS Dataset:**
 
-|         Model        | Attention      Module |    MAE (HR) ↓   |    RMSE (HR) ↓   |    MAPE (HR)↓    |   Corr (HR) ↑   |  SNR (dB, BVP) ↑ |   MACC (BVP) ↑  |
-|:--------------------:|:---------------------:|:---------------:|:----------------:|:----------------:|:---------------:|:----------------:|:---------------:|
-| PhysNet              | -                     |   31.85  |   37.40   |   45.62   |   -0.10  |   -6.11   |   0.16   |
-| PhysFormer           | TD-MHSA*              |   41.73  |   43.89   |   58.56   |   0.15   |   -9.13   |   0.14   |
-| EfficientPhys        | SASN                  |   26.19  |   44.55   |   38.11   |   -0.12  |   -2.36   |   0.30   |
-| EfficientPhys        | FSAM (Ours)           |   13.40  |   22.10   |   19.93   |   0.05   |   -3.46   |   0.24   |
-| FactorizePhys (Ours) | FSAM (Ours)           | **2.71** |  **6.22** |  **3.87** | **0.81** |  **2.36** | **0.43** |
-|                      |                       |                 |                  |                  |                 |                  |                 |
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
+| PhysNet              | -                |   31.85  |   37.40   |   45.62   |   -0.10  |   -6.11   |   0.16   |
+| PhysFormer           | TD-MHSA*         |   41.73  |   43.89   |   58.56   |   0.15   |   -9.13   |   0.14   |
+| EfficientPhys        | SASN             |   26.19  |   44.55   |   38.11   |   -0.12  |   -2.36   |   0.30   |
+| EfficientPhys        | FSAM (Ours)      |   13.40  |   22.10   |   19.93   |   0.05   |   -3.46   |   0.24   |
+| FactorizePhys (Ours) | FSAM (Ours)      | **2.71** |  **6.22** |  **3.87** | **0.81** |  **2.36** | **0.43** |
+|                      |                  |          |           |           |          |           |          |
 
 
 **Performance Evaluation on iBVP Dataset, for Models Trained with UBFC-rPPG Dataset:**
 
-|         Model        | Attention      Module |    MAE (HR) ↓   |    RMSE (HR) ↓   |    MAPE (HR)↓    |   Corr (HR) ↑   |  SNR (dB, BVP) ↑ |   MACC (BVP) ↑  |
-|:--------------------:|:---------------------:|:---------------:|:----------------:|:----------------:|:---------------:|:----------------:|:---------------:|
-| PhysNet              | -                     |   3.18   |    7.65   |    4.84   |   0.70   |    5.54   | **0.56** |
-| PhysFormer           | TD-MHSA*              |   7.86   |   17.13   |   11.44   |   0.38   |    1.71   |   0.43   |
-| EfficientPhys        | SASN                  |   2.74   |    7.07   |    4.02   |   0.74   |    4.03   |   0.49   |
-| EfficientPhys        | FSAM (Ours)           |   2.56   |    6.13   |    3.71   |   0.79   |    4.65   |   0.50   |
-| FactorizePhys (Ours) | FSAM (Ours)           | **1.74** |  **4.39** |  **2.42** | **0.90** |  **6.59** | **0.56** |
-|                      |                       |                 |                  |                  |                 |                  |                 |
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
+| PhysNet              | -                |   3.18   |    7.65   |    4.84   |   0.70   |    5.54   | **0.56** |
+| PhysFormer           | TD-MHSA*         |   7.86   |   17.13   |   11.44   |   0.38   |    1.71   |   0.43   |
+| EfficientPhys        | SASN             |   2.74   |    7.07   |    4.02   |   0.74   |    4.03   |   0.49   |
+| EfficientPhys        | FSAM (Ours)      |   2.56   |    6.13   |    3.71   |   0.79   |    4.65   |   0.50   |
+| FactorizePhys (Ours) | FSAM (Ours)      | **1.74** |  **4.39** |  **2.42** | **0.90** |  **6.59** | **0.56** |
+|                      |                  |          |           |           |          |           |          |
 
 
 ## Reference:
