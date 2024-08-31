@@ -63,6 +63,8 @@ class TestFactorizePhysBig(object):
         self.visualize = model_config["visualize"]
 
         if self.visualize:
+            # self.data_files = list(sorted(self.data_path.rglob("*subject12*input*.npy")))
+            # self.label_files = list(sorted(self.data_path.rglob("*subject12*label*.npy")))
             self.data_files = list(sorted(self.data_path.rglob("*input*.npy")))
             self.label_files = list(sorted(self.data_path.rglob("*label*.npy")))
             self.num_trials = len(self.data_files)
@@ -166,7 +168,7 @@ class TestFactorizePhysBig(object):
         label_matrix = self.np_label.unsqueeze(0).repeat(1, channels, 1).unsqueeze(
             2).unsqueeze(2).permute(0, 1, 4, 3, 2).repeat(1, 1, 1, enc_height, enc_width)
         label_matrix = label_matrix.to(device=self.device)
-        corr_matrix = F.cosine_similarity(self.vox_embed, label_matrix, dim=2)
+        corr_matrix = F.cosine_similarity(self.vox_embed, label_matrix, dim=2).abs()
 
         # avg_emb = torch.mean(self.vox_embed, dim=1)
         # b, enc_frames, enc_height, enc_width = avg_emb.shape
@@ -185,68 +187,69 @@ class TestFactorizePhysBig(object):
 
         fig, ax = plt.subplots(4, 4, figsize=[16, 16])
         fig.tight_layout()
+        cmap = "coolwarm"
 
         ax[0, 0].imshow(self.np_data[enc_frames//2, ...].astype(np.uint8))
         ax[0, 0].axis('off')
 
         ch = 0
-        ax[0, 1].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[0, 1].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[0, 1].axis('off')
 
         ch = 1
-        ax[0, 2].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[0, 2].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[0, 2].axis('off')
 
         ch = 2
-        ax[0, 3].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[0, 3].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[0, 3].axis('off')     
 
         ch = 3
-        ax[1, 0].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[1, 0].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[1, 0].axis('off')
 
         ch = 4
-        ax[1, 1].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[1, 1].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[1, 1].axis('off')
 
         ch = 5
-        ax[1, 2].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[1, 2].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[1, 2].axis('off')
 
         ch = 6
-        ax[1, 3].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[1, 3].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[1, 3].axis('off')
 
         ch = 7
-        ax[2, 0].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[2, 0].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[2, 0].axis('off')
 
         ch = 8
-        ax[2, 1].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[2, 1].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[2, 1].axis('off')
 
         ch = 9
-        ax[2, 2].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[2, 2].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[2, 2].axis('off')
 
         ch = 10
-        ax[2, 3].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[2, 3].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[2, 3].axis('off')
 
         ch = 11
-        ax[3, 0].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[3, 0].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[3, 0].axis('off')
 
         ch = 12
-        ax[3, 1].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[3, 1].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[3, 1].axis('off')
 
         ch = 13
-        ax[3, 2].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[3, 2].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[3, 2].axis('off')
 
         ch = 14
-        ax[3, 3].imshow(corr_matrix[0, ch, :, :], cmap='nipy_spectral', vmin=-1, vmax=1)
+        ax[3, 3].imshow(corr_matrix[0, ch, :, :], cmap=cmap, vmin=0, vmax=1)
         ax[3, 3].axis('off')
 
         # plt.show()

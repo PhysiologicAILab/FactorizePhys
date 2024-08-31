@@ -115,11 +115,11 @@ MODEL:
     MD_S: 1
     MD_STEPS: 4
     MD_RESIDUAL: True
-    MD_INFERENCE: True
+    MD_INFERENCE: False
 INFERENCE:
   BATCH_SIZE: 4
   EVALUATION_METHOD: "FFT"        # "FFT" or "peak detection"
   EVALUATION_WINDOW:
     USE_SMALLER_WINDOW: False        # Change this if you'd like an evaluation window smaller than the test video length
     WINDOW_SIZE: 30        # In seconds
-  # MODEL_PATH: ""
+  MODEL_PATH: ""

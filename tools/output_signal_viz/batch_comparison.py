@@ -70,9 +70,18 @@ path_dict_within_dataset = {
                 "FactorizePhys_FSAM": "PURE_Intra_FactorizePhys_FSAM_Res_outputs.pickle",
                 "PhysNet": "PURE_Intra_PhysNet_outputs.pickle",
             }
+        },
+        "UBFC-rPPG": {
+            "root": "runs/exp/UBFC-rPPG_Raw_160_72x72/saved_test_outputs",
+            "exp": {
+                "EfficientPhys_SASN": "UBFC-rPPG_Intra_EfficientPhys_Epoch9_UBFC-rPPG_outputs.pickle",
+                "FactorizePhys_FSAM": "UBFC-rPPG_Intra_FactorizePhys_FSAM_Res_Epoch9_UBFC-rPPG_outputs.pickle",
+                "PhysNet": "UBFC-rPPG_Intra_PhysNet_Epoch9_UBFC-rPPG_outputs.pickle",
+            }
         }
     }
 }
+
 
 # HELPER FUNCTIONS
 
