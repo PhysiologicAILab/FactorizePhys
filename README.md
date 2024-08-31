@@ -115,11 +115,11 @@ Note 1: Preprocessing requires only once; thus turn it off on the yaml file when
 Note 2: The example yaml setting will allow 100% of PURE to train and and test on iBVP after training 10 for epochs. Alternatively, this can be changed to train using 80% of PURE, validate with 20% of PURE and use the best model(with the least validation loss) to test on iBVP.
 
 ## Cross-Dataset Generalization
+
+**Performance Evaluation on PURE Dataset:**
+
 | Training   Dataset    |         Model        | Attention      Module |    MAE (HR) ↓   |    RMSE (HR) ↓   |    MAPE (HR)↓    |   Corr (HR) ↑   | SNR ( dB, BVP) ↑ |   MACC (BVP) ↑  |
 |:---------------------:|:--------------------:|:---------------------:|:---------------:|:----------------:|:----------------:|:---------------:|:----------------:|:---------------:|
-|                       |                      |                       |                 |                  |                  |                 |                  |                 |
-|                                                             **Performance Evaluation on PURE Dataset**                                                                              |
-|                       |                      |                       |                 |                  |                  |                 |                  |                 |
 |         iBVP          | PhysNet              | -                     |   7.78 ± 2.27   |   19.12 ± 3.93   |    8.94 ± 2.71   |   0.59 ± 0.11   |    9.90 ± 1.49   |   0.70 ± 0.03   |
 |                       | PhysFormer           | TD-MHSA*              |   6.58 ± 1.98   |   16.55 ± 3.60   |    6.93 ± 1.90   |   0.76 ± 0.09   |    9.75 ± 1.96   |   0.71 ± 0.03   |
 |                       | EfficientPhys        | SASN                  |   0.56 ± 0.17   |    1.40 ± 0.33   |    0.87 ± 0.28   | **1.00 ± 0.01** |   11.96 ± 0.84   |   0.73 ± 0.02   |
@@ -138,8 +138,12 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 |                       | EfficientPhys        | FSAM (Ours)           |   3.69 ± 1.66   |   13.27 ± 3.55   |    5.85 ± 2.63   |   0.83 ± 0.07   |    9.65 ± 0.90   |   0.68 ± 0.02   |
 |                       | FactorizePhys (Ours) | FSAM (Ours)           | **0.48 ± 0.17** |  **1.39 ± 0.35** |  **0.72 ± 0.28** | **1.00 ± 0.01** | **14.16 ± 0.83** | **0.78 ± 0.02** |
 |                       |                      |                       |                 |                  |                  |                 |                  |                 |
-|                                                             **Performance Evaluation on UBFC-rPPG Dataset**                                                                         |
-|                       |                      |                       |                 |                  |                  |                 |                  |                 |
+
+
+**Performance Evaluation on UBFC-rPPG Dataset:**
+
+| Training   Dataset    |         Model        | Attention      Module |    MAE (HR) ↓   |    RMSE (HR) ↓   |    MAPE (HR)↓    |   Corr (HR) ↑   | SNR ( dB, BVP) ↑ |   MACC (BVP) ↑  |
+|:---------------------:|:--------------------:|:---------------------:|:---------------:|:----------------:|:----------------:|:---------------:|:----------------:|:---------------:|
 |        iBVP           | PhysNet              | -                     |   3.09 ± 1.79   |   10.72 ± 4.24   |    2.83 ± 1.44   |   0.81 ± 0.10   |    7.13 ± 1.53   |   0.81 ± 0.02   |
 |                       | PhysFormer           | TD-MHSA*              |   9.88 ± 2.95   |   19.59 ± 5.35   |    8.72 ± 2.42   |   0.44 ± 0.16   |    2.80 ± 2.21   |   0.70 ± 0.03   |
 |                       | EfficientPhys        | SASN                  |   1.14 ± 0.45   |    2.85 ± 0.88   |    1.42 ± 0.58   | **0.99 ± 0.03** |    8.71 ± 1.23   |   0.84 ± 0.01   |
@@ -158,8 +162,12 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 |                       | EfficientPhys        | FSAM (Ours)           |   2.69 ± 0.77   |    5.20 ± 1.39   |    3.16 ± 0.95   |   0.95 ± 0.06   |    3.74 ± 1.16   |   0.63 ± 0.02   |
 |                       | FactorizePhys (Ours) | FSAM (Ours)           | **1.17 ± 0.40** |  **2.56 ± 0.70** |  **1.35 ± 0.49** | **0.99 ± 0.03** |  **8.41 ± 1.19** | **0.82 ± 0.01** |
 |                       |                      |                       |                 |                  |                  |                 |                  |                 |
-|                                                             **Performance Evaluation on iBVP Dataset**                                                                              |
-|                       |                      |                       |                 |                  |                  |                 |                  |                 |
+
+
+**Performance Evaluation on iBVP Dataset:**
+
+| Training   Dataset    |         Model        | Attention      Module |    MAE (HR) ↓   |    RMSE (HR) ↓   |    MAPE (HR)↓    |   Corr (HR) ↑   | SNR ( dB, BVP) ↑ |   MACC (BVP) ↑  |
+|:---------------------:|:--------------------:|:---------------------:|:---------------:|:----------------:|:----------------:|:---------------:|:----------------:|:---------------:|
 |        PURE           | PhysNet              | -                     | **1.63 ± 0.33** |    3.77 ± 0.73   |  **2.17 ± 0.42** |   0.92 ± 0.04   |    6.08 ± 0.62   |   0.55 ± 0.01   |
 |                       | PhysFormer           | TD-MHSA*              |   2.50 ± 0.64   |    7.09 ± 1.50   |    3.39 ± 0.82   |   0.79 ± 0.06   |    5.21 ± 0.60   |   0.52 ± 0.01   |
 |                       | EfficientPhys        | SASN                  |   3.80 ± 1.38   |   14.82 ± 3.74   |    5.15 ± 1.87   |   0.56 ± 0.08   |    2.93 ± 0.48   |   0.45 ± 0.01   |
