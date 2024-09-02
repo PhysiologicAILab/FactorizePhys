@@ -10,6 +10,16 @@ The repo currently supports the following algorithms:
   * [EfficientPhys: Enabling Simple, Fast and Accurate Camera-Based Cardiac Measurement (EfficientPhys)](https://openaccess.thecvf.com/content/WACV2023/papers/Liu_EfficientPhys_Enabling_Simple_Fast_and_Accurate_Camera-Based_Cardiac_Measurement_WACV_2023_paper.pdf), by Liu *et al.*, 2023
   * [PhysFormer: Facial Video-based Physiological Measurement with Temporal Difference Transformer (PhysFormer)](https://openaccess.thecvf.com/content/CVPR2022/papers/Yu_PhysFormer_Facial_Video-Based_Physiological_Measurement_With_Temporal_Difference_Transformer_CVPR_2022_paper.pdf), by Yu *et al.*, 2022
 
+## :notebook: Factorized Self-Attention Module (FSAM):
+[FSAM](images/FSAM.png)
+
+## :notebook: FactorizePhys with FSAM
+[FactorizePhys with FSAM](images/FactorizePhys_with_FSAM.png)
+
+## :notebook: EfficientPhys with FSAM
+[EfficientPhys with FSAM](images/EfficientPhys_FSAM.png)
+
+
 # :file_folder: Datasets
 
 The repo supports four datasets, namely SCAMPS, UBFC-rPPG, PURE, and iBVP. **To use these datasets in a deep learning model, you should organize the files as follows.**
@@ -118,7 +128,7 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 
 **Performance Evaluation on PURE Dataset, for Models Trained with iBVP Dataset:**
 
-|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
 |:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
 | PhysNet              | -                |   7.78   |   19.12   |    8.94   |   0.59   |    9.90   |   0.70   |
 | PhysFormer           | TD-MHSA*         |   6.58   |   16.55   |    6.93   |   0.76   |    9.75   |   0.71   |
@@ -130,7 +140,7 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 
 **Performance Evaluation on PURE Dataset, for Models Trained with SCAMPS Dataset:**
 
-|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
 |:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
 | PhysNet              | -                |   26.74  |   36.19   |   46.73   |   0.45   |   -2.21   |   0.31   |
 | PhysFormer           | TD-MHSA*         |   16.64  |   28.13   |   30.58   |   0.51   |    0.84   |   0.42   |
@@ -142,7 +152,7 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 
 **Performance Evaluation on PURE Dataset, for Models Trained with UBFC-rPPG Dataset:**
 
-|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
 |:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
 | PhysNet              | -                |   10.38  |   21.14   |   20.91   |   0.66   |   11.01   |   0.72   |
 | PhysFormer           | TD-MHSA*         |   8.90   |   18.77   |   17.68   |   0.71   |    8.73   |   0.66   |
@@ -154,7 +164,7 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 
 **Performance Evaluation on UBFC-rPPG Dataset, for Models Trained with iBVP Dataset:**
 
-|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
 |:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
 | PhysNet              | -                |   3.09   |   10.72   |    2.83   |   0.81   |    7.13   |   0.81   |
 | PhysFormer           | TD-MHSA*         |   9.88   |   19.59   |    8.72   |   0.44   |    2.80   |   0.70   |
@@ -165,7 +175,7 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 
 
 **Performance Evaluation on UBFC-rPPG Dataset, for Models Trained with PURE Dataset:**
-|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
 |:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
 | PhysNet              | -                |   1.23   |    2.65   |    1.42   | **0.99** |    8.34   |   0.85   |
 | PhysFormer           | TD-MHSA*         | **1.01** |  **2.40** |  **1.21** | **0.99** |    8.42   |   0.85   |
@@ -176,7 +186,7 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 
 
 **Performance Evaluation on UBFC-rPPG Dataset, for Models Trained with SCAMPS Dataset:**
-|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
 |:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
 | PhysNet              | -                |   11.24  |   18.81   |   13.55   |   0.38   |   -0.09   |   0.48   |
 | PhysFormer           | TD-MHSA*         |   8.42   |   17.73   |   11.27   |   0.49   |    2.29   |   0.61   |
@@ -188,7 +198,7 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 
 **Performance Evaluation on iBVP Dataset, for Models Trained with PURE Dataset:**
 
-|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
 |:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
 | PhysNet              | -                | **1.63** |    3.77   |  **2.17** |   0.92   |    6.08   |   0.55   |
 | PhysFormer           | TD-MHSA*         |   2.50   |    7.09   |    3.39   |   0.79   |    5.21   |   0.52   |
@@ -199,7 +209,7 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 
 **Performance Evaluation on iBVP Dataset, for Models Trained with SCAMPS Dataset:**
 
-|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
 |:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
 | PhysNet              | -                |   31.85  |   37.40   |   45.62   |   -0.10  |   -6.11   |   0.16   |
 | PhysFormer           | TD-MHSA*         |   41.73  |   43.89   |   58.56   |   0.15   |   -9.13   |   0.14   |
@@ -211,7 +221,7 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 
 **Performance Evaluation on iBVP Dataset, for Models Trained with UBFC-rPPG Dataset:**
 
-|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR) ↑|SNR (dB, BVP) ↑|MACC (BVP) ↑|
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
 |:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
 | PhysNet              | -                |   3.18   |    7.65   |    4.84   |   0.70   |    5.54   | **0.56** |
 | PhysFormer           | TD-MHSA*         |   7.86   |   17.13   |   11.44   |   0.38   |    1.71   |   0.43   |
