@@ -228,6 +228,10 @@ def compare_estimated_bvps_cross_dataset():
                 data_dict[train_datasets[0]][model_names[0]]['labels'][trial_list[trial_ind]]))
             bvp_label = _process_signal(bvp_label, fs, diff_flag=diff_flag)
 
+            hr_label = _calculate_fft_hr(bvp_label, fs=fs)
+            hr_label = int(np.round(hr_label))
+            hr_pred = {}
+
             for c_ind in range(total_chunks):
                 try:
                     fig, ax = plt.subplots(total_train_datasets, 1, figsize=(20, 12), sharex=True)
@@ -245,7 +249,7 @@ def compare_estimated_bvps_cross_dataset():
                             trial_dict[train_datasets[d_ind]] = {}
 
                         for m_ind in range(len(model_names)):
-                                
+
                             if model_names[m_ind] not in trial_dict[train_datasets[d_ind]]:
                                 trial_dict[train_datasets[d_ind]][model_names[m_ind]] = {}
 
@@ -257,14 +261,11 @@ def compare_estimated_bvps_cross_dataset():
                                 trial_dict[train_datasets[d_ind]][model_names[m_ind]]["prediction"] = _process_signal(
                                     trial_dict[train_datasets[d_ind]][model_names[m_ind]]["prediction"], fs, diff_flag=diff_flag)
 
-                            hr_pred = _calculate_fft_hr(trial_dict[train_datasets[d_ind]][model_names[m_ind]]["prediction"], fs=fs)
-                            hr_pred = int(np.round(hr_pred))
+                                hr_pred[model_names[m_ind]] = _calculate_fft_hr(trial_dict[train_datasets[d_ind]][model_names[m_ind]]["prediction"], fs=fs)
+                                hr_pred[model_names[m_ind]] = int(np.round(hr_pred[model_names[m_ind]]))
 
                             ax[d_ind].plot(x_time, trial_dict[train_datasets[d_ind]][model_names[m_ind]]
-                                           ["prediction"][start: stop], label=model_names[m_ind] + "; HR = " + str(hr_pred))
-
-                        hr_label = _calculate_fft_hr(bvp_label, fs=fs)
-                        hr_label = int(np.round(hr_label))
+                                           ["prediction"][start: stop], label=model_names[m_ind] + "; HR = " + str(hr_pred[model_names[m_ind]]))
 
                         ax[d_ind].plot(x_time, bvp_label[start: stop], label="GT ; HR = " + str(hr_label), color='black')
                         ax[d_ind].legend(loc = "upper right")
@@ -341,6 +342,10 @@ def compare_estimated_bvps_within_dataset():
                 data_dict[model_names[0]]['labels'][trial_list[trial_ind]]))
             bvp_label = _process_signal(bvp_label, fs, diff_flag=diff_flag)
 
+            hr_label = _calculate_fft_hr(bvp_label, fs=fs)
+            hr_label = int(np.round(hr_label))
+            hr_pred = {}
+
             for c_ind in range(total_chunks):
                 try:
                     fig = plt.figure(figsize=(15, 5))
@@ -352,7 +357,7 @@ def compare_estimated_bvps_within_dataset():
                     x_time = np.linspace(0, samples/fs, num=samples)
 
                     for m_ind in range(len(model_names)):
-                            
+
                         if model_names[m_ind] not in trial_dict:
                             trial_dict[model_names[m_ind]] = {}
 
@@ -364,15 +369,11 @@ def compare_estimated_bvps_within_dataset():
                             trial_dict[model_names[m_ind]]["prediction"] = _process_signal(
                                 trial_dict[model_names[m_ind]]["prediction"], fs, diff_flag=diff_flag)
 
-                        hr_pred = _calculate_fft_hr(
-                            trial_dict[model_names[m_ind]]["prediction"], fs=fs)
-                        hr_pred = int(np.round(hr_pred))
+                            hr_pred[model_names[m_ind]] = _calculate_fft_hr(trial_dict[model_names[m_ind]]["prediction"], fs=fs)
+                            hr_pred[model_names[m_ind]] = int(np.round([model_names[m_ind]]))
         
                         plt.plot(x_time, trial_dict[model_names[m_ind]]
-                                    ["prediction"][start: stop], label=model_names[m_ind] + "; HR = " + str(hr_pred))
-
-                    hr_label = _calculate_fft_hr(bvp_label, fs=fs)
-                    hr_label = int(np.round(hr_label))
+                                 ["prediction"][start: stop], label=model_names[m_ind] + "; HR = " + str(hr_pred[model_names[m_ind]]))
 
                     plt.plot(x_time, bvp_label[start: stop], label="GT ; HR = " + str(hr_label), color='black')
                     plt.legend(loc = "upper right")
