@@ -1,3 +1,10 @@
+<p align="center">
+:fire: Please remember to :star: this repo if you find it useful and cite our work if you end up using it in your work! :fire:
+</p>
+<p align="center">
+:fire: If you have any questions or concerns, please create an <a href="https://github.com/PhysiologicAILab/FactorizePhys/issues">issue</a> :memo:! :fire:
+</p>
+
 # FactorizePhys
 FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmography through Factorization of Voxel Embeddings.
 
@@ -25,6 +32,15 @@ CPU: Intel® Core™ i7-10870H CPU @ 2.20GHz × 16 GB RAM, GPU: NVIDIA GeForce R
 
 # :notebook: Algorithms
 The repo currently supports the following algorithms:
+
+* Traditional Unsupervised Algorithms
+  * [Remote plethysmographic imaging using ambient light (GREEN)](https://pdfs.semanticscholar.org/7cb4/46d61a72f76e774b696515c55c92c7aa32b6.pdf?_gl=1*1q7hzyz*_ga*NTEzMzk5OTY3LjE2ODYxMDg1MjE.*_ga_H7P4ZT52H5*MTY4NjEwODUyMC4xLjAuMTY4NjEwODUyMS41OS4wLjA), by Verkruysse *et al.*, 2008
+  * [Advancements in noncontact multiparameter physiological measurements using a webcam (ICA)](https://affect.media.mit.edu/pdfs/11.Poh-etal-TBME.pdf), by Poh *et al.*, 2011
+  * [Robust pulse rate from chrominance-based rppg (CHROM)](https://ieeexplore.ieee.org/document/6523142), by Haan *et al.*, 2013
+  * [Local group invariance for heart rate estimation from face videos in the wild (LGI)](https://openaccess.thecvf.com/content_cvpr_2018_workshops/papers/w27/Pilz_Local_Group_Invariance_CVPR_2018_paper.pdf), by Pilz *et al.*, 2018
+  * [Improved motion robustness of remote-PPG by using the blood volume pulse signature (PBV)](https://iopscience.iop.org/article/10.1088/0967-3334/35/9/1913), by Haan *et al.*, 2014
+  * [Algorithmic principles of remote ppg (POS)](https://ieeexplore.ieee.org/document/7565547), by Wang *et al.*, 2016
+  * [Face2PPG: An Unsupervised Pipeline for Blood Volume Pulse Extraction From Faces (OMIT)](https://ieeexplore.ieee.org/document/10227326), by Álvarez *et al.*, 2023
 
 * Supervised Neural Algorithms
   * FactorizePhys - proposed method
@@ -244,6 +260,6 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 |                      |                  |          |           |           |          |           |          |
 
 
-## Reference:
+# Acknowledgement
 
-This repo builds upon [rPPG-toolbox](https://github.com/ubicomplab/rPPG-Toolbox), that can be referred further for usage related instructions.
+We would like to express sincere thanks to the authors of [rPPG-Toolbox, Liu *et al.*, 2023](https://proceedings.neurips.cc/paper_files/paper/2023/hash/d7d0d548a6317407e02230f15ce75817-Abstract-Datasets_and_Benchmarks.html), building upon which, we developed this repo. For detailed usage related instructions, please refer the GitHub repo of the [rPPG-Toolbox](https://github.com/ubicomplab/rPPG-Toolbox).
