@@ -3,7 +3,7 @@ FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmogra
 
 ## Cumulative Cross-Dataset Performance Overview
 
-<img src="images/Cumulative_Cross-Dataset_Performance copy.png" alt="Cumulative Cross-Dataset Performance" width=720/>
+<img src="images/Cumulative_Cross-Dataset_Performance.png" alt="Cumulative Cross-Dataset Performance" width=720/>
 
 
 ## Proposed Method
