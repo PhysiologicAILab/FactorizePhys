@@ -1,6 +1,26 @@
 # FactorizePhys
 FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmography through Factorization of Voxel Embeddings.
 
+## Cumulative Cross-Dataset Performance Overview
+
+<img src="images/Cumulative_Cross-Dataset_Performance copy.png" alt="Cumulative Cross-Dataset Performance" width=720/>
+
+
+## Proposed Method
+
+### Factorized Self-Attention Module (FSAM)
+  
+<img src="images/FSAM.png" alt="Factorized Self-Attention Module (FSAM)" width=720/>
+
+### FSAM Integrated with FactorizePhys (proposed 3D-CNN architecture)
+
+<img src="images/FactorizePhys_with_FSAM.png" alt="FactorizePhys with FSAM" width=720/>
+
+### FSAM Adapted for [EfficientPhys, Liu *et al.*, 2023](https://openaccess.thecvf.com/content/WACV2023/papers/Liu_EfficientPhys_Enabling_Simple_Fast_and_Accurate_Camera-Based_Cardiac_Measurement_WACV_2023_paper.pdf)
+
+<img src="images/EfficientPhys_FSAM.png" alt="EfficientPhys with FSAM" width=720/>
+
+
 # :notebook: Algorithms
 The repo currently supports the following algorithms:
 
@@ -9,20 +29,6 @@ The repo currently supports the following algorithms:
   * [Remote Photoplethysmograph Signal Measurement from Facial Videos Using Spatio-Temporal Networks (PhysNet)](https://bmvc2019.org/wp-content/uploads/papers/0186-paper.pdf), by Yu *et al.*, 2019
   * [EfficientPhys: Enabling Simple, Fast and Accurate Camera-Based Cardiac Measurement (EfficientPhys)](https://openaccess.thecvf.com/content/WACV2023/papers/Liu_EfficientPhys_Enabling_Simple_Fast_and_Accurate_Camera-Based_Cardiac_Measurement_WACV_2023_paper.pdf), by Liu *et al.*, 2023
   * [PhysFormer: Facial Video-based Physiological Measurement with Temporal Difference Transformer (PhysFormer)](https://openaccess.thecvf.com/content/CVPR2022/papers/Yu_PhysFormer_Facial_Video-Based_Physiological_Measurement_With_Temporal_Difference_Transformer_CVPR_2022_paper.pdf), by Yu *et al.*, 2022
-
-## Proposed Modules
-
-### Factorized Self-Attention Module (FSAM)
-  
-<img src="images/FSAM.png" alt="Factorized Self-Attention Module (FSAM)" width=640/>
-
-### FactorizePhys with FSAM
-
-<img src="images/FactorizePhys_with_FSAM.png" alt="FactorizePhys with FSAM" width=640/>
-
-### EfficientPhys with FSAM
-
-<img src="images/EfficientPhys_FSAM.png" alt="EfficientPhys with FSAM" width=640/>
 
 
 # :file_folder: Datasets
