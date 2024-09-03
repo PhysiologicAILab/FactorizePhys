@@ -5,6 +5,8 @@ FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmogra
 
 <img src="images/Cumulative_Cross-Dataset_Performance.png" alt="Cumulative Cross-Dataset Performance" width=720/>
 
+* Latency computed on Ubuntu 22.04 OS running on a laptop with following specifications:
+CPU: Intel® Core™ i7-10870H CPU @ 2.20GHz × 16 GB RAM, GPU: NVIDIA GeForce RTX 3070 Laptop GPU (CUDA cores = 5120)
 
 ## Proposed Method
 
