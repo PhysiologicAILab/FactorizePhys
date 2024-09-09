@@ -8,7 +8,7 @@
 # FactorizePhys
 FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmography through Factorization of Voxel Embeddings.
 
-## Cumulative Cross-Dataset Performance Overview
+## Cross-Dataset Generalization and Learned Spatial-Temporal Features
 
 <img src="images/Cumulative_Cross-Dataset_Performance.png" alt="Cumulative Cross-Dataset Performance" width=720/>
 
