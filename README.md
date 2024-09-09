@@ -12,14 +12,15 @@ FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmogra
 
 <img src="images/Cumulative_Cross-Dataset_Performance.png" alt="Cumulative Cross-Dataset Performance" width=720/>
 
-* Latency computed on Ubuntu 22.04 OS running on a laptop with following specifications:
-CPU: Intel® Core™ i7-10870H CPU @ 2.20GHz × 16 GB RAM, GPU: NVIDIA GeForce RTX 3070 Laptop GPU (CUDA cores = 5120)
+(A) Cumulative cross-dataset performance (MAE) v/s latency\* plot; (B) Visualization of learned spatial-temporal features for base 3D-CNN model trained with and without FSAM.
 
-## Proposed Method
+\* Latency computed on Ubuntu 22.04 OS having NVIDIA GeForce RTX 3070 Laptop GPU (5120 CUDA cores) and Intel® Core™ i7-10870H CPU @ 2.20GHz, 16 GB RAM
 
-### Factorized Self-Attention Module (FSAM)
+## Proposed Factorized Self-Attention Module (FSAM)
   
 <img src="images/FSAM.png" alt="Factorized Self-Attention Module (FSAM)" width=720/>
+
+Please refer to our paper for notations and symbols used in this figure. 
 
 # :notebook: Algorithms
 The repo currently supports the following algorithms:
