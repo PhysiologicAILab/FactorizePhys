@@ -42,7 +42,7 @@ The repo currently supports the following algorithms:
   
   * [EfficientPhys: Enabling Simple, Fast and Accurate Camera-Based Cardiac Measurement (EfficientPhys)](https://openaccess.thecvf.com/content/WACV2023/papers/Liu_EfficientPhys_Enabling_Simple_Fast_and_Accurate_Camera-Based_Cardiac_Measurement_WACV_2023_paper.pdf), by Liu *et al.*, 2023
   
-  * EfficientPhys with FSAM:
+  * **EfficientPhys with our proposed FSAM** (adapted for TSM network):
   
   <img src="images/EfficientPhys_FSAM.png" alt="EfficientPhys with FSAM" width=720/>
 
