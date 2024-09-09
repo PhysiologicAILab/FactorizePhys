@@ -39,8 +39,10 @@ The repo currently supports the following algorithms:
   <img src="images/FactorizePhys_with_FSAM.png" alt="FactorizePhys with FSAM" width=720/>
   
   * [Remote Photoplethysmograph Signal Measurement from Facial Videos Using Spatio-Temporal Networks (PhysNet)](https://bmvc2019.org/wp-content/uploads/papers/0186-paper.pdf), by Yu *et al.*, 2019
+  
   * [EfficientPhys: Enabling Simple, Fast and Accurate Camera-Based Cardiac Measurement (EfficientPhys)](https://openaccess.thecvf.com/content/WACV2023/papers/Liu_EfficientPhys_Enabling_Simple_Fast_and_Accurate_Camera-Based_Cardiac_Measurement_WACV_2023_paper.pdf), by Liu *et al.*, 2023
-  * [EfficientPhys](https://openaccess.thecvf.com/content/WACV2023/papers/Liu_EfficientPhys_Enabling_Simple_Fast_and_Accurate_Camera-Based_Cardiac_Measurement_WACV_2023_paper.pdf), by Liu *et al.*, 2023: SASN attention replaced with our proposed FSAM:
+  
+  * EfficientPhys with FSAM:
   
   <img src="images/EfficientPhys_FSAM.png" alt="EfficientPhys with FSAM" width=720/>
 
