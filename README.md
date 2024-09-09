@@ -21,15 +21,6 @@ CPU: Intel® Core™ i7-10870H CPU @ 2.20GHz × 16 GB RAM, GPU: NVIDIA GeForce R
   
 <img src="images/FSAM.png" alt="Factorized Self-Attention Module (FSAM)" width=720/>
 
-### FSAM Integrated with FactorizePhys (proposed 3D-CNN architecture)
-
-<img src="images/FactorizePhys_with_FSAM.png" alt="FactorizePhys with FSAM" width=720/>
-
-### FSAM Adapted for [EfficientPhys, Liu *et al.*, 2023](https://openaccess.thecvf.com/content/WACV2023/papers/Liu_EfficientPhys_Enabling_Simple_Fast_and_Accurate_Camera-Based_Cardiac_Measurement_WACV_2023_paper.pdf)
-
-<img src="images/EfficientPhys_FSAM.png" alt="EfficientPhys with FSAM" width=720/>
-
-
 # :notebook: Algorithms
 The repo currently supports the following algorithms:
 
@@ -43,9 +34,16 @@ The repo currently supports the following algorithms:
   * [Face2PPG: An Unsupervised Pipeline for Blood Volume Pulse Extraction From Faces (OMIT)](https://ieeexplore.ieee.org/document/10227326), by Álvarez *et al.*, 2023
 
 * Supervised Neural Algorithms
-  * **FactorizePhys - proposed method**
+  * **FactorizePhys with FSAM - proposed 3D-CNN architecture**
+  
+  <img src="images/FactorizePhys_with_FSAM.png" alt="FactorizePhys with FSAM" width=720/>
+  
   * [Remote Photoplethysmograph Signal Measurement from Facial Videos Using Spatio-Temporal Networks (PhysNet)](https://bmvc2019.org/wp-content/uploads/papers/0186-paper.pdf), by Yu *et al.*, 2019
   * [EfficientPhys: Enabling Simple, Fast and Accurate Camera-Based Cardiac Measurement (EfficientPhys)](https://openaccess.thecvf.com/content/WACV2023/papers/Liu_EfficientPhys_Enabling_Simple_Fast_and_Accurate_Camera-Based_Cardiac_Measurement_WACV_2023_paper.pdf), by Liu *et al.*, 2023
+  * [EfficientPhys](https://openaccess.thecvf.com/content/WACV2023/papers/Liu_EfficientPhys_Enabling_Simple_Fast_and_Accurate_Camera-Based_Cardiac_Measurement_WACV_2023_paper.pdf), by Liu *et al.*, 2023: SASN attention replaced with our proposed FSAM:
+  
+  <img src="images/EfficientPhys_FSAM.png" alt="EfficientPhys with FSAM" width=720/>
+
   * [PhysFormer: Facial Video-based Physiological Measurement with Temporal Difference Transformer (PhysFormer)](https://openaccess.thecvf.com/content/CVPR2022/papers/Yu_PhysFormer_Facial_Video-Based_Physiological_Measurement_With_Temporal_Difference_Transformer_CVPR_2022_paper.pdf), by Yu *et al.*, 2022
 
 
