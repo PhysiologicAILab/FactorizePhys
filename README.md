@@ -22,6 +22,9 @@ FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmogra
 
 Please refer to our paper for notations and symbols used in this figure. 
 
+<img src="images/FactorizePhys-FSAM_EfficientPhys-FSAM.png" alt="(A) Proposed FactorizePhys with FSAM; (B) FSAM Adapted for EfficientPhys" width=720/>
+
+
 # :notebook: Algorithms
 The repo currently supports the following algorithms:
 
@@ -36,17 +39,9 @@ The repo currently supports the following algorithms:
 
 * Supervised Neural Algorithms
   * **FactorizePhys with FSAM - proposed 3D-CNN architecture**
-  
-  <img src="images/FactorizePhys_with_FSAM.png" alt="FactorizePhys with FSAM" width=720/>
-  
   * [Remote Photoplethysmograph Signal Measurement from Facial Videos Using Spatio-Temporal Networks (PhysNet)](https://bmvc2019.org/wp-content/uploads/papers/0186-paper.pdf), by Yu *et al.*, 2019
-  
   * [EfficientPhys: Enabling Simple, Fast and Accurate Camera-Based Cardiac Measurement (EfficientPhys)](https://openaccess.thecvf.com/content/WACV2023/papers/Liu_EfficientPhys_Enabling_Simple_Fast_and_Accurate_Camera-Based_Cardiac_Measurement_WACV_2023_paper.pdf), by Liu *et al.*, 2023
-  
   * **EfficientPhys with our proposed FSAM** (adapted for TSM network):
-  
-  <img src="images/EfficientPhys_FSAM.png" alt="EfficientPhys with FSAM" width=720/>
-
   * [PhysFormer: Facial Video-based Physiological Measurement with Temporal Difference Transformer (PhysFormer)](https://openaccess.thecvf.com/content/CVPR2022/papers/Yu_PhysFormer_Facial_Video-Based_Physiological_Measurement_With_Temporal_Difference_Transformer_CVPR_2022_paper.pdf), by Yu *et al.*, 2022
 
 
