@@ -22,6 +22,8 @@ FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmogra
 
 Please refer to our paper for notations and symbols used in this figure. 
 
+## FactorizePhys and EfficientPhys with FSAM
+
 <img src="images/FactorizePhys-FSAM_EfficientPhys-FSAM.png" alt="(A) Proposed FactorizePhys with FSAM; (B) FSAM Adapted for EfficientPhys" width=720/>
 
 
