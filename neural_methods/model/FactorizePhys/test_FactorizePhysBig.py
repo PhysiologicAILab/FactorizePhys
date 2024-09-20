@@ -36,8 +36,8 @@ model_config = {
     "visualize": False,
     # "ckpt_path": "./final_model_release/UBFC-rPPG_Intra_FactorizePhys_Base_HighRes.pth",
     "ckpt_path": "./final_model_release/UBFC-rPPG_Intra_FactorizePhys_FSAM_Res_HighRes.pth",
-    "data_path": "/home/jitesh/data/UBFC-rPPG/UBFC-rPPG_Raw_240_128x128",
-    "label_path": "/home/jitesh/data/UBFC-rPPG/UBFC-rPPG_Raw_240_128x128"
+    "data_path": "/mnt/sdb1/data/UBFC-rPPG/UBFC-rPPG_Raw_240_128x128",
+    "label_path": "/mnt/sdb1/data/UBFC-rPPG/UBFC-rPPG_Raw_240_128x128"
 }
 
 # default `log_dir` is "runs" - we'll be more specific here

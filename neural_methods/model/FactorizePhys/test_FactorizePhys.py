@@ -34,8 +34,8 @@ model_config = {
     "num_trials": 20,
     "visualize": False,
     "ckpt_path": "./final_model_release/iBVP_FactorizePhys_FSAM_Res.pth",
-    "data_path": "/home/jitesh/data/iBVP_Dataset/iBVP_RGB_160_72x72",
-    "label_path": "/home/jitesh/data/iBVP_Dataset/iBVP_RGB_160_72x72"
+    "data_path": "/mnt/sdb1/data/iBVP_Dataset/iBVP_RGB_160_72x72",
+    "label_path": "/mnt/sdb1/data/iBVP_Dataset/iBVP_RGB_160_72x72"
 }
 
 
