@@ -8,6 +8,8 @@
 # FactorizePhys
 FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmography through Factorization of Voxel Embeddings.
 
+*Update: This work is accepted at NeurIPS, 2024*
+
 ## Cross-Dataset Generalization and Learned Spatial-Temporal Features
 
 <img src="images/Cumulative_Cross-Dataset_Performance.png" alt="Cumulative Cross-Dataset Performance" width=720/>
