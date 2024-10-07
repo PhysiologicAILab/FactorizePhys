@@ -224,7 +224,7 @@ class BaseLoader(Dataset):
         self.load_preprocessed_data()  # load all data and corresponding labels (sorted for consistency)
         print("Total Number of raw files preprocessed:", len(data_dirs_split), end='\n\n')
 
-    def preprocess(self, frames, bvps, config_preprocess, resps=None, process_frames=True):
+    def preprocess(self, frames, bvps, config_preprocess, process_frames=True):
         """Preprocesses a pair of data.
 
         Args:
@@ -266,31 +266,19 @@ class BaseLoader(Dataset):
             pass
         elif config_preprocess.LABEL_TYPE == "DiffNormalized":
             bvps = BaseLoader.diff_normalize_label(bvps)
-            if np.all(resps) != None:
-                resps = BaseLoader.diff_normalize_label(resps)
 
         elif config_preprocess.LABEL_TYPE == "Standardized":
             bvps = BaseLoader.standardized_label(bvps)
-            if np.all(resps) != None:
-                resps = BaseLoader.standardized_label(resps)
 
         else:
             raise ValueError("Unsupported label type!")
 
         if config_preprocess.DO_CHUNK:  # chunk data into snippets
-            if np.all(resps) == None:
-                if process_frames:
-                    frames_clips, bvps_clips = self.chunk(data, bvps, config_preprocess.CHUNK_LENGTH)
-                else:
-                    frames_clips, bvps_clips = self.chunk(np.empty(
-                        0), bvps, config_preprocess.CHUNK_LENGTH, process_frames=process_frames)
-                resp_clips = np.empty(0)
+            if process_frames:
+                frames_clips, bvps_clips = self.chunk(data, bvps, config_preprocess.CHUNK_LENGTH)
             else:
-                if process_frames:
-                    frames_clips, bvps_clips, resp_clips = self.chunk(data, bvps, config_preprocess.CHUNK_LENGTH, resps,)
-                else:
-                    frames_clips, bvps_clips, resp_clips = self.chunk(np.empty(
-                        0), bvps, config_preprocess.CHUNK_LENGTH, resps, process_frames=process_frames)
+                frames_clips, bvps_clips = self.chunk(np.empty(
+                    0), bvps, config_preprocess.CHUNK_LENGTH, process_frames=process_frames)
 
         else:
             if process_frames:
@@ -300,15 +288,8 @@ class BaseLoader(Dataset):
     
             bvps_clips = np.array([bvps])
 
-            if np.all(resps) != None:
-                resp_clips = np.array([resps])
-            else:
-                resp_clips = np.empty(0)
+        return frames_clips, bvps_clips
 
-        if np.all(resps) == None:
-            return frames_clips, bvps_clips
-        else:
-            return frames_clips, bvps_clips, resp_clips
 
     def face_detection(self, frame, backend, use_larger_box=False, larger_box_coef=1.0):
         """Face detection on a single frame.
@@ -479,7 +460,7 @@ class BaseLoader(Dataset):
             resized_frames[i] = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
         return resized_frames
 
-    def chunk(self, frames, bvps, chunk_length, resps=None, process_frames=True):
+    def chunk(self, frames, bvps, chunk_length, process_frames=True):
         """Chunk the data into small chunks.
 
         Args:
@@ -501,15 +482,7 @@ class BaseLoader(Dataset):
         
         # print("bvps.shape", bvps.shape)
         # print("len(bvps_clips)", len(bvps_clips))
-        if np.all(resps) != None:
-            resp_clips = [resps[i * chunk_length:(i + 1) * chunk_length] for i in range(clip_num)]
-            # print("resps.shape", resps.shape)
-            # print("len(resp_clips)", len(resp_clips))
-            # print("np.array(bvps_clips).shape, np.array(resp_clips).shape", [np.array(bvps_clips).shape, np.array(resp_clips).shape])
-            # exit()
-            return np.array(frames_clips), np.array(bvps_clips), np.array(resp_clips)
-        else:
-            return np.array(frames_clips), np.array(bvps_clips)
+        return np.array(frames_clips), np.array(bvps_clips)
 
     def save(self, frames_clips, bvps_clips, filename):
         """Save all the chunked data.
