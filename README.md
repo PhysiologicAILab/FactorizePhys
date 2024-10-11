@@ -6,17 +6,11 @@
 </p>
 
 # FactorizePhys
-FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmography through Factorization of Voxel Embeddings.
+**FactorizePhys: Matrix Factorization for Spatial-Temporal Attention in Remote Physiology**
 
-*Update: This work is accepted at NeurIPS, 2024*
+The work introduces the Factorized Self-Attention Module (FSAM), which uses nonnegative matrix factorization to compute multidimensional attention across spatial, temporal, and channel dimensions collectively, rather than separately. It proposes FactorizePhys, an end-to-end 3D-CNN model leverages FSAM to estimate blood volume pulse signals from video frames. The method enhances signal extraction tasks by effectively factorizing voxel embeddings for multidimensional attention and demonstrates adaptability by integrating into EfficientPhys, an established 2D-CNN-based architecture. FSAM's effectiveness and cross-dataset generalization are validated through experiments on four datasets, surpassing state-of-the-art rPPG techniques. The study highlights FSAM's potential as a general multidimensional attention mechanism and provides insights into the role of nonnegative matrix factorization in rPPG, offering a new approach for estimating accurate physiological signals from spatial-temporal data. 
 
-## Cross-Dataset Generalization and Learned Spatial-Temporal Features
-
-<img src="images/Cumulative_Cross-Dataset_Performance.png" alt="Cumulative Cross-Dataset Performance" width=720/>
-
-(A) Cumulative cross-dataset performance (MAE) v/s latency\* plot; (B) Visualization of learned spatial-temporal features for base 3D-CNN model trained with and without FSAM.
-
-\* Latency computed on Ubuntu 22.04 OS having NVIDIA GeForce RTX 3070 Laptop GPU (5120 CUDA cores) and Intel® Core™ i7-10870H CPU @ 2.20GHz, 16 GB RAM
+*This work is accepted at NeurIPS, 2024*
 
 ## Proposed Factorized Self-Attention Module (FSAM)
   
@@ -28,8 +22,16 @@ Please refer to our paper for notations and symbols used in this figure.
 
 <img src="images/FactorizePhys-FSAM_EfficientPhys-FSAM.png" alt="(A) Proposed FactorizePhys with FSAM; (B) FSAM Adapted for EfficientPhys" width=720/>
 
+## Cross-Dataset Generalization and Learned Spatial-Temporal Features
 
-# :notebook: Algorithms
+<img src="images/Cumulative_Cross-Dataset_Performance.png" alt="Cumulative Cross-Dataset Performance" width=720/>
+
+(A) Cumulative cross-dataset performance (MAE) v/s latency\* plot; (B) Visualization of learned spatial-temporal features for base 3D-CNN model trained with and without FSAM. \* System specs: Ubuntu 22.04 OS, NVIDIA GeForce RTX 3070 Laptop GPU, Intel® Core™ i7-10870H CPU @ 2.20GHz, 16 GB RAM
+
+# About the Repository
+
+## :notebook: Algorithms
+
 The repo currently supports the following algorithms:
 
 * Traditional Unsupervised Algorithms
@@ -49,7 +51,7 @@ The repo currently supports the following algorithms:
   * [PhysFormer: Facial Video-based Physiological Measurement with Temporal Difference Transformer (PhysFormer)](https://openaccess.thecvf.com/content/CVPR2022/papers/Yu_PhysFormer_Facial_Video-Based_Physiological_Measurement_With_Temporal_Difference_Transformer_CVPR_2022_paper.pdf), by Yu *et al.*, 2022
 
 
-# :file_folder: Datasets
+## :file_folder: Datasets
 
 The repo supports four datasets, namely SCAMPS, UBFC-rPPG, PURE, and iBVP. **To use these datasets in a deep learning model, you should organize the files as follows.**
 
@@ -121,7 +123,7 @@ The repo supports four datasets, namely SCAMPS, UBFC-rPPG, PURE, and iBVP. **To 
           |      |-- pii_x_bvp.csv
     -----------------
 
-# :wrench: Setup
+## :wrench: Setup
 
 STEP 1: `bash setup.sh`
 
@@ -129,17 +131,17 @@ STEP 2: `conda activate fsam`
 
 STEP 3: `pip install -r requirements.txt`
 
-# :computer: Example of Using Pre-trained Models
+## :computer: Example of Using Pre-trained Models
 
 Please use config files under `./configs/infer_configs`
 
 For example, if you want to run The model trained on PURE and tested on UBFC-rPPG, use `python main.py --config_file configs/infer_configs/PURE_UBFC-rPPG_FactorizePhys_FSAM_Res.yaml`
 
-# :computer: Examples of Neural Network Training
+## :computer: Examples of Neural Network Training
 
 Please use config files under `./configs/train_configs`
 
-## Training on PURE and Testing on iBVP With FactorizePhys
+### Training on PURE and Testing on iBVP With FactorizePhys
 
 STEP 1: Download the PURE raw data by asking the [paper authors](https://www.tu-ilmenau.de/universitaet/fakultaeten/fakultaet-informatik-und-automatisierung/profil/institute-und-fachgebiete/institut-fuer-technische-informatik-und-ingenieurinformatik/fachgebiet-neuroinformatik-und-kognitive-robotik/data-sets-code/pulse-rate-detection-dataset-pure).
 
@@ -153,7 +155,7 @@ Note 1: Preprocessing requires only once; thus turn it off on the yaml file when
 
 Note 2: The example yaml setting will allow 100% of PURE to train and and test on iBVP after training 10 for epochs. Alternatively, this can be changed to train using 80% of PURE, validate with 20% of PURE and use the best model(with the least validation loss) to test on iBVP.
 
-## Cross-Dataset Generalization
+### Cross-Dataset Generalization
 
 **Performance Evaluation on PURE Dataset, for Models Trained with iBVP Dataset:**
 
