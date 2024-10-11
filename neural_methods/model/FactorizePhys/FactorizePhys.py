@@ -1,5 +1,7 @@
 """
-FactorizePhys: Effective Spatial-Temporal Attention in Remote Photo-plethysmography through Factorization of Voxel Embeddings
+FactorizePhys: Matrix Factorization for Multidimensional Attention in Remote Physiological Sensing
+NeurIPS 2024
+Jitesh Joshi, Sos S. Agaian, and Youngjun Cho
 """
 
 import torch
