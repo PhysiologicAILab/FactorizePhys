@@ -155,7 +155,7 @@ Note 1: Preprocessing requires only once; thus turn it off on the yaml file when
 
 Note 2: The example yaml setting will allow 100% of PURE to train and and test on iBVP after training 10 for epochs. Alternatively, this can be changed to train using 80% of PURE, validate with 20% of PURE and use the best model(with the least validation loss) to test on iBVP.
 
-### Cross-Dataset Generalization
+### Detailed Cross-Dataset Generalization for Reproducibility
 
 **Performance Evaluation on PURE Dataset, for Models Trained with iBVP Dataset:**
 
