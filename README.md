@@ -14,6 +14,17 @@
 
 *This work is accepted at NeurIPS, 2024*
 
+--------------------
+
+<p align="center">
+:fire: Please remember to :star: this repo if you find it useful and cite our work if you end up using it in your work! :fire:
+</p>
+<p align="center">
+:fire: If you have any questions or concerns, please create an <a href="https://github.com/PhysiologicAILab/FactorizePhys/issues">issue</a> :memo:! :fire:
+</p>
+
+--------------------
+
 ## Proposed Factorized Self-Attention Module (FSAM)
   
 <img src="images/FSAM.png" alt="Factorized Self-Attention Module (FSAM)" width=720/>
@@ -32,17 +43,6 @@ Please refer to our paper for notations and symbols used in this figure.
 
 
 # About the Repository
-
---------------------
-
-<p align="center">
-:fire: Please remember to :star: this repo if you find it useful and cite our work if you end up using it in your work! :fire:
-</p>
-<p align="center">
-:fire: If you have any questions or concerns, please create an <a href="https://github.com/PhysiologicAILab/FactorizePhys/issues">issue</a> :memo:! :fire:
-</p>
-
---------------------
 
 ## :notebook: Algorithms
 
