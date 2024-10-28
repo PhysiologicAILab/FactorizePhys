@@ -5,10 +5,19 @@
 :fire: If you have any questions or concerns, please create an <a href="https://github.com/PhysiologicAILab/FactorizePhys/issues">issue</a> :memo:! :fire:
 </p>
 
-# FactorizePhys
-**FactorizePhys: Matrix Factorization for Multidimensional Attention in Remote Physiological Sensing**
+# FactorizePhys: Matrix Factorization for Multidimensional Attention in Remote Physiological Sensing
 
-This work introduces the Factorized Self-Attention Module (FSAM), which uses nonnegative matrix factorization to compute multidimensional attention across spatial, temporal, and channel dimensions collectively, rather than separately. It proposes FactorizePhys, an end-to-end 3D-CNN model leverages FSAM to estimate blood volume pulse signals from video frames. The method enhances signal extraction tasks by effectively factorizing voxel embeddings for multidimensional attention and demonstrates adaptability by integrating into EfficientPhys, an established 2D-CNN-based architecture. FSAM's effectiveness and cross-dataset generalization are validated through experiments on four datasets, surpassing state-of-the-art rPPG techniques. The study highlights FSAM's potential as a general multidimensional attention mechanism and provides insights into the role of nonnegative matrix factorization in rPPG, offering a new approach for estimating accurate physiological signals from spatial-temporal data. 
+  **Jitesh Joshi**<sup>1</sup>, **Sos S. Agaian**<sup>2</sup> and **Youngjun Cho**<sup>1</sup>
+
+  <sup>1</sup> Department of Computer Science, University College London, UK
+
+  <sup>2</sup> Department of Computer Science, College of Staten Island, City University of New York, USA
+
+---------------------------------
+
+## Introduction
+
+  This work introduces the Factorized Self-Attention Module (FSAM), which uses nonnegative matrix factorization to compute multidimensional attention across spatial, temporal, and channel dimensions collectively, rather than separately. It proposes FactorizePhys, an end-to-end 3D-CNN model leverages FSAM to estimate blood volume pulse signals from video frames. The method enhances signal extraction tasks by effectively factorizing voxel embeddings for multidimensional attention and demonstrates adaptability by integrating into EfficientPhys, an established 2D-CNN-based architecture. FSAM's effectiveness and cross-dataset generalization are validated through experiments on four datasets, surpassing state-of-the-art rPPG techniques. The study highlights FSAM's potential as a general multidimensional attention mechanism and provides insights into the role of nonnegative matrix factorization in rPPG, offering a new approach for estimating accurate physiological signals from spatial-temporal data. 
 
 *This work is accepted at NeurIPS, 2024*
 
@@ -53,7 +62,42 @@ The repo currently supports the following algorithms:
 
 ## :file_folder: Datasets
 
-The repo supports four datasets, namely SCAMPS, UBFC-rPPG, PURE, and iBVP. **To use these datasets in a deep learning model, you should organize the files as follows.**
+The repo supports four datasets, namely iBVP, PURE, SCAMPS, and UBFC-rPPG. **To use these datasets in a deep learning model, you should organize the files as follows.**
+
+  * [iBVP](https://github.com/PhysiologicAILab/iBVP-Dataset)
+    * Joshi, J.; Cho, Y. iBVP Dataset: RGB-Thermal rPPG Dataset with High Resolution Signal Quality Labels. Electronics 2024, 13, 1334.
+    -----------------
+          iBVP_Dataset/
+          |   |-- p01_a/
+          |      |-- p01_a_rgb/
+          |      |-- p01_a_t/
+          |      |-- p01_a_bvp.csv
+          |   |-- p01_b/
+          |      |-- p01_b_rgb/
+          |      |-- p01_b_t/
+          |      |-- p01_b_bvp.csv
+          |...
+          |   |-- pii_x/
+          |      |-- pii_x_rgb/
+          |      |-- pii_x_t/
+          |      |-- pii_x_bvp.csv
+    -----------------
+
+  * [PURE](https://www.tu-ilmenau.de/universitaet/fakultaeten/fakultaet-informatik-und-automatisierung/profil/institute-und-fachgebiete/institut-fuer-technische-informatik-und-ingenieurinformatik/fachgebiet-neuroinformatik-und-kognitive-robotik/data-sets-code/pulse-rate-detection-dataset-pure)
+    * Stricker, R., Müller, S., Gross, H.-M.Non-contact "Video-based Pulse Rate Measurement on a Mobile Service Robot" in: Proc. 23st IEEE Int. Symposium on Robot and Human Interactive Communication (Ro-Man 2014), Edinburgh, Scotland, UK, pp. 1056 - 1062, IEEE 2014
+    -----------------
+         data/PURE/
+         |   |-- 01-01/
+         |      |-- 01-01/
+         |      |-- 01-01.json
+         |   |-- 01-02/
+         |      |-- 01-02/
+         |      |-- 01-02.json
+         |...
+         |   |-- ii-jj/
+         |      |-- ii-jj/
+         |      |-- ii-jj.json
+    -----------------
 
   * [SCAMPS](https://arxiv.org/abs/2206.04197)
     * D. McDuff, M. Wander, X. Liu, B. Hill, J. Hernandez, J. Lester, T. Baltrusaitis, "SCAMPS: Synthetics for Camera Measurement of Physiological Signals", NeurIPS, 2022
@@ -88,40 +132,6 @@ The repo supports four datasets, namely SCAMPS, UBFC-rPPG, PURE, and iBVP. **To 
          |       |-- ground_truth.txt
     -----------------
 
-  * [PURE](https://www.tu-ilmenau.de/universitaet/fakultaeten/fakultaet-informatik-und-automatisierung/profil/institute-und-fachgebiete/institut-fuer-technische-informatik-und-ingenieurinformatik/fachgebiet-neuroinformatik-und-kognitive-robotik/data-sets-code/pulse-rate-detection-dataset-pure)
-    * Stricker, R., Müller, S., Gross, H.-M.Non-contact "Video-based Pulse Rate Measurement on a Mobile Service Robot" in: Proc. 23st IEEE Int. Symposium on Robot and Human Interactive Communication (Ro-Man 2014), Edinburgh, Scotland, UK, pp. 1056 - 1062, IEEE 2014
-    -----------------
-         data/PURE/
-         |   |-- 01-01/
-         |      |-- 01-01/
-         |      |-- 01-01.json
-         |   |-- 01-02/
-         |      |-- 01-02/
-         |      |-- 01-02.json
-         |...
-         |   |-- ii-jj/
-         |      |-- ii-jj/
-         |      |-- ii-jj.json
-    -----------------
-
-  * [iBVP](https://github.com/PhysiologicAILab/iBVP-Dataset)
-    * Joshi, J.; Cho, Y. iBVP Dataset: RGB-Thermal rPPG Dataset with High Resolution Signal Quality Labels. Electronics 2024, 13, 1334.
-    -----------------
-          iBVP_Dataset/
-          |   |-- p01_a/
-          |      |-- p01_a_rgb/
-          |      |-- p01_a_t/
-          |      |-- p01_a_bvp.csv
-          |   |-- p01_b/
-          |      |-- p01_b_rgb/
-          |      |-- p01_b_t/
-          |      |-- p01_b_bvp.csv
-          |...
-          |   |-- pii_x/
-          |      |-- pii_x_rgb/
-          |      |-- pii_x_t/
-          |      |-- pii_x_bvp.csv
-    -----------------
 
 ## :wrench: Setup
 
@@ -156,6 +166,42 @@ Note 1: Preprocessing requires only once; thus turn it off on the yaml file when
 Note 2: The example yaml setting will allow 100% of PURE to train and and test on iBVP after training 10 for epochs. Alternatively, this can be changed to train using 80% of PURE, validate with 20% of PURE and use the best model(with the least validation loss) to test on iBVP.
 
 ### Detailed Cross-Dataset Generalization for Reproducibility
+
+
+**Performance Evaluation on iBVP Dataset, for Models Trained with PURE Dataset:**
+
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
+|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
+| PhysNet              | -                | **1.63** |    3.77   |  **2.17** |   0.92   |    6.08   |   0.55   |
+| PhysFormer           | TD-MHSA*         |   2.50   |    7.09   |    3.39   |   0.79   |    5.21   |   0.52   |
+| EfficientPhys        | SASN             |   3.80   |   14.82   |    5.15   |   0.56   |    2.93   |   0.45   |
+| EfficientPhys        | FSAM (Ours)      |   2.10   |    4.00   |    2.94   |   0.91   |    4.19   |   0.49   |
+| FactorizePhys (Ours) | FSAM (Ours)      |   1.66   |  **3.55** |    2.31   | **0.93** |  **6.78** | **0.58** |
+|                      |                  |          |           |           |          |           |          |
+
+**Performance Evaluation on iBVP Dataset, for Models Trained with SCAMPS Dataset:**
+
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
+|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
+| PhysNet              | -                |   31.85  |   37.40   |   45.62   |   -0.10  |   -6.11   |   0.16   |
+| PhysFormer           | TD-MHSA*         |   41.73  |   43.89   |   58.56   |   0.15   |   -9.13   |   0.14   |
+| EfficientPhys        | SASN             |   26.19  |   44.55   |   38.11   |   -0.12  |   -2.36   |   0.30   |
+| EfficientPhys        | FSAM (Ours)      |   13.40  |   22.10   |   19.93   |   0.05   |   -3.46   |   0.24   |
+| FactorizePhys (Ours) | FSAM (Ours)      | **2.71** |  **6.22** |  **3.87** | **0.81** |  **2.36** | **0.43** |
+|                      |                  |          |           |           |          |           |          |
+
+
+**Performance Evaluation on iBVP Dataset, for Models Trained with UBFC-rPPG Dataset:**
+
+|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
+|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
+| PhysNet              | -                |   3.18   |    7.65   |    4.84   |   0.70   |    5.54   | **0.56** |
+| PhysFormer           | TD-MHSA*         |   7.86   |   17.13   |   11.44   |   0.38   |    1.71   |   0.43   |
+| EfficientPhys        | SASN             |   2.74   |    7.07   |    4.02   |   0.74   |    4.03   |   0.49   |
+| EfficientPhys        | FSAM (Ours)      |   2.56   |    6.13   |    3.71   |   0.79   |    4.65   |   0.50   |
+| FactorizePhys (Ours) | FSAM (Ours)      | **1.74** |  **4.39** |  **2.42** | **0.90** |  **6.59** | **0.56** |
+|                      |                  |          |           |           |          |           |          |
+
 
 **Performance Evaluation on PURE Dataset, for Models Trained with iBVP Dataset:**
 
@@ -224,41 +270,6 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 | EfficientPhys        | SASN             |   2.18   |    4.82   |    2.35   |   0.96   |    4.40   |   0.67   |
 | EfficientPhys        | FSAM (Ours)      |   2.69   |    5.20   |    3.16   |   0.95   |    3.74   |   0.63   |
 | FactorizePhys (Ours) | FSAM (Ours)      | **1.17** |  **2.56** |  **1.35** | **0.99** |  **8.41** | **0.82** |
-|                      |                  |          |           |           |          |           |          |
-
-
-**Performance Evaluation on iBVP Dataset, for Models Trained with PURE Dataset:**
-
-|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
-|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
-| PhysNet              | -                | **1.63** |    3.77   |  **2.17** |   0.92   |    6.08   |   0.55   |
-| PhysFormer           | TD-MHSA*         |   2.50   |    7.09   |    3.39   |   0.79   |    5.21   |   0.52   |
-| EfficientPhys        | SASN             |   3.80   |   14.82   |    5.15   |   0.56   |    2.93   |   0.45   |
-| EfficientPhys        | FSAM (Ours)      |   2.10   |    4.00   |    2.94   |   0.91   |    4.19   |   0.49   |
-| FactorizePhys (Ours) | FSAM (Ours)      |   1.66   |  **3.55** |    2.31   | **0.93** |  **6.78** | **0.58** |
-|                      |                  |          |           |           |          |           |          |
-
-**Performance Evaluation on iBVP Dataset, for Models Trained with SCAMPS Dataset:**
-
-|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
-|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
-| PhysNet              | -                |   31.85  |   37.40   |   45.62   |   -0.10  |   -6.11   |   0.16   |
-| PhysFormer           | TD-MHSA*         |   41.73  |   43.89   |   58.56   |   0.15   |   -9.13   |   0.14   |
-| EfficientPhys        | SASN             |   26.19  |   44.55   |   38.11   |   -0.12  |   -2.36   |   0.30   |
-| EfficientPhys        | FSAM (Ours)      |   13.40  |   22.10   |   19.93   |   0.05   |   -3.46   |   0.24   |
-| FactorizePhys (Ours) | FSAM (Ours)      | **2.71** |  **6.22** |  **3.87** | **0.81** |  **2.36** | **0.43** |
-|                      |                  |          |           |           |          |           |          |
-
-
-**Performance Evaluation on iBVP Dataset, for Models Trained with UBFC-rPPG Dataset:**
-
-|         Model        | Attention Module |MAE (HR) ↓|RMSE (HR) ↓|MAPE (HR)↓ |Corr (HR)↑|SNR (BVP)↑ |MACC(BVP)↑|
-|:--------------------:|:----------------:|:--------:|:---------:|:---------:|:--------:|:---------:|---------:|
-| PhysNet              | -                |   3.18   |    7.65   |    4.84   |   0.70   |    5.54   | **0.56** |
-| PhysFormer           | TD-MHSA*         |   7.86   |   17.13   |   11.44   |   0.38   |    1.71   |   0.43   |
-| EfficientPhys        | SASN             |   2.74   |    7.07   |    4.02   |   0.74   |    4.03   |   0.49   |
-| EfficientPhys        | FSAM (Ours)      |   2.56   |    6.13   |    3.71   |   0.79   |    4.65   |   0.50   |
-| FactorizePhys (Ours) | FSAM (Ours)      | **1.74** |  **4.39** |  **2.42** | **0.90** |  **6.59** | **0.56** |
 |                      |                  |          |           |           |          |           |          |
 
 
