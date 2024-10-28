@@ -30,6 +30,11 @@ Please refer to our paper for notations and symbols used in this figure.
 
 (A) Cumulative cross-dataset performance (MAE) v/s latency\* plot; (B) Visualization of learned spatial-temporal features for base 3D-CNN model trained with and without FSAM. \* System specs: Ubuntu 22.04 OS, NVIDIA GeForce RTX 3070 Laptop GPU, Intel® Core™ i7-10870H CPU @ 2.20GHz, 16 GB RAM
 
+
+# About the Repository
+
+--------------------
+
 <p align="center">
 :fire: Please remember to :star: this repo if you find it useful and cite our work if you end up using it in your work! :fire:
 </p>
@@ -37,7 +42,7 @@ Please refer to our paper for notations and symbols used in this figure.
 :fire: If you have any questions or concerns, please create an <a href="https://github.com/PhysiologicAILab/FactorizePhys/issues">issue</a> :memo:! :fire:
 </p>
 
-# About the Repository
+--------------------
 
 ## :notebook: Algorithms
 
