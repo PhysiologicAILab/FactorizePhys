@@ -12,7 +12,7 @@
 
   This work introduces the Factorized Self-Attention Module (FSAM), which uses nonnegative matrix factorization to compute multidimensional attention across spatial, temporal, and channel dimensions collectively, rather than separately. It proposes FactorizePhys, an end-to-end 3D-CNN model leverages FSAM to estimate blood volume pulse signals from video frames. The method enhances signal extraction tasks by effectively factorizing voxel embeddings for multidimensional attention and demonstrates adaptability by integrating into EfficientPhys, an established 2D-CNN-based architecture. FSAM's effectiveness and cross-dataset generalization are validated through experiments on four datasets, surpassing state-of-the-art rPPG techniques. The study highlights FSAM's potential as a general multidimensional attention mechanism and provides insights into the role of nonnegative matrix factorization in rPPG, offering a new approach for estimating accurate physiological signals from spatial-temporal data. 
 
-*This work is accepted at NeurIPS, 2024*
+*This work is accepted at NeurIPS, 2024. Please find our paper [at this link](https://openreview.net/pdf?id=qrfp4eeZ47)*
 
 --------------------
 
