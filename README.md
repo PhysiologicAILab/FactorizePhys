@@ -281,3 +281,14 @@ Note 2: The example yaml setting will allow 100% of PURE to train and and test o
 # Acknowledgement
 
 We would like to express sincere thanks to the authors of [rPPG-Toolbox, Liu *et al.*, 2023](https://proceedings.neurips.cc/paper_files/paper/2023/hash/d7d0d548a6317407e02230f15ce75817-Abstract-Datasets_and_Benchmarks.html), building upon which, we developed this repo. For detailed usage related instructions, please refer the GitHub repo of the [rPPG-Toolbox](https://github.com/ubicomplab/rPPG-Toolbox).
+
+
+### **Citation:**
+```bib
+@inproceedings{joshi2024factorizephys,
+ title={FactorizePhys: Matrix Factorization for Multidimensional Attention in Remote Physiological Sensing},
+ author={Jitesh Joshi and Sos Agaian and Youngjun Cho},
+ booktitle={The Thirty-eighth Annual Conference on Neural Information Processing Systems},
+ year={2024},
+ url={https://openreview.net/forum?id=qrfp4eeZ47}
+}
