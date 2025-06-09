@@ -14,6 +14,8 @@
 
 *This work is published at NeurIPS, 2024. Please find our paper [here](https://proceedings.neurips.cc/paper_files/paper/2024/hash/af1c61e4dd59596f033d826419870602-Abstract-Conference.html).*
 
+*Check out the blog on FactorizePhys [here](https://physiologicailab.github.io/FactorizePhys-Page)*
+
 --------------------
 
 <p align="center">
