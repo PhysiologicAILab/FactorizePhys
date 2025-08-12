@@ -287,10 +287,14 @@ We would like to express sincere thanks to the authors of [rPPG-Toolbox, Liu *et
 
 # Citation
 ```bib
-@inproceedings{joshi2024factorizephys,
- title={FactorizePhys: Matrix Factorization for Multidimensional Attention in Remote Physiological Sensing},
- author={Jitesh Joshi and Sos Agaian and Youngjun Cho},
- booktitle={The Thirty-eighth Annual Conference on Neural Information Processing Systems},
- year={2024},
- url={https://openreview.net/forum?id=qrfp4eeZ47}
+@inproceedings{NEURIPS2024_af1c61e4,
+ author = {Joshi, Jitesh and Agaian, Sos S. and Cho, Youngjun},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {A. Globerson and L. Mackey and D. Belgrave and A. Fan and U. Paquet and J. Tomczak and C. Zhang},
+ pages = {96607--96639},
+ publisher = {Curran Associates, Inc.},
+ title = {FactorizePhys: Matrix Factorization for Multidimensional Attention in Remote Physiological Sensing},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2024/file/af1c61e4dd59596f033d826419870602-Paper-Conference.pdf},
+ volume = {37},
+ year = {2024}
 }
